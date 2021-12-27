@@ -24,7 +24,7 @@ import "vue3-tree/dist/style.css";
 import moment from "moment" // eslint-disable-line no-unused-vars
 
 
-const key = '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';
+const key = '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';
 
 export default {
   components: {

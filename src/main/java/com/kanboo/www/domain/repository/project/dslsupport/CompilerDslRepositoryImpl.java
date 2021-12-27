@@ -45,4 +45,19 @@ public class CompilerDslRepositoryImpl implements CompilerDslRepository {
 
         return result.toString();
     }
+
+    @Override
+    public List<Compiler> getFilePath(List<String> list, Long projectIdx) {
+
+        QCompiler compiler = QCompiler.compiler;
+
+        JPAQueryFactory query = new JPAQueryFactory(em);
+
+        return query.selectFrom(compiler)
+                .where(
+                        compiler.comNm.in(list)
+                                .and(compiler.project.prjctIdx.eq(projectIdx))
+                )
+                .fetch();
+    }
 }

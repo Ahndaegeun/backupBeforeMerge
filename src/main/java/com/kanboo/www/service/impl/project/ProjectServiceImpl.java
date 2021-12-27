@@ -130,23 +130,33 @@ public class ProjectServiceImpl implements ProjectService {
         Long comIdx = Long.parseLong(map.get("comIdx") + "");
 
         boolean result = false;
+        String pkg = "";
 
         if(type.equals("Directory")) {
             Map<String, String> rootPath = new HashMap<>();
             rootPath.put("rootPath", "/compileFiles/member");
             rootPath.put("project", project.getPrjctIdx() + project.getPrjctNm());
-            rootPath.put("path", "project");
+            rootPath.put("path", "project/src");
             rootPath.put("name", path + "/" + name);
             rootPath.put("type", "dir");
             result = fileSystemUtil.createFileOrDir(rootPath);
         } else {
             Map<String, String> rootPath = new HashMap<>();
-            String dataPath = compilerRepository.getPath(projectIdx);
             StringBuilder code = new StringBuilder();
+
+            String[] split = path.split("/");
+
+            for (String s : split) {
+                pkg += s + ".";
+            }
+            pkg = pkg.substring(0, pkg.length() - 1);
+
+            code.append("package " + pkg + ";\n");
+            code.append("\n");
             code.append("public class " + name + " {\n");
             code.append("\n");
             code.append("}");
-            rootPath.put("filePath", dataPath);
+            rootPath.put("filePath", "src/" + path);
             rootPath.put("fileName", name);
             rootPath.put("fileExtension", classification.equals("JAVA") ? ".java" : ".html");
             rootPath.put("fileDetail", code.toString());
@@ -162,13 +172,16 @@ public class ProjectServiceImpl implements ProjectService {
                     .project(project)
                     .parentComIdx(parentCompiler.getComIdx())
                     .comSe(type.equals("Directory") ? "d" : "f")
-                    .comNm(name)
+                    .comNm(type.equals("Directory") ? name : name + ".java")
                     .build();
 
             Compiler save = compilerRepository.save(compiler);
 
+
             if(compiler.getComSe().equals("f")) {
                 StringBuilder code = new StringBuilder();
+                code.append("package " + pkg + ";\n");
+                code.append("\n");
                 code.append("public class " + name + " {\n");
                 code.append("\n");
                 code.append("}");
@@ -219,7 +232,6 @@ public class ProjectServiceImpl implements ProjectService {
                 .project(saveProject)
                 .build();
         Compiler savedCompiler = compilerRepository.save(compiler);
-        System.out.println(savedCompiler.entityToDto());
 
         Compiler mainFile = Compiler.builder()
                 .comNm("Main.java")
@@ -228,11 +240,10 @@ public class ProjectServiceImpl implements ProjectService {
                 .parentComIdx(savedCompiler.getComIdx())
                 .build();
         Compiler savedMainFile = compilerRepository.save(mainFile);
-        System.out.println(savedMainFile.entityToDto());
 
         StringBuilder source = new StringBuilder();
         source.append("public class Main {\n");
-        source.append("\tpublic void main(String[] args) {\n");
+        source.append("\tpublic static void main(String[] args) {\n");
         source.append("\t\tSystem.out.println(\"Hello World!\")\n");
         source.append("\t}\n");
         source.append("}");
@@ -242,8 +253,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .compiler(savedMainFile)
                 .build();
 
-        CompilerFile save1 = compilerContentRepository.save(mainSource);
-        System.out.println(save1.entityToDto());
+        compilerContentRepository.save(mainSource);
 
         ProjectMember pm = ProjectMember.builder()
                 .project(saveProject)
@@ -274,11 +284,11 @@ public class ProjectServiceImpl implements ProjectService {
             Map<String, String> createFile = new HashMap<>();
             StringBuilder manifest = new StringBuilder();
             manifest.append("Class-Path: ../class/\n");
-            manifest.append("Main-Class: Main");
+            manifest.append("Main-Class: Main\n");
 
             createFile.put("filePath", "/META-INF/");
             createFile.put("fileName", "Manifest");
-            createFile.put("fileExtension", ".text");
+            createFile.put("fileExtension", ".txt");
             createFile.put("fileDetail", manifest.toString());
             createFile.put("project", "/member/" + saveProject.getPrjctIdx() + saveProject.getPrjctNm() + "/project");
             saveCompileFile.saveFile(createFile);

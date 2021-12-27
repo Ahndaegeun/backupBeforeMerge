@@ -13,7 +13,9 @@ const javaCompile = {
     dataObj: [],
     code: ``,
     clickedFile: {},
-    result: ""
+    result: "",
+    isError: "",
+    axiosPath: ""
   },
   mutations: {
     openAddModal(state) {
@@ -70,14 +72,36 @@ const javaCompile = {
     setClickedFile(state, item) {
       state.clickedFile = item
     },
+    setIsError(state, item) {
+      if(item === 'true') {
+        state.isError = "#fff"
+      } else {
+        state.isError = "#ff0000"
+      }
+    },
+    setResult(state, item) {
+      state.result = item
+    },
+    recursiveFindPath(state, item) {
+      if(item.parent_id !== null) {
+        state.axiosPath = item.label + "/" + state.axiosPath
+        const ele = state.path.find(p => p.id === item.parent_id)
+        this.commit("javaCompile/recursiveFindPath", ele)
+      }
+    },
+    axiosPathReset(state) {
+      state.axiosPath = ""
+    }
   },
   actions: {
     createDirOrFile(context) {
-      console.log(context.state.requestData)
       const obj = context.state.requestData
       const params = new URLSearchParams();
+      context.commit("recursiveFindPath", obj.path)
+      const p = context.state.axiosPath
+
       params.append("name", obj.name)
-      params.append("path", obj.path.label)
+      params.append("path", p)
       params.append("type", obj.type)
       params.append("classification", obj.classification)
       params.append("projectIdx", sessionStorage.getItem("project"))
@@ -88,6 +112,7 @@ const javaCompile = {
           .then(() => {
             context.commit("getJavaSideBar")
             context.commit("openAddModal")
+            context.commit("axiosPathReset")
           })
     },
     getFileDetail(context, item) {
@@ -134,7 +159,9 @@ const javaCompile = {
         prjctIdx: sessionStorage.getItem("project")
       }
       axios.post(url, obj).then(res => {
-        context.state.result = res.data
+        console.log(res)
+        context.commit("setIsError", res.data.isSuccess)
+        context.commit("setResult", res.data.detail)
       })
     }
   },
