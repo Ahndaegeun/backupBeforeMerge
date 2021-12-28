@@ -32,4 +32,8 @@ public class CompilerFile {
                 .comFileCn(comFileCn)
                 .build();
     }
+
+    public void updateContent(String comFileCn) {
+        this.comFileCn = comFileCn;
+    }
 }

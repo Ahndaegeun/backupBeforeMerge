@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ErdColumnRepository  extends JpaRepository<ErdColumn, Long> {
+    void deleteByErd_ErdIdx(Long erdIdx);
 }

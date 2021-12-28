@@ -30,26 +30,6 @@
         </li>
       </ul>
     </div>
-
-    <div class="front-tab" :style="{display: show}" v-if="bottom">
-      <h2 class="title">
-        <img src="../../../../../assets/documentIcon.png" alt="/">
-        <router-link :to="bottomPath"
-                      :style="{color: textColor}">
-          {{bottomTitle}}
-        </router-link>
-        <button class="add-front-btn" 
-                type="button"
-                v-if="bottomButton">+</button>
-      </h2>
-      <ul class="files">
-        <li v-for="data in bottomData" 
-            :key="data"
-            :style="{color: textColor}">
-          {{data.name}}
-        </li>
-      </ul>
-    </div>
   </div>
 </template>
 

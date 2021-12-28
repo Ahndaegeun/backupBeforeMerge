@@ -13,4 +13,5 @@ public interface CompilerRepository extends JpaRepository<Compiler, Long>, Compi
     List<Compiler> findByProjectPrjctIdx(Long prjtcIdx);
     Compiler findByProjectPrjctIdxAndComNm(Long prjtcIdx, String comNm);
     Compiler findByComIdx(Long comIdx);
+    List<Compiler> findByProjectPrjctIdxAndComSe(Long prjctIdx, String comSe);
 }

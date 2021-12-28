@@ -30,7 +30,6 @@ public class ErdColumn {
     public ErdColumnDTO entityToDto() {
         return ErdColumnDTO.builder()
                 .erdColumnIdx(erdColumnIdx)
-                .erd(erd.entityToDto())
                 .erdColumnName(erdColumnName)
                 .erdColumnType(erdColumnType)
                 .erdColumnConstraint(erdColumnConstraint)

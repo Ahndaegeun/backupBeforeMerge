@@ -85,3 +85,7 @@ button {
 .vuecal__header .vuecal__flex.vuecal__weekdays-headings {
 	background: rgba(44, 47, 59, 1) !important;
 }
+
+.vuepress-markdown-body {
+	height: 100%;
+}

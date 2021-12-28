@@ -1,11 +1,9 @@
 package com.kanboo.www.dto.project;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.kanboo.www.domain.entity.project.Erd;
 import com.kanboo.www.domain.entity.project.ErdColumn;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -13,10 +11,14 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(exclude = {"erd"})
 public class ErdColumnDTO {
 
     private Long erdColumnIdx;
+
+    @JsonBackReference
     private ErdDTO erd;
+
     private String erdColumnName;
     private String erdColumnType;
     private String erdColumnConstraint;

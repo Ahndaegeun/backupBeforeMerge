@@ -1,17 +1,17 @@
 <template>
   <div class="erd-container">
 
-    <SideBar  :topTitle="$store.state.erd.sideBarData.title"
+    <SideBar  :topTitle="this.$store.state.erd.sideBarData.title"
               :top="true"
               :bottom="false"
-              :topPath="$store.state.erd.sideBarData.path"
-              :topData="$store.state.erd.sideBarData.topData"
+              :topPath="this.$store.state.erd.sideBarData.path"
+              :topData="this.$store.state.erd.sideBarData.topData"
               :isTree="false"
-              :textColor="$store.state.erd.sideBarData.textColor"/>
+              :textColor="this.$store.state.erd.sideBarData.textColor"/>
 
     <router-view></router-view>
 
-    <ShowQuery v-if="$store.state.erd.isShowQuery"/>
+    <ShowQuery v-if="this.$store.state.erd.isShowQuery"/>
   </div>
 </template>
 

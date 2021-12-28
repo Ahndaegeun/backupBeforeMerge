@@ -1,5 +1,6 @@
 import axios from "axios"
 import arrayToTree from "array-to-tree";
+import router from "@/router";
 
 const javaCompile = {
   namespaced: true,
@@ -8,25 +9,36 @@ const javaCompile = {
     name: "",
     type: ['Directory', 'File'],
     path: [],
-    classification: ['JAVA', 'HTML'],
+    classification: ['JAVA'],
     requestData: {},
     dataObj: [],
     code: ``,
     clickedFile: {},
     result: "",
     isError: "",
-    axiosPath: ""
+    axiosPath: "",
+    htmlList: [],
+    isJava: false
   },
   mutations: {
-    openAddModal(state) {
-      state.requestData = {
-        name: "",
-        type: 'Directory',
-        path: null,
-        classification: 'JAVA'
+    openAddModal(state, item) {
+      if(item === 'java') {
+        state.requestData = {
+          name: "",
+          type: 'Directory',
+          path: null,
+          classification: 'JAVA'
+        }
+        state.isJava = true
+      } else {
+        state.requestData = {
+          name: "",
+          type: 'File',
+          path: null,
+          classification: 'HTML'
+        }
+        state.isJava = false
       }
-
-
       state.isOpen = !state.isOpen
     },
     addPath(state, arr) {
@@ -48,10 +60,10 @@ const javaCompile = {
       }).then(res => {
         state.dataObj.splice(0, state.dataObj.length)
         const arr = []
-        res.data.forEach(node => {
+        res.data.javaList.forEach(node => {
           const obj = {
             id: node.comIdx,
-            classification: node.comSe === "d" ? "directory" : "file",
+            classification: node.comSe === "d" ? "directory" : (node.comSe === "f" ? "file" : "html"),
             label: node.comNm,
             parent_id: node.parentComIdx
           }
@@ -59,11 +71,16 @@ const javaCompile = {
         })
 
         arrayToTree(arr, {childrenProperty: 'nodes'}).forEach(item => {
-          state.dataObj.push(item)
+          if(item.classification !== "html") {
+            state.dataObj.push(item)
+          }
         })
 
-
         this.commit("javaCompile/addPath", arr)
+
+        res.data.htmlList.forEach(item => {
+          state.htmlList.push(item)
+        })
       })
     },
     setCode(state, item) {
@@ -91,31 +108,52 @@ const javaCompile = {
     },
     axiosPathReset(state) {
       state.axiosPath = ""
+    },
+    addCreatedFile(state, item) {
+      state.htmlList.push(item)
     }
   },
   actions: {
     createDirOrFile(context) {
-      const obj = context.state.requestData
-      const params = new URLSearchParams();
-      context.commit("recursiveFindPath", obj.path)
-      const p = context.state.axiosPath
+      if(context.state.isJava) {
+        const obj = context.state.requestData
+        const params = new URLSearchParams();
+        context.commit("recursiveFindPath", obj.path)
+        const p = context.state.axiosPath
 
-      params.append("name", obj.name)
-      params.append("path", p)
-      params.append("type", obj.type)
-      params.append("classification", obj.classification)
-      params.append("projectIdx", sessionStorage.getItem("project"))
-      params.append("comIdx", obj.path.id)
+        params.append("name", obj.name)
+        params.append("path", p)
+        params.append("type", obj.type)
+        params.append("classification", obj.classification)
+        params.append("projectIdx", sessionStorage.getItem("project"))
+        params.append("comIdx", obj.path.id)
 
-      const url = "/pdtail/addDirOrFile"
-      axios.post(url, params)
-          .then(() => {
-            context.commit("getJavaSideBar")
-            context.commit("openAddModal")
-            context.commit("axiosPathReset")
-          })
+        const url = "/pdtail/addDirOrFile"
+        axios.post(url, params)
+            .then(() => {
+              context.commit("getJavaSideBar")
+              context.commit("axiosPathReset")
+            })
+      } else {
+        const obj = context.state.requestData
+        axios({
+          url: '/compiler/createHtml',
+          method: 'post',
+          data: {
+            prjctIdx: sessionStorage.getItem("project"),
+            name: obj.name
+          }
+        }).then(res => {
+          context.commit("addCreatedFile", res.data.compiler)
+        })
+      }
+      context.commit("openAddModal")
     },
     getFileDetail(context, item) {
+      if(!(router.currentRoute._rawValue.fullPath).includes("backend")) {
+        router.push("/pdtail/compiler/backend")
+      }
+
       if(item.classification === "file") {
         const url = '/compiler/getFile'
 
@@ -147,8 +185,6 @@ const javaCompile = {
           }
         }
       }
-
-
       axios.post(url, obj).then(res => {
         res
       })
@@ -159,7 +195,6 @@ const javaCompile = {
         prjctIdx: sessionStorage.getItem("project")
       }
       axios.post(url, obj).then(res => {
-        console.log(res)
         context.commit("setIsError", res.data.isSuccess)
         context.commit("setResult", res.data.detail)
       })

@@ -15,4 +15,6 @@ public interface CompilerService {
     List<CompilerDTO> getList(ProjectDTO projectDTO);
 
     Map<String, String> runMemberProject(ProjectDTO projectDTO);
+
+    List<CompilerDTO> getHtmlList(ProjectDTO projectDTO);
 }

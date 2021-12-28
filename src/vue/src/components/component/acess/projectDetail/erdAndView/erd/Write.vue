@@ -1,48 +1,50 @@
 <template>
   <div class="add-container">
-    <button class="add-btn"
-            @click="openAndClose">{{$store.state.erd.writeData.popupName}}</button>
-    <div class="add-box" 
-          v-if="$store.state.erd.writeData.isOpen">
-      
-      <div class="modal-top">
-        <input v-model="$store.state.erd.writeData.tableData.name" type="text" placeholder="table name">
-        <div class="add-col-wrap">
-          <button @click="addCol" class="add-col">+</button>
-          <button @click="delCol" class="del-col">-</button>
+    <div class="wrap">
+      <button class="add-btn"
+              @click="openAndClose">{{this.$store.state.erd.writeData.popupName}}</button>
+      <div class="add-box"
+            v-if="this.$store.state.erd.writeData.isOpen">
+
+        <div class="modal-top">
+          <input v-model="this.$store.state.erd.writeData.tableData.name" type="text" placeholder="table name">
+          <div class="add-col-wrap">
+            <button @click="addCol" class="add-col">+</button>
+            <button @click="delCol" class="del-col">-</button>
+          </div>
         </div>
+
+        <ul class="list">
+          <li class="list-header">
+            <span>name</span>
+            <span>type</span>
+            <span>constraint</span>
+            <span>references</span>
+          </li>
+
+          <li class="list-body"
+              v-for="item in this.$store.state.erd.writeData.tableData.columns"
+              :key="item">
+            <input v-model="item.name" type="text" placeholder="name"/>
+            <input v-model="item.type" type="text" placeholder="type"/>
+
+            <select v-model="item.constraint">
+              <option>null</option>
+              <option>pk</option>
+              <option>fk</option>
+            </select>
+
+            <select v-model="item.references">
+              <option>null</option>
+              <option v-for="item in this.$store.state.erd.relation['primaryKey']" :key="item">{{item[0].table}}</option>
+            </select>
+          </li>
+        </ul>
+
+        <button @click="create"
+                class="add-table-btn"
+                type="button">create table</button>
       </div>
-
-      <ul class="list">
-        <li class="list-header">
-          <span>name</span>
-          <span>type</span>
-          <span>constraint</span>
-          <span>references</span>
-        </li>
-
-        <li class="list-body"
-            v-for="item in $store.state.erd.writeData.tableData.columns" 
-            :key="item">
-          <input v-model="item.name" type="text" placeholder="name"/>
-          <input v-model="item.type" type="text" placeholder="type"/>
-
-          <select v-model="item.constraint">
-            <option>null</option>
-            <option>pk</option>
-            <option>fk</option>
-          </select>
-
-          <select v-model="item.references">
-            <option>null</option>
-            <option v-for="item in $store.state.erd.relation['primaryKey']" :key="item">{{item[0].table}}</option>
-          </select>
-        </li>
-      </ul>
-
-      <button @click="create"
-              class="add-table-btn"
-              type="button">create table</button>
     </div>
   </div>
 </template>
@@ -104,6 +106,7 @@ input {
   padding: 5px 10px;
   width: fit-content;
   border-radius: 5px;
+  border: 1px solid #fff;
 }
 
 .modal-top {

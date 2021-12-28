@@ -1,5 +1,6 @@
 package com.kanboo.www.dto.project;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.kanboo.www.domain.entity.project.Erd;
 import com.kanboo.www.domain.entity.project.Project;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -21,6 +23,9 @@ public class ErdDTO {
     private ProjectDTO project;
     private String erdName;
     private int erdOrder;
+
+    @JsonManagedReference
+    private List<ErdColumnDTO> columns;
 
     public Erd dtoToEntity() {
         return Erd.builder()

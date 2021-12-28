@@ -11,25 +11,25 @@
     </div>
     <ul class="table-list">
       <li class="table-box"
-          v-for="(item, index) in $store.state.erd.sideBarData.topData" 
+          v-for="(item, index) in this.$store.state.erd.sideBarData.topData"
           :key="index"
           @click="clickErd(item)"
           :style="{
-            border: item.borderColor, 
-            transform: `scale(${$store.state.erd.scale})`
+            border: item.borderColor,
+            transform: `scale(${this.$store.state.erd.scale})`
             }">
         <div class="title">
           <input type="text" :readonly="!item.isModify" v-model="item.name"> 
           <div>
-            <button @click="deleteTable(item)"
+            <button @click.stop="deleteTable(item)"
                     v-if="!item.isModify"
                     type="button"
                     class="table-del-btn">Del</button>
-            <button @click="showModify(item)"
+            <button @click.stop="showModify(item)"
                     v-if="!item.isModify"
                     type="button"
                     class="table-mod-btn">Mod</button>
-            <button @click="modifyTable(item)"
+            <button @click.stop="modifyTable(item)"
                     v-if="item.isModify"
                     type="button"
                     class="table-mod-btn">finish</button>
@@ -39,17 +39,20 @@
           <li v-for="col of item.columns"
               :key="col"
               class="col-wrap">
-            <input type="text" 
+            <input @click.stop
+                  type="text"
                   placeholder="name" 
                   :readonly="!item.isModify" 
                   class="name" 
                   v-model="col.name">
-            <input type="text" 
+            <input @click.stop
+                  type="text"
                   placeholder="type" 
                   :readonly="!item.isModify" 
                   class="type" 
                   v-model="col.type">
-            <input type="text" 
+            <input @click.stop
+                  type="text"
                   placeholder="constraint" 
                   :readonly="!item.isModify" 
                   class="constraint" 
@@ -87,7 +90,7 @@ export default {
     }),
     ...mapActions({
       getErdData: 'erd/getErdData'
-    })
+    }),
   },
   mounted() {
     this.getErdData()
@@ -106,6 +109,7 @@ export default {
   position: absolute;
   top: 10px;
   right: 10px;
+  z-index: 9999;
 }
 
 .table-list {

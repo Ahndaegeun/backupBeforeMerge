@@ -104,6 +104,17 @@ public class CompilerServiceImpl implements CompilerService {
         return resultMap;
     }
 
+    @Override
+    public List<CompilerDTO> getHtmlList(ProjectDTO projectDTO) {
+        List<Compiler> compilerList = compilerRepository.findByProjectPrjctIdxAndComSe(projectDTO.getPrjctIdx(), "h");
+        List<CompilerDTO> result = new ArrayList<>();
+        compilerList.forEach(item -> {
+            result.add(item.entityToDto());
+        });
+
+        return result;
+    }
+
     private Map<String, String> runCompile(String path) {
         Map<String, String> pathList = new HashMap<>();
         pathList.put("classPath", path + "/class");

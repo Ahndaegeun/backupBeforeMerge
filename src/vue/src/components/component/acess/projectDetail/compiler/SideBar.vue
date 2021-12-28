@@ -4,10 +4,11 @@
       <h2 class="title">
         <img src="../../../../../assets/documentIcon.png" alt="/">
         <router-link to="/pdtail/compiler/backend">JAVA</router-link>
-        <button class="add-java-btn" type="button" @click="openAddModal">+</button>
+        <button class="add-java-btn" type="button" @click="openAddModal('java')">+</button>
       </h2>
       <div class="directory">
-        <Tree :nodes='dataObj' @nodeExpanded="getFileDetail"/>
+        <Tree :nodes='dataObj'
+              @nodeExpanded="getFileDetail"/>
       </div>
     </div>
 
@@ -15,10 +16,10 @@
       <h2 class="title">
         <img src="../../../../../assets/documentIcon.png" alt="/">
         <router-link to="/pdtail/compiler/frontend">Front</router-link>
-        <button class="add-front-btn" type="button">+</button>
+        <button class="add-front-btn" type="button" @click="openAddModal('html')">+</button>
       </h2>
-      <ul class="directory">
-        <li>Test.html</li>
+      <ul class="directory html">
+        <li v-for="item in htmlList" :key="item" @click="getHtmlDetail(item)">{{item.comNm}}</li>
       </ul>
     </div>
   </div>
@@ -36,7 +37,8 @@ export default {
   },
   computed: {
     ...mapState({
-      dataObj: state => state.javaCompile.dataObj
+      dataObj: state => state.javaCompile.dataObj,
+      htmlList: state => state.javaCompile.htmlList
     })
   },
   data() {
@@ -49,7 +51,8 @@ export default {
       getJavaSideBar: 'javaCompile/getJavaSideBar',
     }),
     ...mapActions({
-      getFileDetail: 'javaCompile/getFileDetail'
+      getFileDetail: 'javaCompile/getFileDetail',
+      getHtmlDetail: 'htmlCompile/getHtmlDetail'
     })
   },
   mounted() {
@@ -93,6 +96,15 @@ button {
 .directory {
   height: calc(100% - 46px);
   overflow: scroll;
+}
+
+.directory.html {
+  padding: 5px 10px;
+}
+
+.directory.html li {
+  cursor: pointer;
+  line-height: 1.25;
 }
 
 </style>

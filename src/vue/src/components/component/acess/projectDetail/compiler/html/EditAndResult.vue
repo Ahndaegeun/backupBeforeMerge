@@ -1,11 +1,13 @@
 <template>
   <div class="editor-container">
-    <Codemirror v-model:value="html"
+    <Codemirror v-model:value="this.$store.state.htmlCompile.detail"
                 :options="cmOptions"
-                class="code-container"/>
-    <v-md-preview-html :v-model="html" 
+                class="code-container"
+                @input="updateHtml"/>
+    <v-md-preview-html :v-model="this.$store.state.htmlCompile.detail"
                         preview-class="vuepress-markdown-body" 
-                        :html="html"></v-md-preview-html>
+                        :html="this.$store.state.htmlCompile.detail"></v-md-preview-html>
+
   </div>
 </template>
 
@@ -14,12 +16,12 @@ import Codemirror from "codemirror-editor-vue3";
 import "codemirror-editor-vue3/dist/style.css"
 import "codemirror/theme/dracula.css"
 import "codemirror/mode/htmlmixed/htmlmixed.js";
+import {mapActions} from "vuex";
 
 export default {
   components: { Codemirror },
   data() {
     return {
-      html: '<h1 style="color: #000;">hello</h1>',
       cmOptions: {
         mode: 'text/html',
         theme: 'dracula',
@@ -30,6 +32,11 @@ export default {
         styleActiveLine: true,
       }
     }
+  },
+  methods: {
+    ...mapActions({
+      updateHtml: "htmlCompile/updateHtml"
+    })
   }
 }
 </script>

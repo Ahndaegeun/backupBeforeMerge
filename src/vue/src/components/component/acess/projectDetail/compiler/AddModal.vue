@@ -10,16 +10,16 @@
       <div class="add-form">
         <input v-model="requestData.name" type="text" class="name" placeholder="File or Directory Name">
 
-        <select v-model="requestData.type" class="type">
+        <select v-model="requestData.type" class="type" v-if="isJava">
           <option v-for="item in type" :key="item">{{item}}</option>
         </select>
 
-        <select v-model="requestData.path" class="path">
+        <select v-model="requestData.path" class="path" v-if="isJava">
           <option :value="null">Path</option>
           <option v-for="item in path" :key="item" :value="item">{{item.label}}</option>
         </select>
 
-        <select v-model="requestData.classification" class="classification">
+        <select v-model="requestData.classification" class="classification" v-if="isJava">
           <option v-for="item in classification" :key="item">{{item}}</option>
         </select>
       </div>
@@ -41,7 +41,8 @@ export default {
       path: state => state.javaCompile.path,
       classification: state => state.javaCompile.classification,
       name: state => state.javaCompile.name,
-      requestData: state => state.javaCompile.requestData
+      requestData: state => state.javaCompile.requestData,
+      isJava: state => state.javaCompile.isJava
     })
   },
   methods: {

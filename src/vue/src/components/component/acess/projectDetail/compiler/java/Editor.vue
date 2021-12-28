@@ -7,7 +7,8 @@
     </div>
     <button class="run-btn"
             type="button"
-            @click="runCompile">run</button>
+            @click="runCompile"
+            v-if="isOpenCode">run</button>
   </div>
 </template>
 
@@ -37,7 +38,8 @@ export default {
         foldGutter: true,
         styleActiveLine: true,
       },
-      modifyCode: this.code
+      modifyCode: this.code,
+      isOpenCode: false
     }
   },
   methods: {
@@ -49,6 +51,7 @@ export default {
   watch: {
     "$store.state.javaCompile.code"(e) {
       this.modifyCode = e
+      this.isOpenCode = true
     },
     modifyCode(e) {
       this.updateCode(e)

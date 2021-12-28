@@ -1,4 +1,5 @@
 import erdData from '../../../assets/erdData.json'
+import axios from 'axios'
 
 const erd = {
   namespaced: true,
@@ -96,35 +97,74 @@ const erd = {
       if(isDuplicate) {
         return
       }
+
+      const obj = {
+        project: {
+          prjctIdx: sessionStorage.getItem("project")
+        },
+        columns: [],
+        erdName: table.name
+      }
+
       table['idx'] = ++state.lastIdx
       table.columns.forEach(item => {
         item["table"] = table.name
+        const col = {
+          erdColumnName: item.name,
+          erdColumnType: item.type,
+          erdColumnConstraint: item.constraint,
+          erdColumnReferences: item.references,
+          "erd.erdName": table.name
+        }
+        obj.columns.push(col)
       })
-      state.sideBarData.topData.push(table)
-      state.writeData.tableData = {
-        idx: 0,
-        name: "",
-        columns: [
-          {
-            table: "",
-            name: "",
-            type: "",
-            constraint: "",
-            references: null
-          }
-        ],
-        isModify: false
-      }
+
+      axios({
+        url: '/erd/createTable',
+        method: 'post',
+        data: obj
+      }).then(res => {
+        console.log(res)
+        state.sideBarData.topData.push(table)
+        state.writeData.tableData = {
+          idx: 0,
+          name: "",
+          columns: [
+            {
+              table: "",
+              name: "",
+              type: "",
+              constraint: "",
+              references: null
+            }
+          ],
+          isModify: false
+        }
+      })
+
       state.writeData.isOpen = false
       state.writeData.popupName = "addTable"
     },
     // 테이블 삭제
     deleteTable(state, item) {
-      delete state.relation.primaryKey[item.idx]
-      delete state.relation.foreignKey[item.idx]
+      const obj = {
+        project: {
+          prjctIdx: sessionStorage.getItem("project")
+        },
+        erdIdx: item.idx
+      }
 
-      const idx = state.sideBarData.topData.indexOf(item)
-      state.sideBarData.topData.splice(idx, 1)
+      axios({
+        url: "/erd/deleteTable",
+        method: 'post',
+        data: obj
+      }).then(() => {
+        delete state.relation.primaryKey[item.idx]
+        delete state.relation.foreignKey[item.idx]
+
+        const idx = state.sideBarData.topData.indexOf(item)
+        state.sideBarData.topData.splice(idx, 1)
+      })
     },
     // 테이블 수정폼 출력
     showModify(state, item) {
@@ -133,24 +173,84 @@ const erd = {
     // 테이블 수정 완료
     modifyTable(state, item) {
       // axios로 백단으로 쏴서 저장
+      console.log(item)
 
-      state.sideBarData.topData.find(ele => ele.idx === item.idx).isModify = false
+      const obj = {
+        project: {
+          prjctIdx: sessionStorage.getItem("project")
+        },
+        erdIdx: item.idx,
+        columns: []
+      }
+
+      item.columns.forEach(col => {
+        const column = {
+          erdColumnIdx: col.idx,
+          erdColumnName: col.name,
+          erdColumnType: col.type,
+          erdColumnConstraint: col.constraint,
+          erdColumnReferences: col.references
+        }
+        obj.columns.push(column)
+      })
+
+      axios({
+        url: '/erd/updateTable',
+        method: 'post',
+        data: obj
+      }).then(() => {
+        state.sideBarData.topData.find(ele => ele.idx === item.idx).isModify = false
+      })
+
     },
     // 백에서 가져온 데이터 바인딩
     addErdData(state) {
-      state.sideBarData.topData = JSON.parse(JSON.stringify(state.erdData))
+      axios({
+        url: '/erd/getErd',
+        method: 'post',
+        data: {
+          projectIdx: sessionStorage.getItem("project")
+        }
+      }).then(res => {
+        const tables = []
+        res.data.forEach(table => {
+          const t = {
+            idx: table.erdIdx,
+            columns: [],
+            name: table.erdName,
+            borderColor: ''
+          }
+
+          table.columns.forEach(column => {
+            console.log(column)
+            const col = {
+              idx: column.erdColumnIdx,
+              name : column.erdColumnName,
+              type : column.erdColumnType,
+              constraint : column.erdColumnConstraint,
+              references : column.erdColumnReferences,
+              table: t.name
+            }
+            t.columns.push(col)
+          })
+          tables.push(t)
+        })
+
+        state.sideBarData.topData = tables
+        this.commit("erd/setRelation")
+      })
     },
     // 가져온 데이터를 바탕으로 관계 json설정
     setRelation(state) {
       const primary = {}
       const foreign = {}
-      const tables = JSON.parse(JSON.stringify(state.sideBarData.topData))
-      
+      const tables = state.sideBarData.topData
+
       for(let item of tables) {
         const pk = []
         const references = new Set()
         const tableIdx = item.idx
-        
+
         for(let col of item.columns) {
           if(col.constraint === 'pk') {
             pk.push(col)
@@ -166,7 +266,10 @@ const erd = {
           }
         }
 
-        primary[tableIdx] = pk
+        if(pk.length > 0) {
+          primary[tableIdx] = pk
+        }
+
         foreign[tableIdx] = Array.from(references)
       }
 
@@ -176,8 +279,9 @@ const erd = {
     // 쿼리 출력
     exportQuery(state) {
       const tables = state.sideBarData.topData
-      const primary = JSON.parse(JSON.stringify(state.relation.primaryKey))
-      const foreign = JSON.parse(JSON.stringify(state.relation.foreignKey))
+      const primary = state.relation["primaryKey"]
+      const foreign = state.relation["foreignKey"]
+
       // 테이블 생성
       const createTable = []
       for(let table of tables) {
@@ -237,11 +341,13 @@ const erd = {
             })
           }
 
-          primaryKey = primaryKey.substring(0, primaryKey.length - 2)
-          sql = `alter table ${tableName} add constraint fk_${parentTable}_${tableName} foreign key(`
-          sql += `${primaryKey})`
-          sql = `${sql} references ${parentTable} (${primaryKey});`
-          createForeign.push(sql)
+          if(primaryKey.trim() !== "") {
+            primaryKey = primaryKey.substring(0, primaryKey.length - 2)
+            sql = `alter table ${tableName} add constraint fk_${parentTable}_${tableName} foreign key(`
+            sql += `${primaryKey})`
+            sql = `${sql} references ${parentTable} (${primaryKey});`
+            createForeign.push(sql)
+          }
         }
       }
 
@@ -301,7 +407,6 @@ const erd = {
   actions: {
     getErdData(context) {
       context.commit('addErdData')
-      context.commit('setRelation')
     }
   }
 }
