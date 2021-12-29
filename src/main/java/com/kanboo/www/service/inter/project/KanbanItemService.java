@@ -12,4 +12,6 @@ public interface KanbanItemService {
     void deleteKanbanItem(Long kbItmIdx);
 
     void updateKanbanItem(KanbanItemDTO kanbanItemDTO);
+
+    void saveKanbanItem(KanbanItemDTO kanbanItemDTO);
 }

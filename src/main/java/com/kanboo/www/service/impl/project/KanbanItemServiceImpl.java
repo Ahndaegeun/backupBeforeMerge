@@ -4,11 +4,13 @@ import com.kanboo.www.domain.entity.member.Member;
 import com.kanboo.www.domain.entity.project.Kanban;
 import com.kanboo.www.domain.entity.project.KanbanItem;
 import com.kanboo.www.domain.repository.project.KanbanItemRepository;
+import com.kanboo.www.domain.repository.project.KanbanRepository;
 import com.kanboo.www.dto.project.KanbanItemDTO;
 import com.kanboo.www.service.inter.project.KanbanItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,10 +19,11 @@ import java.util.List;
 public class KanbanItemServiceImpl implements KanbanItemService {
 
     private final KanbanItemRepository kanbanItemRepository;
+    private final KanbanRepository kanbanRepository;
 
     @Override
     public KanbanItemDTO insertKanbanItem(KanbanItemDTO itemDTO) {
-        Kanban kanban = Kanban.builder().kbIdx(itemDTO.getKanban().getKbIdx()).build();
+        Kanban kanban = kanbanRepository.findByProjectPrjctIdx(itemDTO.getKanban().getProject().getPrjctIdx());
         Member member = Member.builder().memIdx(itemDTO.getMember().getMemIdx()).build();
 
         KanbanItem kanbanItem = KanbanItem.builder()
@@ -40,8 +43,7 @@ public class KanbanItemServiceImpl implements KanbanItemService {
 
     @Override
     public List<KanbanItemDTO> getAllKanbanItemsByMemIdxAndPrjctIdx(KanbanItemDTO kanbanItemDTO) {
-        List<KanbanItem> list = kanbanItemRepository.getAllItemsByMemIdxAndPrjctIdx(kanbanItemDTO.getMember().getMemIdx()
-                , kanbanItemDTO.getKanban().getProject().getPrjctIdx());
+        List<KanbanItem> list = kanbanItemRepository.getAllItemsByPrjctIdx(kanbanItemDTO.getKanban().getProject().getPrjctIdx());
         List<KanbanItemDTO> dtoList = new ArrayList<>();
         for (KanbanItem item : list) {
             dtoList.add(item.entityToDto());
@@ -50,6 +52,7 @@ public class KanbanItemServiceImpl implements KanbanItemService {
     }
 
     @Override
+    @Transactional
     public void updateKanbanItem(KanbanItemDTO kanbanItemDTO) {
         KanbanItem kanbanItem = kanbanItemRepository.findByKbItmIdx(kanbanItemDTO.getKbItmIdx());
         kanbanItem.changeKbBadge(kanbanItemDTO.getKbBadge());
@@ -63,6 +66,16 @@ public class KanbanItemServiceImpl implements KanbanItemService {
     @Override
     public void deleteKanbanItem(Long kbItmIdx) {
         kanbanItemRepository.deleteById(kbItmIdx);
+    }
+
+    @Override
+    public void saveKanbanItem(KanbanItemDTO kanbanItemDTO) {
+
+        KanbanItem kanbanItem = kanbanItemRepository.findByKbItmIdx(kanbanItemDTO.getKbItmIdx());
+
+        kanbanItem.changeKbItmNum(kanbanItemDTO.getKbItmNum());
+
+        kanbanItemRepository.save(kanbanItem);
     }
 
 }

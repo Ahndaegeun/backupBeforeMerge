@@ -6,4 +6,10 @@ import java.util.List;
 
 public interface GanttService {
     List<GanttDTO> getGantt(Long projectIdx);
+
+    GanttDTO insertGantt(GanttDTO ganttDTO);
+
+    GanttDTO updateGantt(GanttDTO ganttDTO);
+
+    void deleteGantt(GanttDTO ganttDTO);
 }

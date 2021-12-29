@@ -12,225 +12,34 @@ const gantt = {
       progress: "",
       showCalWrite: false,
       showCalDetail: false,
-      tasks: {
-        2021: {
-          12: [
-            {
-              memId: "zerochae",
-              title: "task1",
-              content: "내용1",
-              start: "03",
-              end: "04",
-              state: "Y",
-              priority: "낮음",
-              progress: "30",
-              img: "con1.jpg",
-            },
-            {
-              memId: "juwon",
-              title: "task2",
-              content: "내용2",
-              start: "04",
-              end: "05",
-              state: "Y",
-              priority: "보통",
-              progress: "70",
-              img: "con1.jpg",
-            },
-            {
-              memId: "daeg",
-              title: "task3",
-              content: "내용3",
-              start: "05",
-              end: "06",
-              state: "Y",
-              priority: "높음",
-              progress: "50",
-              img: "con1.jpg",
-            },
-            {
-              memId: "th",
-              title: "task4",
-              content: "내용4",
-              start: "07",
-              end: "08",
-              state: "Y",
-              priority: "긴급",
-              progress: "10",
-              img: "con1.jpg",
-            },
-            {
-              memId: "chang",
-              title: "task5",
-              content: "내용5",
-              start: "10",
-              end: "13",
-              state: "N",
-              priority: "즉시",
-              progress: "100",
-              img: "con1.jpg",
-            },
-          ],
-          11: [
-            {
-              memId: "zerochae",
-              title: "task1",
-              content: "내용1",
-              start: "07",
-              end: "09",
-              state: "Y",
-              priority: "낮음",
-              progress: "30",
-              img: "con1.jpg",
-            },
-            {
-              memId: "juwon",
-              title: "task2",
-              content: "내용2",
-              start: "10",
-              end: "11",
-              state: "Y",
-              priority: "보통",
-              progress: "70",
-              img: "con1.jpg",
-            },
-            {
-              memId: "daeg",
-              title: "task3",
-              content: "내용3",
-              start: "13",
-              end: "15",
-              state: "Y",
-              priority: "높음",
-              progress: "50",
-              img: "con1.jpg",
-            },
-            {
-              memId: "th",
-              title: "task4",
-              content: "내용4",
-              start: "18",
-              end: "19",
-              state: "Y",
-              priority: "긴급",
-              progress: "10",
-              img: "con1.jpg",
-            },
-            {
-              memId: "chang",
-              title: "task5",
-              content: "내용5",
-              start: "21",
-              end: "22",
-              state: "N",
-              priority: "즉시",
-              progress: "100",
-              img: "con1.jpg",
-            },
-          ],
-          10: [
-            {
-              memId: "zerochae",
-              title: "task1",
-              content: "내용1",
-              start: "01",
-              end: "03",
-              state: "Y",
-              priority: "낮음",
-              progress: "30",
-              img: "con1.jpg",
-            },
-            {
-              memId: "juwon",
-              title: "task2",
-              content: "내용2",
-              start: "05",
-              end: "08",
-              state: "Y",
-              priority: "보통",
-              progress: "70",
-              img: "con1.jpg",
-            },
-            {
-              memId: "daeg",
-              title: "task3",
-              content: "내용3",
-              start: "11",
-              end: "14",
-              state: "Y",
-              priority: "높음",
-              progress: "50",
-              img: "con1.jpg",
-            },
-            {
-              memId: "th",
-              title: "task4",
-              content: "내용4",
-              start: "11",
-              end: "15",
-              state: "Y",
-              priority: "긴급",
-              progress: "10",
-              img: "con1.jpg",
-            },
-            {
-              memId: "chang",
-              title: "task5",
-              content: "내용5",
-              start: "13",
-              end: "29",
-              state: "N",
-              priority: "즉시",
-              progress: "100",
-              img: "con1.jpg",
-            },
-          ],
-        },
-      },
+      tasks: {},
+      selectedTasks: [],
     },
     detail: "",
     openYear: "",
     openMonth: "",
     openIndex: "",
+    showData: [],
+    year: "",
+    month: "",
+    dateList: [],
+    memNick: "",
+    memIdx: 0,
   },
   mutations: {
     insert(state, payload) {
-      state.chart.tasks[payload[2].start.year][payload[0]].push(payload[1]);
-
-
-      let today = moment();
-
-      /*
-
-      ganttChart/write.vue
-
-      payload[1] = {
-
-        memId: this.userId,
-        title: this.inputTitle,
-        content: this.inputContent,
-        start: start[2],
-        end: end[2],
-        state: this.inputState,
-        priority: this.inputPriority,
-        progress: this.inputProgress == "" ? 0 : this.inputProgress,
-
-      }
-
-      */
-
-      let start = `${today.format("YYYY")}-${today.format("MM")}-${payload[1].start} 00:00:00`;
-      let end = `${today.format("YYYY")}-${today.format("MM")}-${payload[1].end} 00:00:00`;
+      let target = state.chart.tasks[payload[2].start.year][payload[0]];
+      target.push(payload[1]);
 
       let ganttDTO = {
-        "project.prjctIdx": "1",
-        "member.memIdx": "3",
+        "project.prjctIdx": sessionStorage.getItem("project"),
+        "member.memIdx": state.memIdx,
         gtIdx: "",
         gtExplanation: payload[1].content,
         gtPriority: payload[1].priority,
         gtProgress: payload[1].progress,
-        gtStartDate: start,
-        gtEndDate: end,
+        gtStartDate: payload[1].start + " 00:00:00",
+        gtEndDate: payload[1].end + " 00:00:00",
         gtState: payload[1].state,
         gtTitle: payload[1].title,
       };
@@ -240,24 +49,61 @@ const gantt = {
             params: ganttDTO,
           })
           .then((result) => {
-            console.log(result);
+            target[target.length - 1].gtIdx = result.data.gtIdx;
           });
     },
     select(state, payload) {
-      state.detail = state.chart.tasks[payload[3]][payload[0]][payload[1]];
-      state.openIndex = payload[1];
-      state.openMonth = payload[2];
-      state.openYear = payload[3];
+      state.detail = state.chart.tasks[state.year][state.month][payload];
+      state.openIndex = payload;
+      state.openMonth = state.month;
+      state.openYear = state.year;
     },
     update(state, payload) {
       state.chart.tasks[state.openYear][state.openMonth][state.openIndex] =
-          state.detail = payload;
+          payload;
+
+      let today = moment();
+
+      let start = `${today.format("YYYY")}-${today.format("MM")}-${
+          payload.start
+      } 00:00:00`;
+      let end = `${today.format("YYYY")}-${today.format("MM")}-${
+          payload.end
+      } 00:00:00`;
+
+      let ganttDTO = {
+        gtIdx: payload.gtIdx,
+        gtExplanation: payload.content,
+        gtPriority: payload.priority,
+        gtProgress: payload.progress,
+        gtStartDate: start,
+        gtEndDate: end,
+        gtState: payload.state,
+        gtTitle: payload.title,
+      };
+
+      state.detail =
+          state.chart.tasks[state.year][state.month][state.openIndex];
+
+      axios.post("/gantt/updateGantt", null, {
+        params: ganttDTO,
+      });
     },
-    delete(state) {
+    delete(state, payload) {
       state.chart.tasks[state.openYear][state.openMonth].splice(
           state.openIndex,
           1
       );
+
+      state.detail = "";
+
+      let ganttDTO = {
+        gtIdx: payload,
+      };
+
+      axios.post("/gantt/deleteGantt", null, {
+        params: ganttDTO,
+      });
     },
     calWriteOpen(state) {
       state.showCalWrite = true;
@@ -272,44 +118,135 @@ const gantt = {
       state.showCalDetail = false;
     },
     setGanttData(state, payload) {
+      state.chart.tasks = payload;
+      state.year = moment().format("YYYY")
+      state.month = moment().format("MM")
+    },
+    pushGanttData(state, payload) {
       let year = payload[0];
       let month = payload[1];
       state.chart.tasks[year][month].push(payload[2]);
     },
+    selectedTasks(state) {
+      state.selectedTasks = state.chart.tasks[2021][12];
+    },
+    renderDate(state) {
+      state.dateList = [];
+      let today = moment().format("YYYY-MM-DD").split("-");
+      if (state.year === "") {
+        state.year = today[0];
+      }
+
+      if (state.month === "") {
+        state.month = today[1];
+      }
+
+      let lastDay = new Date(state.year, state.month, 0).getDate();
+
+      for (let day = 1; day < lastDay + 1; day++) {
+        if (day < 10) {
+          day = `0${day}`;
+        }
+        state.dateList.push(`${day}`);
+      }
+    },
+    setShowList(state, item) {
+      try {
+        state.showData = item[state.year][state.month];
+      } catch (err) {
+        state.showData = item
+      }
+    },
+    renderChart(state) {
+      let days = document.querySelectorAll(".chart-date li");
+      let tasks = document.querySelectorAll(".chart-bars li");
+      days = Array.from(days);
+      tasks = Array.from(tasks);
+
+      let left = 0,
+          width = 0,
+          f_arr = [];
+
+      tasks.forEach((el, index) => {
+        let start = state.showData[index].start;
+
+        f_arr = days.filter((day) => day.textContent === start);
+
+        left = f_arr[0].offsetLeft - 20;
+
+        let end = state.showData[index].end;
+
+        f_arr = days.filter((day) => day.textContent === end);
+        width = f_arr[0].offsetLeft + f_arr[0].offsetWidth - left - 20;
+
+        el.style.left = `${left}px`;
+        el.style.width = `${width}px`;
+
+        el.style.opacity = 1;
+      });
+    },
+    setPrevMonth(state) {
+      if(state.month === 1) {
+        state.month = 12
+        state.year--
+      } else {
+        state.month--
+      }
+    }
   },
   actions: {
     getGanttData(context) {
       axios
           .get("/gantt/selectGantt", {
             params: {
-              projectIdx: "1",
+              projectIdx: sessionStorage.getItem("project"),
             },
           })
           .then((result) => {
-            console.log(result.data);
+            let temp = {};
+            if(result.data.length > 0) {
+              result.data.map((item) => {
+                const date = item.gtStartDate.split("T")[0].split("-");
+                const year = date[0];
+                const month = date[1];
 
-            result.data.map((item) => {
-              let payload = [];
-              let date = item.gtStartDate.split("T")[0].split("-");
-              let year = date[0];
-              let month = date[1];
-              let start = date[2];
-              let end = item.gtEndDate.split("T")[0].split("-")[2];
-              let obj = {
-                memId: "zz",
-                title: item.gtTitle,
-                content: item.gtExplanation,
-                start: start,
-                end: end,
-                state: item.gtState,
-                priority: item.gtPriority,
-                progress: item.gtProgress,
-              };
+                if (temp[year] == null) temp[year] = {};
+                if (temp[year][month] == null) temp[year][month] = [];
 
-              payload.push(year, month, obj);
+                const obj = {
+                  gtIdx: item.gtIdx,
+                  memNick: item.member.memNick,
+                  title: item.gtTitle,
+                  content: item.gtExplanation,
+                  start: item.gtStartDate.replace("T", " "),
+                  end: item.gtEndDate.replace("T", " "),
+                  state: item.gtState,
+                  priority: item.gtPriority,
+                  progress: item.gtProgress,
+                };
+                temp[year][month].push(obj);
+              });
+            } else {
+              const date = moment().format("YYYY-MM-DD").split("-")
+              const year = date[0];
+              const month = date[1];
 
-              return context.commit("setGanttData", payload);
-            });
+              temp[year] = {};
+              temp[year][month] = [];
+            }
+            context.commit("setGanttData", temp);
+            context.commit("setShowList", temp);
+          });
+    },
+    getUserInfo(context) {
+      const url = "/access/userInfo";
+      axios
+          .post(url, {
+            token: sessionStorage.getItem("token"),
+          })
+          .then((result) => {
+            context.state.memNick = result.data.memNick;
+            context.state.memIdx = result.data.memIdx;
           });
     },
   },

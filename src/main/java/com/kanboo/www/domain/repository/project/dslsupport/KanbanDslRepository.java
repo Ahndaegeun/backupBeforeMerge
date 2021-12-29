@@ -5,5 +5,5 @@ import com.kanboo.www.domain.entity.project.KanbanItem;
 import java.util.List;
 
 public interface KanbanDslRepository {
-	List<KanbanItem> getAllItemsByMemIdxAndPrjctIdx(Long memIdx, Long prjctIdx);
+	List<KanbanItem> getAllItemsByPrjctIdx(Long prjctIdx);
 }

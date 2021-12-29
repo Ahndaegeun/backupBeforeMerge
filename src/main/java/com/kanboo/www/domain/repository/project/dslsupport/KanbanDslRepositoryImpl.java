@@ -17,7 +17,7 @@ public class KanbanDslRepositoryImpl implements KanbanDslRepository{
 	private final EntityManager em;
 
 	@Override
-	public List<KanbanItem> getAllItemsByMemIdxAndPrjctIdx(Long memIdx, Long prjctIdx) {
+	public List<KanbanItem> getAllItemsByPrjctIdx(Long prjctIdx) {
 		QKanbanItem qKanbanItem = QKanbanItem.kanbanItem;
 		QKanban qKanban = QKanban.kanban;
 		QMember qMember = QMember.member;
@@ -32,8 +32,7 @@ public class KanbanDslRepositoryImpl implements KanbanDslRepository{
 				.fetchJoin()
 				.leftJoin(qMember.ban, qBan)
 				.fetchJoin()
-				.where(qKanbanItem.member.memIdx.eq(memIdx)
-						.and(qKanbanItem.kanban.project.prjctIdx.eq(prjctIdx)))
+				.where(qKanbanItem.kanban.project.prjctIdx.eq(prjctIdx))
 				.fetch();
 	}
 }

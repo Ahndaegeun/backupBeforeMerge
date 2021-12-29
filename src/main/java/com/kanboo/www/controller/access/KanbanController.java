@@ -3,12 +3,10 @@ package com.kanboo.www.controller.access;
 import com.kanboo.www.dto.project.KanbanItemDTO;
 import com.kanboo.www.service.inter.project.KanbanItemService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,14 +22,11 @@ public class KanbanController {
 
     @GetMapping("/getAll")
     public List<KanbanItemDTO> getAllKanbanItemsByMemIdxAndPrjctIdx(KanbanItemDTO kanbanItemDTO){
-//		System.out.println(kanbanItemDTO);
-//		return null;
         return kanbanItemService.getAllKanbanItemsByMemIdxAndPrjctIdx(kanbanItemDTO);
     }
 
     @PostMapping("/update")
     public void updateKanbanItem(KanbanItemDTO kanbanItemDTO){
-        System.out.println(kanbanItemDTO);
         kanbanItemService.updateKanbanItem(kanbanItemDTO);
     }
 
@@ -40,4 +35,10 @@ public class KanbanController {
         kanbanItemService.deleteKanbanItem(kbItmIdx);
     }
 
+    @PostMapping("/save")
+    public void saveKanbanItem(@RequestBody KanbanItemDTO kanbanItemDTO){
+
+        kanbanItemService.saveKanbanItem(kanbanItemDTO);
+
+    }
 }

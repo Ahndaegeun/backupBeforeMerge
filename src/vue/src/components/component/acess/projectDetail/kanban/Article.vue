@@ -4,68 +4,73 @@
       <div class="white-container">
         <div class="color-picker-wrap">
           <input
-              class="create-input"
-              v-model="inputBadge"
-              type="text"
-              placeholder="badge"
-              id="inputBadge"
+            class="create-input"
+            v-model="this.$store.state.kanban.inputBadge"
+            type="text"
+            placeholder="badge"
+            id="inputBadge"
           />
           <div class="vertical-wrap">
+            {{
+              this.$store.state.kanban.inputDate !== "" ?
+              (typeof this.$store.state.kanban.inputDate === 'string'
+                  ? this.$store.state.kanban.inputDate.split(" ")[0] : this.$store.state.kanban.inputDate._i.split(" ")[0])
+                  : ""
+            }}
+            <CalendarIcon
+              id="inputDate"
+              class="icons calendar"
+              @click="showCalendar()"
+            />
             <label
-                id="pickColor"
-                for="color"
-                :style="{ background: pickColor }"
+              id="pickColor"
+              for="color"
+              :style="{ background: pickColor }"
             ></label>
             <input id="color" type="color" v-model="pickColor" />
-            <CalendarIcon
-                id="inputDate"
-                class="icons calendar"
-                @click="showCalendar()"
-            />
           </div>
           <vue-cal
-              locale="ko"
-              class="vuecal--date-picker"
-              xsmall
-              hide-view-selector
-              :time="false"
-              :transitions="false"
-              active-view="month"
-              :disable-views="['years,week,days']"
-              style="width: 210px; height: 230px"
-              @cell-click="pickDate($event)"
-              @dblclick="showCalendar()"
-              v-if="showCal"
+            locale="ko"
+            class="vuecal--date-picker"
+            xsmall
+            hide-view-selector
+            :time="false"
+            :transitions="false"
+            active-view="month"
+            :disable-views="['year', 'day', 'week']"
+            style="width: 210px; height: 230px"
+            @cell-click="pickDate($event)"
+            v-if="showCal"
           >
           </vue-cal>
         </div>
 
         <textarea
-            class="create-input input-content"
-            v-model="inputContent"
-            type="text"
-            placeholder="content"
-            id="inputContent"
+          class="create-input input-content"
+          v-model="this.$store.state.kanban.inputContent"
+          type="text"
+          id="inputContent"
         />
         <div class="button-zone">
           <PencilAltIcon
-              @click="addCard(addColumnIndex)"
-              class="icons btn create-btn"
+            v-if="!isUpdate"
+            @click="addCard(addColumnIndex)"
+            class="icons btn create-btn"
+          />
+          <PencilAltIcon
+            v-else
+            @click="updateCard(addColumnIndex)"
+            class="icons btn create-btn"
           />
           <ReplyIcon @click="closeAddForm()" class="icons btn return-btn" />
         </div>
       </div>
     </div>
-    <Container
-        group-name="cols"
-        tag="div"
-        orientation="horizontal"
-        @drop="onColumnDrop($event)"
-    >
+    <Container group-name="cols" tag="div" orientation="horizontal">
       <div
-          class="kanbanContainer"
-          v-for="(column, index) in kanban.columns"
-          :key="index"
+        class="kanbanContainer"
+        v-for="(column, index) in kanban.columns"
+        :key="index"
       >
         <div>
           <div class="kanban-title">
@@ -74,25 +79,25 @@
           </div>
           <Draggable class="kanban-column">
             <Container
-                orientation="vertical"
-                group-name="col-items"
-                :shouldAcceptDrop="(e, payload) => e.groupName === 'col-items'"
-                :get-child-payload="getCardPayload(column.id)"
-                :drop-placeholder="{
+              orientation="vertical"
+              group-name="col-items"
+              :shouldAcceptDrop="(e, payload) => e.groupName === 'col-items'"
+              :get-child-payload="getCardPayload(column.id)"
+              :drop-placeholder="{
                 className: `drop-placeholder`,
                 animationDuration: '300',
                 showOnTop: true,
               }"
-                :dragClass="`cardGhostDrag`"
-                :dropClass="`cardGhostDrop`"
-                @drop="(e) => onCardDrop(column.id, e)"
+              :dragClass="`cardGhostDrag`"
+              :dropClass="`cardGhostDrop`"
+              @drop="(e) => onCardDrop(column.id, e)"
             >
               <KanbanItem
-                  v-for="(item, cardIndex) in column.cards"
-                  :key="item.id"
-                  :columnIndex="index"
-                  :cardIndex="cardIndex"
-                  :item="item"
+                v-for="(item, cardIndex) in column.cards"
+                :key="item.id"
+                :columnIndex="index"
+                :cardIndex="cardIndex"
+                :item="item"
               />
             </Container>
           </Draggable>
@@ -118,8 +123,6 @@ import {
 import { Container, Draggable } from "vue3-smooth-dnd";
 import { applyDrag } from "@/assets/helpers";
 
-
-
 export default {
   components: {
     Container,
@@ -135,7 +138,20 @@ export default {
     ...mapState({
       showAddForm: (state) => state.kanban.showAddForm,
       showCal: (state) => state.kanban.showCal,
+      isUpdate: (state) => state.kanban.isUpdate,
+      first: (state) => state.kanban.first,
+      updateTarget: state => state.kanban.updateTarget
     }),
+  },
+  created() {
+    if (this.first) {
+      this.getUserInfo();
+    }
+  },
+  mounted() {
+    if (this.first) {
+      this.getAllKanbanItems();
+    }
   },
   data() {
     return {
@@ -143,26 +159,26 @@ export default {
       kanban: this.$store.state.kanban.kanban,
       pickColor: "#4caf50",
       addColumnIndex: "",
-      inputBadge: "",
-      inputContent: "",
       inputDate: "",
+      dropSensor:0,
     };
-  },
-  mounted() {
-    this.getAllKanbanItems()
   },
   methods: {
     ...mapMutations({
       add: "kanban/add",
       showAdd: "kanban/showAdd",
+      update: "kanban/update",
       closeAdd: "kanban/closeAdd",
       showCalendar: "kanban/showCalendar",
+      switchCard: "kanban/switchCard",
+      setInputDate: "kanban/setInputDate"
     }),
     ...mapActions({
-      getAllKanbanItems : 'kanban/getAllKanbanItems',
+      getAllKanbanItems: "kanban/getAllKanbanItems",
+      getUserInfo: "kanban/getUserInfo",
     }),
     pickDate(data) {
-      moment.locale('en')
+      moment.locale("en");
       let today = moment().format("YYYY-MM-DD HH:mm");
       let nowTime = moment().format("HH:mm:ss");
 
@@ -174,33 +190,24 @@ export default {
       selectDate = moment(temp, "YYYY-MM-DD HH:mm:ss");
 
       if (
-          selectDate.from(today).split(" ")[0] !== "in" &&
-          selectDate._i !== todayWithOutTime
+        selectDate.from(today).split(" ")[0] !== "in" &&
+        selectDate._i !== todayWithOutTime
       ) {
         let target = document.querySelector(
-            ".vuecal__cell--selected .vuecal__cell-content"
+          ".vuecal__cell--selected .vuecal__cell-content"
         );
         target.style.background = "red";
         setTimeout(() => {
           target.style.background = "none";
         }, 1000);
         clearTimeout();
-        return;
       } else {
-        this.inputDate = selectDate;
+        this.showCalendar();
+        this.setInputDate(selectDate)
       }
     },
-    getColumnHeightPx() {
-      let container = document.getElementById("kanbanContainer");
-      return container ? container.offsetHeight - 122 : 0;
-    },
-    onColumnDrop(dropResult) {
-      const kanban = Object.assign({}, this.kanban);
-      kanban.columns = applyDrag(kanban.columns, dropResult);
-      this.kanban = kanban;
-    },
-    // drop헀을떄
     onCardDrop(columnId, dropResult) {
+      this.dropSensor++;
       if (dropResult.removedIndex !== null || dropResult.addedIndex !== null) {
         const kanban = Object.assign({}, this.kanban);
         const column = kanban.columns.filter((p) => p.id === columnId)[0];
@@ -210,12 +217,16 @@ export default {
         kanban.columns.splice(itemIndex, 1, newColumn);
         this.kanban = kanban;
       }
+        if(this.dropSensor === 5){
+          this.switchCard();
+          this.dropSensor = 0;
+        }
     },
     getCardPayload(columnId) {
       return (index) => {
-        return this.kanban.columns.filter((p) => p.id === columnId)[0].cards[
-            index
-            ];
+        let f_arr = this.kanban.columns.filter((p) => p.id === columnId);
+        let result = f_arr[0].cards[index];
+        return result;
       };
     },
     closeAddForm() {
@@ -226,10 +237,10 @@ export default {
     },
     beforeShowAddForm(index) {
       this.addColumnIndex = index;
-      this.showAdd();
+      this.showAdd(index)
     },
-    addCard(index) {
-      let inputData = [this.inputBadge, this.inputContent];
+    validationTest() {
+      let inputData = [this.$store.state.kanban.inputBadge, this.$store.state.kanban.inputContent];
 
       let testBeforePush = ["inputBadge", "inputContent"];
 
@@ -242,14 +253,11 @@ export default {
             target.style.boxShadow = "none";
           }, 1000);
           clearTimeout();
-          return;
+          return false;
         }
       }
 
-
-      if (this.inputDate === "") {
-        // this.showCalendar();
-
+      if (this.$store.state.kanban.inputDate === "") {
         let inputDate = document.querySelector("svg.icons.calendar");
 
         inputDate.style.boxShadow = "0px 0px 40px 40px #dd323e";
@@ -258,22 +266,40 @@ export default {
           inputDate.style.boxShadow = "none";
         }, 1000);
         clearTimeout();
-        return;
+        return false;
       }
 
-      let payload = [];
-      payload.push(index);
-      payload.push(this.inputBadge);
-      payload.push(this.pickColor);
-      payload.push(this.inputDate);
-      payload.push(this.inputContent);
-      payload.push(sessionStorage.getItem("memId"));
+      return true;
+    },
+    addCard(index) {
+      if (this.validationTest()) {
+        let payload = [];
+        payload.push(index);
+        payload.push(this.$store.state.kanban.inputBadge);
+        payload.push(this.pickColor);
+        payload.push(this.$store.state.kanban.inputDate);
+        payload.push(this.$store.state.kanban.inputContent);
 
-      this.add(payload);
-      this.showAddForm = false;
-      this.inputBadge = "";
-      this.inputDate = "";
-      this.inputContent = "";
+        this.add(payload);
+        this.inputBadge = "";
+        this.inputDate = "";
+        this.inputContent = "";
+      }
+    },
+    updateCard(index) {
+      if (this.validationTest()) {
+        let payload = [];
+        payload.push(index);
+        payload.push(this.$store.state.kanban.inputBadge);
+        payload.push(this.pickColor);
+        payload.push(this.$store.state.kanban.inputDate);
+        payload.push(this.$store.state.kanban.inputContent);
+
+        this.update(payload);
+        this.inputBadge = "";
+        this.inputDate = "";
+        this.inputContent = "";
+      }
     },
   },
 };
@@ -288,7 +314,7 @@ export default {
   z-index: 20;
   height: calc(100% - 70px);
   width: 100vw;
-  background: rgba(0, 0, 0, 0.36);
+  background: rgba(0, 0, 0, 0.7);
   position: absolute;
   color: #fff;
   display: flex;
@@ -299,18 +325,18 @@ export default {
 
 .white-container {
   z-index: 2;
-  width: 30vw;
+  width: 35vw;
   border-radius: 15px;
   background: #2c2f3b;
   padding: 25px;
-  box-shadow: 0px 3px 7px rgba(255, 255, 255, 0.2) inset;
+  box-shadow: 0px 4px 8px rgba(255, 255, 255, 0.2) inset;
 }
 
 .create-input {
   background: #414556;
   border: none;
   outline: none;
-  width: 70%;
+  width: 60%;
   margin-bottom: 15px;
   font-size: 22px;
   color: white;
@@ -321,7 +347,6 @@ export default {
 
 .color-picker-wrap {
   position: relative;
-  /* width: fit-content; */
   display: flex;
   justify-content: space-between;
 }
@@ -339,7 +364,6 @@ export default {
 [for="color"] {
   width: 25px;
   height: 25px;
-  margin-left: 20px;
   border-radius: 5px;
   box-shadow: 0 5px 35px rgba(0, 0, 0, 0.3);
 }
@@ -402,9 +426,8 @@ export default {
 }
 .vertical-wrap {
   display: flex;
-  justify-content: right;
+  justify-content: space-around;
   align-items: center;
-  width: 30%;
 }
 
 .input-content {
@@ -438,8 +461,7 @@ export default {
   box-shadow: 0 5px 35px rgba(0, 0, 0, 0.3);
   width: 28px;
   height: 28px;
-  margin: 0;
-  /* margin:5px 15px 5px 0; */
+  margin: 0 10px 2px 10px;
 }
 
 .button-zone {
@@ -466,7 +488,6 @@ export default {
 
 .kanban-title span {
   vertical-align: -webkit-baseline-middle;
-
 }
 
 .kanban-column {

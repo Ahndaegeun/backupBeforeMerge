@@ -120,6 +120,7 @@ public class MemberServiceImpl implements MemberService {
     public MemberDTO getUserInfo(String memTag) {
         Member member = memberRepository.findByMemTag(memTag);
         return MemberDTO.builder()
+                .memIdx(member.getMemIdx())
                 .memId(member.getMemId())
                 .memNick(member.getMemNick())
                 .memTag(member.getMemTag())

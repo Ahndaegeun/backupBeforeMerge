@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface KanbanRepository extends JpaRepository<Kanban, Long> {
+    Kanban findByProjectPrjctIdx(Long prjctIdx);
 }

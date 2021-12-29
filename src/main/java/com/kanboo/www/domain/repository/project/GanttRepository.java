@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface GanttRepository extends JpaRepository<Gantt, Long> {
     List<Gantt> findByProjectPrjctIdx(Long projectIdx);
+
+    Gantt findByGtIdx(Long gtIdx);
 }

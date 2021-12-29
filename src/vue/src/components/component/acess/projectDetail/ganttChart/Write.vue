@@ -3,7 +3,7 @@
     <div class="write-header">
       <span class="write-title">일감 등록</span>
       <span
-      ><button @click="addTask()" class="write-btn btn">작성</button></span
+        ><button @click="addTask()" class="write-btn btn">작성</button></span
       >
     </div>
     <hr class="write-line" />
@@ -15,10 +15,10 @@
         <th>진척도</th>
         <td>
           <input
-              type="text"
-              v-model="inputProgress"
-              id="progress_w"
-              placeholder="0"
+            type="text"
+            v-model="inputProgress"
+            id="progress_w"
+            placeholder="0"
           />
         </td>
       </tr>
@@ -41,25 +41,27 @@
         <th id="startTitle_w">시작일</th>
         <td>
           <input
-              type="text"
-              v-model="inputStart"
-              @click="isPick(`start`)"
-              id="start_w"
-              placeholder="날짜를 선택하세요"
+            type="text"
+            v-model="inputStart"
+            @click="isPick(`start`)"
+            id="start_w"
+            placeholder="날짜를 선택하세요"
+            readonly
           />
         </td>
       </tr>
       <tr>
-        <th>담장자</th>
-        <td>{{ userId }}</td>
+        <th>담당자</th>
+        <td>{{ memNick }}</td>
         <th id="endTitle_w">종료일</th>
         <td>
           <input
-              type="text"
-              v-model="inputEnd"
-              @click="isPick(`end`)"
-              id="end_w"
-              placeholder="날짜를 선택하세요"
+            type="text"
+            v-model="inputEnd"
+            @click="isPick(`end`)"
+            id="end_w"
+            placeholder="날짜를 선택하세요"
+            readonly
           />
         </td>
       </tr>
@@ -67,11 +69,11 @@
         <th>제목</th>
         <td colspan="4">
           <input
-              type="text"
-              v-model="inputTitle"
-              id="title_w"
-              placeholder="일감 제목을 입력해주세요"
-              style="width: fit-content"
+            type="text"
+            v-model="inputTitle"
+            id="title_w"
+            placeholder="일감 제목을 입력해주세요"
+            style="width: fit-content"
           />
         </td>
       </tr>
@@ -80,27 +82,27 @@
         <td colspan="4">
           <span>
             <input
-                style="width: 230px"
-                type="text"
-                v-model="inputContent"
-                placeholder="일감에 대한 설명을 입력해주세요."
-                id="content_w"
+              style="width: 230px"
+              type="text"
+              v-model="inputContent"
+              placeholder="일감에 대한 설명을 입력해주세요."
+              id="content_w"
             />
           </span>
         </td>
       </tr>
     </table>
     <vue-cal
-        locale="ko"
-        class="vuecal--date-picker"
-        xsmall
-        hide-view-selector
-        :time="false"
-        :transitions="true"
-        active-view="month"
-        :disable-views="['years', 'year', 'week', 'day']"
-        @cell-click="pickDate($event)"
-        v-if="showCalWrite"
+      locale="ko"
+      class="vuecal--date-picker"
+      xsmall
+      hide-view-selector
+      :time="false"
+      :transitions="true"
+      active-view="month"
+      :disable-views="['years', 'year', 'week', 'day']"
+      @cell-click="pickDate($event)"
+      v-if="showCalWrite"
     >
     </vue-cal>
   </div>
@@ -132,8 +134,8 @@ export default {
   computed: {
     ...mapState({
       showCalWrite: (state) => state.gantt.showCalWrite,
+      memNick: state => state.gantt.memNick
     }),
-    userId: () => sessionStorage.getItem("memId") ?? "zerochae",
   },
   methods: {
     ...mapMutations({
@@ -142,47 +144,33 @@ export default {
       calClose: "gantt/calClose",
     }),
     pickDate(data) {
-      let today = moment().format("YYYY-MM-DD").split(" ")[0];
+      moment.locale("ko");
+
+      // let today = moment().format("YYYY-MM-DD").split(" ")[0];
 
       let selectDate = moment(data.format("YYYY-MM-DD"));
+      selectDate = selectDate._i.split(" ")[0];
+      this.calClose();
 
-      if (
-          selectDate.from(today).split(" ")[0] !== "in" &&
-          selectDate._i !== today
-      ) {
-        let target = document.querySelector(
-            ".vuecal__cell--selected .vuecal__cell-content"
-        );
-        target.style.background = "red";
-        setTimeout(() => {
-          target.style.background = "none";
-        }, 1000);
-        clearTimeout();
-        return;
-      } else {
-        selectDate = selectDate._i.split(" ")[0];
-        this.calClose();
-
-        switch (this.startOrEndInWrite) {
-          case "start":
-            this.inputStart = selectDate;
-            break;
-          case "end":
-            this.inputEnd = selectDate;
-            break;
-        }
-        document
-            .querySelector(`#${this.startOrEndInWrite}_w`)
-            .classList.remove("selectDate");
+      switch (this.startOrEndInWrite) {
+        case "start":
+          this.inputStart = selectDate;
+          break;
+        case "end":
+          this.inputEnd = selectDate;
+          break;
       }
+      document
+        .querySelector(`#${this.startOrEndInWrite}_w`)
+        .classList.remove("selectDate");
     },
     isPick(position) {
       this.calWriteOpen();
 
       if (this.startOrEndInWrite != "") {
         document
-            .querySelector(`#${this.startOrEndInWrite}_w`)
-            .classList.remove("selectDate");
+          .querySelector(`#${this.startOrEndInWrite}_w`)
+          .classList.remove("selectDate");
       }
       document.querySelector(`#${position}_w`).classList.add("selectDate");
 
@@ -241,17 +229,21 @@ export default {
         return;
       }
 
+      const sDate = this.inputStart
+      const eDate = this.inputEnd
+
       payload.push(today[1]);
       payload.push({
-        memId: this.userId,
+        memNick: this.memNick,
         title: this.inputTitle,
         content: this.inputContent,
-        start: start[2],
-        end: end[2],
+        start: sDate,
+        end: eDate,
         state: this.inputState,
         priority: this.inputPriority,
         progress: this.inputProgress == "" ? 0 : this.inputProgress,
       });
+
       payload.push({
         start: {
           year: start[0],

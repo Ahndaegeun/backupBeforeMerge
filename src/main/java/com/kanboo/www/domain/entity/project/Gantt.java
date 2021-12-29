@@ -40,6 +40,7 @@ public class Gantt {
         return GanttDTO.builder()
                 .gtIdx(gtIdx)
                 .project(project.entityToDto())
+                .member(member.entityToDto())
                 .gtState(gtState)
                 .gtPriority(gtPriority)
                 .gtProgress(gtProgress)
@@ -49,4 +50,33 @@ public class Gantt {
                 .gtTitle(gtTitle)
                 .build();
     }
+
+    public void changeGtState(String gtState) {
+        this.gtState = gtState;
+    }
+
+    public void changeGtPriority(String gtPriority) {
+        this.gtPriority = gtPriority;
+    }
+
+    public void changeGtProgress(int gtProgress) {
+        this.gtProgress = gtProgress;
+    }
+
+    public void changeGtStartDate(LocalDateTime gtStartDate) {
+        this.gtStartDate = gtStartDate;
+    }
+
+    public void changeGtEndDate(LocalDateTime gtEndDate) {
+        this.gtEndDate = gtEndDate;
+    }
+
+    public void changeGtExplanation(String gtExplanation) {
+        this.gtExplanation = gtExplanation;
+    }
+
+    public void changeGtTitle(String gtTitle) {
+        this.gtTitle = gtTitle;
+    }
+
 }

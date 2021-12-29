@@ -11,23 +11,24 @@
               {{ item.badgeText }}
             </span>
             <DotsHorizontalIcon
-                @click="showMenu(columnIndex, cardIndex)"
-                class="icons"
-                style="float: right"
+              @click="showMenu(columnIndex, cardIndex)"
+              class="icons"
+              style="float: right"
             />
           </p>
           <p>{{ item.user_name }}</p>
         </div>
         <transition name="showMenu">
           <div
-              class="card-in-menu"
-              v-if="item.showCardInMenu == true"
-              :id="`cardMenu${columnIndex}${cardIndex}`"
+            class="card-in-menu"
+            v-if="item.showCardInMenu == true"
+            :id="`cardMenu${columnIndex}${cardIndex}`"
           >
             <p @click="updateCard(columnIndex, cardIndex)">
               <PencilIcon class="icons" />
               수정
             </p>
+            <hr/>
             <p @click="deleteCard(columnIndex, cardIndex)">
               <TrashIcon class="icons" /> 삭제
             </p>
@@ -35,11 +36,8 @@
         </transition>
         <p>{{ item.content }}</p>
         <p class="kanban-timeZone">
-          <ClockIcon
-              @load="D_days(item.startDate, item.endDate, columnIndex, cardIndex)"
-              class="icons"
-          />
-          {{ item.day }}
+          <ClockIcon class="icons" />
+          {{ D_days(item.startDate, item.endDate, columnIndex, cardIndex) }}
         </p>
       </div>
     </div>
@@ -87,25 +85,24 @@ export default {
     ...mapMutations({
       showCardMenu: "kanban/showCardMenu",
       delete: "kanban/delete",
-      update: "kanban/update",
+      preUpdate: "kanban/preUpdate",
       setDays: "kanban/setDays",
-      D_Days: "kanban/D_Days",
-      // find: "kanban/find",
+      resetUpdateTarget: "kanban/resetUpdateTarget",
     }),
     showMenu(i, j) {
       var indexArr = [i, j];
       this.showCardMenu(indexArr);
     },
     deleteCard(i, j) {
-      // var target = document.querySelector(`#cardMenu${i}${j}`)
       var indexArr = [i, j];
       this.delete(indexArr);
     },
     updateCard(i, j) {
       var indexArr = [i, j];
-      this.update(indexArr);
+      this.preUpdate(indexArr);
     },
     D_days(start, end, i, j) {
+      moment.locale("en");
       var today = moment().format("YYYY-MM-DD HH:mm:ss");
       var startDay = moment(start, "YYYY-MM-DD HH:mm:ss");
       var endDay = moment(end, "YYYY-MM-DD HH:mm:ss");
@@ -115,9 +112,9 @@ export default {
       var registrationTime = startDay.from(today).split(" ");
 
       date +=
-          registrationTime[0] === "a" || registrationTime[0] === "an"
-              ? 1
-              : registrationTime[0];
+        registrationTime[0] === "a" || registrationTime[0] === "an"
+          ? 1
+          : registrationTime[0];
 
       switch (registrationTime[1]) {
         case "few":
@@ -145,13 +142,29 @@ export default {
       let d_day = "D";
 
       let day = startDay.from(endDay).split(" ");
-      if (day[0] === "in") {
-        d_day += `+${day[1]}`;
-      } else if (day[0] === "a" || day[0] === "an") {
-        d_day += "-1";
+
+      if (day[day.length - 1] === "ago") {
+        if (day[1] === "day" || day[1] === "days") {
+          if (day[0] === "a" || day[0] === "an") {
+            d_day += "-1";
+          } else {
+            d_day += `-${day[0]}`;
+          }
+        } else {
+          d_day += "-1"; // 내일인데 24시간 안지났으면 이거 나와
+        }
       } else {
-        d_day += `-${day[0]}`;
+        if (day[2] === "day" || day[2] === "days") {
+          if (day[1] === "a" || day[1] === "an") {
+            d_day += "+1";
+          } else {
+            d_day += `+${day[1]}`;
+          }
+        } else {
+          d_day = "D-Day"; // 오늘 날짜 선택하면 이거 나와
+        }
       }
+
       this.day = d_day;
 
       var payload = [];
@@ -159,6 +172,8 @@ export default {
       payload.push(i);
       payload.push(j);
       this.setDays(payload);
+
+      return `${this.time} (${this.day})`;
     },
   },
 };
@@ -184,13 +199,20 @@ export default {
 .card-in-menu {
   cursor: pointer;
   position: absolute;
-  background-color: white;
-  color: black;
-  padding: 5px;
+  background-color: #2c2f3b;
+  color: #fff;
+  padding: 12px;
   border-radius: 10px;
   right: 0;
   top: 35%;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.6);
+}
+
+.card-in-menu p:hover {
+color: #ff8906;
+}
+.card-in-menu hr {
+  margin-top: 12px;
 }
 
 .icons {
@@ -250,7 +272,7 @@ export default {
   color: white;
 }
 .cardGhostDrop {
-  transition: all 5s ease-in;
+  transition: all 3s ease-in;
   transform: rotate(-20deg) scale(0.9);
 }
 </style>

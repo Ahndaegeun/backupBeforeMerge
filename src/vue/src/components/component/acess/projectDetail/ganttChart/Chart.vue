@@ -7,19 +7,19 @@
         <ChevronRightIcon class="icons" @click="nextMonth" />
       </div>
       <ul class="chart-date">
-        <li v-for="day in date" :key="day">
+        <li v-for="day in this.$store.state.gantt.dateList" :key="day">
           {{ day }}
         </li>
       </ul>
     </div>
     <ul class="chart-bars">
       <li
-          v-for="(task, index) in chart.tasks[year][month]"
-          :key="index"
-          @click="showInfo(index)"
+        v-for="(task, index) in this.$store.state.gantt.showData"
+        :key="index"
+        @click="showInfo(index)"
       >
         <span
-            :style="{
+          :style="{
             background: setColor(task.priority),
             width: `${task.progress}%`,
           }"
@@ -30,26 +30,25 @@
       </li>
     </ul>
     <div
-        class="todayLine"
-        :style="{
+      class="todayLine"
+      :style="{
         left: `${todayLineOffsetLeft}px`,
         top: `${todayLineOffsetTop}px`,
       }"
-        v-if="isToday"
+      v-if="isToday"
     ></div>
   </div>
 </template>
 
 <script>
 import moment from "moment";
-import { mapActions, mapMutations, mapState } from "vuex";
+import { mapActions, mapMutations } from "vuex";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/vue/outline";
 
 export default {
   name: "chart",
   data() {
     return {
-      date: [],
       year: "",
       month: "",
       isToday: "true",
@@ -62,38 +61,40 @@ export default {
     ChevronLeftIcon,
     ChevronRightIcon,
   },
-  computed: {
-    ...mapState({
-      chart: (state) => state.gantt.chart,
-    }),
-  },
   created() {
-    this.getGanttData()
-    this.renderDate();
     this.month = new Date().getMonth() + 1;
-
+    this.renderDate();
+    this.getUserInfo();
+    this.getGanttData();
+    window.addEventListener('resize', this.render )
   },
   mounted() {
     if (this.first) {
-      this.renderChart();
       this.renderTodayLine();
-    }
-
-
-    window.onresize = () => {
       this.renderChart();
-    };
+    }
   },
   updated() {
     !this.first ? this.renderChart() : (this.first = false);
   },
+  unmounted() {
+    window.removeEventListener("resize", this.render)
+  },
   methods: {
     ...mapMutations({
       select: "gantt/select",
+      renderDate: "gantt/renderDate",
+      renderChart: "gantt/renderChart",
+      setPrevMonth: "gantt/setPrevMonth"
     }),
     ...mapActions({
-      getGanttData: "gantt/getGanttData"
+      getGanttData: "gantt/getGanttData",
+      getUserInfo: "gantt/getUserInfo"
     }),
+    render(){
+      this.renderTodayLine();
+      this.renderChart();
+    },
     renderTodayLine() {
       let today = moment().format("YYYY-MM-DD").split("-");
 
@@ -108,81 +109,36 @@ export default {
 
       let f_arr = days.filter((day) => day.textContent === today[2]);
 
-      this.todayLineOffsetLeft = f_arr[0].offsetLeft;
-      this.todayLineOffsetTop = f_arr[0].offsetTop + 50;
-    },
-    renderDate() {
-      this.date = [];
-
-      let today = moment().format("YYYY-MM-DD").split("-");
-
-      if (this.year === "") {
-        this.year = today[0];
-      }
-
-      if (this.month === "") {
-        this.month = today[1];
-      }
-
-      let lastDay = new Date(today[0], this.month, 0).getDate();
-
-      for (let day = 1; day < lastDay + 1; day++) {
-        if (day < 10) {
-          day = `0${day}`;
-        }
-        this.date.push(`${day}`);
-      }
-    },
-    renderChart() {
-      console.log("차트돈다");
-
-      let days = document.querySelectorAll(".chart-date li");
-      let tasks = document.querySelectorAll(".chart-bars li");
-      days = Array.from(days);
-      tasks = Array.from(tasks);
-
-      let left = 0,
-          width = 0,
-          f_arr = [];
-
-      tasks.forEach((el, index) => {
-        let start = this.chart.tasks[this.year][this.month][index].start;
-
-        f_arr = days.filter((day) => day.textContent === start);
-        left = f_arr[0].offsetLeft - 35;
-
-        let end = this.chart.tasks[this.year][this.month][index].end;
-
-        f_arr = days.filter((day) => day.textContent === end);
-        width = f_arr[0].offsetLeft + f_arr[0].offsetWidth - left - 35;
-
-        el.style.left = `${left}px`;
-        el.style.width = `${width}px`;
-
-        el.style.opacity = 1;
-      });
+      this.todayLineOffsetLeft = f_arr[0].offsetLeft + 50;
+      this.todayLineOffsetTop = f_arr[0].offsetTop + 110;
     },
     showInfo(index) {
-      let payload = [];
-      payload.push(this.month, index, this.month, this.year);
-      this.select(payload);
+      this.select(index);
     },
     prevMonth() {
-      for (let key of Object.keys(this.chart.tasks[this.year])) {
-        if (this.month - 1 == key) {
-          this.month--;
-          this.renderDate();
-          return;
+      try {
+        for (let key of Object.keys(this.$store.state.gantt.chart.tasks[this.$store.state.gantt.year])) {
+          if (this.$store.state.gantt.month - 1 == key) {
+            this.setPrevMonth()
+            this.renderDate();
+            break;
+          }
         }
+      } catch (err) {
+        alert("지난달 데이터가 없습니다.")
       }
     },
     nextMonth() {
-      for (let key of Object.keys(this.chart.tasks[this.year])) {
-        if (this.month + 1 == key) {
-          this.month++;
-          this.renderDate();
-          return;
+      try {
+        for (let key of Object.keys(this.$store.state.gantt.chart.tasks[this.year])) {
+          if (this.month + 1 == key) {
+            this.month++;
+            this.renderDate();
+            break;
+          }
         }
+      } catch (err) {
+        alert("다음달 데이터가 없습니다.")
       }
     },
     setColor(str) {
@@ -200,30 +156,30 @@ export default {
       }
     },
     monthName() {
-      switch (this.month) {
-        case 1:
+      switch (this.$store.state.gantt.month) {
+        case "1": case 1:
           return "January";
-        case 2:
+        case "2": case 2:
           return "February";
-        case 3:
+        case "3": case 3:
           return "March";
-        case 4:
+        case "4": case 4:
           return "April";
-        case 5:
+        case "5": case 5:
           return "May";
-        case 6:
+        case "6": case 6:
           return "June";
-        case 7:
+        case "7": case 7:
           return "July";
-        case 8:
+        case "8": case 8:
           return "August";
-        case 9:
+        case "9": case 9:
           return "September";
-        case 10:
+        case "10": case 10:
           return "October";
-        case 11:
+        case "11": case 11:
           return "November";
-        case 12:
+        case "12": case 12:
           return "December";
       }
     },
@@ -234,7 +190,7 @@ export default {
 <style scoped>
 .chart-container {
   color: white;
-  height: calc(60vh - 70px);
+  height: calc(65vh - 70px);
   border-radius: 25px;
   background: #2c2f3b;
   padding: 20px;

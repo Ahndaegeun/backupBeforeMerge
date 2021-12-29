@@ -70,6 +70,8 @@ public class KanbanItem {
                 .kbItmNum(kbItmNum)
                 .kbBadge(kbBadge)
                 .kbColor(kbColor)
+                .kbEndDate(kbEndDate)
+                .kbStartDate(kbStartDate)
                 .build();
     }
 }
