@@ -32,6 +32,7 @@ public class GanttController {
 
     @PostMapping("/updateGantt")
     public GanttDTO updateGantt(GanttDTO ganttDTO) {
+        System.out.println(ganttDTO);
         return ganttService.updateGantt(ganttDTO);
     }
 

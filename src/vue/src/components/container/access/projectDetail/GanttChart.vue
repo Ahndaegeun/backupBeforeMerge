@@ -1,7 +1,7 @@
 <template>
-  <div className="ganttChart-container">
-    <Chart/>
-    <div className="gantt-footer">
+  <div class="ganttChart-container">
+    <Chart :maxHeight="maxHeight"/>
+    <div class="gantt-footer">
       <Detail class="detail"/>
       <Write class="write"/>
     </div>
@@ -19,6 +19,11 @@ export default {
     Detail,
     Write,
   },
+  data() {
+    return {
+      maxHeight: '55vh'
+    }
+  }
 };
 </script>
 
@@ -27,12 +32,12 @@ export default {
   padding: 20px;
   height: calc(100vh - 70px);
   overflow: hidden;
-
 }
 
 .gantt-footer {
   display: flex;
   color: white;
+  justify-content: space-between;
 }
 
 </style>

@@ -62,28 +62,20 @@ const gantt = {
       state.chart.tasks[state.openYear][state.openMonth][state.openIndex] =
           payload;
 
-      let today = moment();
-
-      let start = `${today.format("YYYY")}-${today.format("MM")}-${
-          payload.start
-      } 00:00:00`;
-      let end = `${today.format("YYYY")}-${today.format("MM")}-${
-          payload.end
-      } 00:00:00`;
-
       let ganttDTO = {
         gtIdx: payload.gtIdx,
         gtExplanation: payload.content,
         gtPriority: payload.priority,
         gtProgress: payload.progress,
-        gtStartDate: start,
-        gtEndDate: end,
+        gtStartDate: payload.start,
+        gtEndDate: payload.end,
         gtState: payload.state,
         gtTitle: payload.title,
       };
 
       state.detail =
           state.chart.tasks[state.year][state.month][state.openIndex];
+      console.log(ganttDTO)
 
       axios.post("/gantt/updateGantt", null, {
         params: ganttDTO,
@@ -168,21 +160,23 @@ const gantt = {
           f_arr = [];
 
       tasks.forEach((el, index) => {
-        let start = state.showData[index].start;
+        if(state.showData[index].start.split(" ")[0].split("-")[1] == state.month) {
+          let start = state.showData[index].start.split(" ")[0].split("-")[2];
 
-        f_arr = days.filter((day) => day.textContent === start);
+          f_arr = days.filter((day) => day.textContent === start);
 
-        left = f_arr[0].offsetLeft - 20;
+          left = f_arr[0].offsetLeft - 20;
 
-        let end = state.showData[index].end;
+          let end = state.showData[index].end.split(" ")[0].split("-")[2];
 
-        f_arr = days.filter((day) => day.textContent === end);
-        width = f_arr[0].offsetLeft + f_arr[0].offsetWidth - left - 20;
+          f_arr = days.filter((day) => day.textContent === end);
+          width = f_arr[0].offsetLeft + f_arr[0].offsetWidth - left - 20;
 
-        el.style.left = `${left}px`;
-        el.style.width = `${width}px`;
+          el.style.left = `${left}px`;
+          el.style.width = `${width}px`;
 
-        el.style.opacity = 1;
+          el.style.opacity = 1;
+        }
       });
     },
     setPrevMonth(state) {
@@ -191,6 +185,14 @@ const gantt = {
         state.year--
       } else {
         state.month--
+      }
+    },
+    setNextMonth(state) {
+      if(state.month === 12) {
+        state.month = 1
+        state.year++
+      } else {
+        state.month++
       }
     }
   },

@@ -1,5 +1,6 @@
 <template>
-  <div class="chart-container">
+  <div class="chart-container"
+       :style="{'max-height': maxHeight}">
     <div class="date-container">
       <div class="chart-header">
         <ChevronLeftIcon class="icons" @click="prevMonth" />
@@ -33,7 +34,6 @@
       class="todayLine"
       :style="{
         left: `${todayLineOffsetLeft}px`,
-        top: `${todayLineOffsetTop}px`,
       }"
       v-if="isToday"
     ></div>
@@ -56,6 +56,9 @@ export default {
       todayLineOffsetLeft: 0,
       todayLineOffsetTop: 0,
     };
+  },
+  props: {
+    maxHeight: String
   },
   components: {
     ChevronLeftIcon,
@@ -85,7 +88,9 @@ export default {
       select: "gantt/select",
       renderDate: "gantt/renderDate",
       renderChart: "gantt/renderChart",
-      setPrevMonth: "gantt/setPrevMonth"
+      setPrevMonth: "gantt/setPrevMonth",
+      setShowList: "gantt/setShowList",
+      setNextMonth: "gantt/setNextMonth"
     }),
     ...mapActions({
       getGanttData: "gantt/getGanttData",
@@ -98,7 +103,7 @@ export default {
     renderTodayLine() {
       let today = moment().format("YYYY-MM-DD").split("-");
 
-      if (today[1] == this.month) {
+      if (today[1] == this.$store.state.gantt.month) {
         this.isToday = true;
       } else {
         this.isToday = false;
@@ -110,36 +115,31 @@ export default {
       let f_arr = days.filter((day) => day.textContent === today[2]);
 
       this.todayLineOffsetLeft = f_arr[0].offsetLeft + 50;
-      this.todayLineOffsetTop = f_arr[0].offsetTop + 110;
     },
     showInfo(index) {
       this.select(index);
     },
     prevMonth() {
-      try {
-        for (let key of Object.keys(this.$store.state.gantt.chart.tasks[this.$store.state.gantt.year])) {
-          if (this.$store.state.gantt.month - 1 == key) {
-            this.setPrevMonth()
-            this.renderDate();
-            break;
-          }
+      for (let key of Object.keys(this.$store.state.gantt.chart.tasks[this.$store.state.gantt.year])) {
+        if (this.$store.state.gantt.month - 1 == key) {
+          this.setPrevMonth()
+          this.setShowList(this.$store.state.gantt.chart.tasks)
+          this.renderDate();
+          break;
         }
-      } catch (err) {
-        alert("지난달 데이터가 없습니다.")
       }
+      this.renderTodayLine();
     },
     nextMonth() {
-      try {
-        for (let key of Object.keys(this.$store.state.gantt.chart.tasks[this.year])) {
-          if (this.month + 1 == key) {
-            this.month++;
-            this.renderDate();
-            break;
-          }
+      for (let key of Object.keys(this.$store.state.gantt.chart.tasks[this.$store.state.gantt.year])) {
+        if (this.$store.state.gantt.month + 1 == key) {
+          this.setNextMonth()
+          this.setShowList(this.$store.state.gantt.chart.tasks)
+          this.renderDate();
+          break;
         }
-      } catch (err) {
-        alert("다음달 데이터가 없습니다.")
       }
+      this.renderTodayLine();
     },
     setColor(str) {
       switch (str) {
@@ -190,14 +190,15 @@ export default {
 <style scoped>
 .chart-container {
   color: white;
-  height: calc(65vh - 70px);
   border-radius: 25px;
   background: #2c2f3b;
+  height: 100%;
   padding: 20px;
   position: relative;
   overflow: hidden;
   width: 100%;
   box-shadow: 0px 10px 25px rgba(255, 255, 255, 0.2) inset;
+  margin-bottom: 20px;
 }
 
 .chart-header {
@@ -226,10 +227,9 @@ export default {
 
 .chart-date {
   display: flex;
-  margin: 0 0 20px 0;
+  margin: 10px 0 20px 0;
   font-weight: bold;
   font-size: 1.2rem;
-  margin-top: 10px;
   filter: drop-shadow(2px 4px 4px rgba(10, 10, 10, 0.8));
 }
 
@@ -300,12 +300,24 @@ export default {
 }
 
 .todayLine {
-  top: 0;
+  bottom: 0;
   position: absolute;
-  height: 100vh;
-  border-right: 1px solid red;
-  opacity: 0.5;
+  height: 5%;
+  border-right: 1px solid #ff000050;
   filter: drop-shadow(2px 4px 4px rgba(10, 10, 10, 0.8));
+  z-index: 999999;
+}
+
+.todayLine::after {
+  content: "Today";
+  position: absolute;
+  background: #ff8906;
+  font-size: 12px;
+  padding: 3px 5px;
+  border-radius: 20px;
+  color: #fff;
+  top: -15px;
+  left: -20px;
 }
 
 ::-webkit-scrollbar {

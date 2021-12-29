@@ -12,15 +12,8 @@
       <tr>
         <th>상태</th>
         <td><input type="text" value="신규" readonly /></td>
-        <th>진척도</th>
-        <td>
-          <input
-            type="text"
-            v-model="inputProgress"
-            id="progress_w"
-            placeholder="0"
-          />
-        </td>
+        <th>담당자</th>
+        <td>{{ memNick }}</td>
       </tr>
       <tr>
         <th>우선순위</th>
@@ -38,21 +31,53 @@
             <!-- #f44336 -->
           </select>
         </td>
-        <th id="startTitle_w">시작일</th>
+        <th>진척도</th>
+        <td>
+          <input
+              type="text"
+              v-model="inputProgress"
+              id="progress_w"
+              placeholder="0"
+          />
+        </td>
+
+      </tr>
+      <tr>
+        <th>제목</th>
         <td>
           <input
             type="text"
-            v-model="inputStart"
-            @click="isPick(`start`)"
-            id="start_w"
-            placeholder="날짜를 선택하세요"
-            readonly
+            v-model="inputTitle"
+            id="title_w"
+            placeholder="일감 제목을 입력해주세요"
+            style="width: fit-content"
+          />
+        </td>
+        <th id="startTitle_w">시작일</th>
+        <td>
+          <input
+              type="text"
+              v-model="inputStart"
+              @click="isPick(`start`)"
+              id="start_w"
+              placeholder="날짜를 선택하세요"
+              readonly
           />
         </td>
       </tr>
       <tr>
-        <th>담당자</th>
-        <td>{{ memNick }}</td>
+        <th>설명</th>
+        <td>
+          <span>
+            <input
+              style="width: 230px"
+              type="text"
+              v-model="inputContent"
+              placeholder="일감에 대한 설명을 입력해주세요."
+              id="content_w"
+            />
+          </span>
+        </td>
         <th id="endTitle_w">종료일</th>
         <td>
           <input
@@ -63,32 +88,6 @@
             placeholder="날짜를 선택하세요"
             readonly
           />
-        </td>
-      </tr>
-      <tr>
-        <th>제목</th>
-        <td colspan="4">
-          <input
-            type="text"
-            v-model="inputTitle"
-            id="title_w"
-            placeholder="일감 제목을 입력해주세요"
-            style="width: fit-content"
-          />
-        </td>
-      </tr>
-      <tr>
-        <th>설명</th>
-        <td colspan="4">
-          <span>
-            <input
-              style="width: 230px"
-              type="text"
-              v-model="inputContent"
-              placeholder="일감에 대한 설명을 입력해주세요."
-              id="content_w"
-            />
-          </span>
         </td>
       </tr>
     </table>
@@ -184,6 +183,7 @@ export default {
       }
     },
     addTask() {
+      moment.locale("en")
       let checkList = [
         document.querySelector("#start_w"),
         document.querySelector("#end_w"),
@@ -272,8 +272,7 @@ export default {
 .write-container {
   border-radius: 25px;
   height: calc(30vh - 40px);
-  width: 95%;
-  margin: 20px 0 0 20px;
+  width: 49%;
   padding: 20px;
   background: #2c2f3b;
   position: relative;
@@ -302,7 +301,7 @@ export default {
 }
 
 .write-title {
-  font-size: 22px;
+  font-size: 18px;
 }
 
 .write-line {
@@ -322,17 +321,17 @@ export default {
   padding: 2px;
   box-shadow: 3px 6px 10px rgba(255, 255, 255, 0.2) inset;
   -webkit-filter: drop-shadow(0px 15px 15px rgba(10, 10, 10, 0.8));
+  font-size: 12px;
 }
 
 .write-table {
   border: none;
   width: 100%;
   text-align: left;
-  height: 90%;
 }
 
 .write-table th,
-td {
+.write-table td {
   width: 50px;
   filter: drop-shadow(2px 4px 4px rgba(10, 10, 10, 0.8));
 }
