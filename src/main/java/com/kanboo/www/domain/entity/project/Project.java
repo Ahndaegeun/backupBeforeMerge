@@ -30,6 +30,7 @@ public class Project {
     private String prjctDelAt;
     private String prjctComplAt;
     private String prjctReadMe;
+    private String prjctManager;
 
     @OneToMany(mappedBy = "project")
     private List<ProjectMember> projectMembers = new ArrayList<>();
@@ -59,6 +60,7 @@ public class Project {
                 .prjctDelAt(prjctDelAt)
                 .prjctComplAt(prjctComplAt)
                 .prjctReadMe(prjctReadMe)
+                .prjctManager(prjctManager)
                 .build();
     }
 

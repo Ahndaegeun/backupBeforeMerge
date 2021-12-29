@@ -26,4 +26,5 @@ public interface ProjectService {
     ProjectDTO updateProjectState(ProjectDTO projectDTO);
 
     Long getMaxIndexOfProject(String selected, String key);
+
 }

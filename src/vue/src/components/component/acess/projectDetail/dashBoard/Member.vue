@@ -2,12 +2,12 @@
   <div class="container">
     <h2>Member</h2>
     <ul class="mem-list">
-      <li v-for="item in memList" 
+      <li v-for="item in this.$store.state.dashBoard.memberList"
           :key="item">
         <span class="icon"><img src="../../../../../assets/memIcon.png" alt="icon"></span>
-        <span class="mem-role">{{item.memRole}}</span>
-        <span class="mem-id">{{item.memId}}</span>
-        <span class="mem-code">{{item.memCode}}</span>
+        <span class="mem-role">{{item.prjctMemRole}}</span>
+        <span class="mem-id">{{item.member.memId}}</span>
+        <span class="mem-code">{{item.member.memTag}}</span>
       </li>
     </ul>
   </div>

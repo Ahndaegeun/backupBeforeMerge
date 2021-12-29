@@ -2,37 +2,25 @@ package com.kanboo.www.service.impl.project;
 
 import com.kanboo.www.domain.entity.member.Member;
 import com.kanboo.www.domain.entity.member.ProjectMember;
+import com.kanboo.www.domain.entity.project.*;
 import com.kanboo.www.domain.entity.project.Calendar;
 import com.kanboo.www.domain.entity.project.Compiler;
-import com.kanboo.www.domain.entity.project.CompilerFile;
-import com.kanboo.www.domain.entity.project.Issue;
-import com.kanboo.www.domain.entity.project.Project;
 import com.kanboo.www.domain.repository.member.MemberRepository;
-import com.kanboo.www.domain.repository.project.CompilerContentRepository;
-import com.kanboo.www.domain.repository.project.CompilerRepository;
-import com.kanboo.www.domain.repository.project.ProjectMemberRepository;
-import com.kanboo.www.domain.repository.project.ProjectRepository;
+import com.kanboo.www.domain.repository.project.*;
 import com.kanboo.www.dto.member.ProjectMemberDTO;
-import com.kanboo.www.dto.member.ProjectMemberDTOInter;
-import com.kanboo.www.dto.member.nativedto.ProjectMemberNative;
 import com.kanboo.www.dto.project.CalendarDTO;
-import com.kanboo.www.dto.project.CompilerDTO;
 import com.kanboo.www.dto.project.IssueDTO;
 import com.kanboo.www.dto.project.ProjectDTO;
 import com.kanboo.www.security.JwtSecurityService;
-import com.kanboo.www.service.inter.project.CompilerContentService;
 import com.kanboo.www.service.inter.project.ProjectService;
 import com.kanboo.www.util.FileSystemUtil;
 import com.kanboo.www.util.SaveCompileFile;
-import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
-import org.qlrm.mapper.JpaResultMapper;
 import org.springframework.stereotype.Service;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -47,6 +35,9 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectMemberRepository projectMemberRepository;
     private final MemberRepository memberRepository;
     private final CompilerContentRepository compilerContentRepository;
+    private final ChattingRepository chattingRepository;
+    private final DemandRepository demandRepository;
+    private final KanbanRepository kanbanRepository;
 
     @PersistenceContext
     private EntityManager em;
@@ -224,6 +215,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         /** 저장 */
         Member member = memberRepository.findByMemTag(tag);
+        project.setPrjctManager(member.getMemId());
         Project saveProject = projectRepository.save(project.dtoToEntity());
 
         Compiler compiler = Compiler.builder()
@@ -261,6 +253,23 @@ public class ProjectServiceImpl implements ProjectService {
                 .prjctMemRole("PM")
                 .build();
         ProjectMember save = projectMemberRepository.save(pm);
+
+        Chat chat = Chat.builder()
+                .member(member)
+                .project(saveProject)
+                .build();
+        chattingRepository.save(chat);
+
+        Demand demand = Demand.builder()
+                .project(saveProject)
+                .demandReviseDate(LocalDateTime.now())
+                .build();
+        demandRepository.save(demand);
+
+        Kanban kanban = Kanban.builder()
+                .project(saveProject)
+                .build();
+        kanbanRepository.save(kanban);
 
         String successYn = "N";
         if(save != null) {
@@ -304,7 +313,11 @@ public class ProjectServiceImpl implements ProjectService {
             createFile.put("fileName", "Main");
             createFile.put("fileExtension", ".java");
             createFile.put("fileDetail", main.toString());
+            
             boolean isSave = saveCompileFile.saveFile(createFile);
+            
+            
+            
             if(isSave) {
                 param.put("project", saveProject.entityToDto());
                 successYn = "Y";

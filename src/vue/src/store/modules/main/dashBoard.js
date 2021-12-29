@@ -1,56 +1,59 @@
 import axios from "axios"
 
-axios.defaults.baseURL = "http://localhost:8099"
-
 const dashBoard = {
-  namespaced: true,
-  state: {
-    gantt: [],
-    progress: 0,
-    memberList: [],
-    gitCommit: [],
-    issue: [],
-    finishDay: 0,
-    boardList: [],
-    scheduleList: [],
-    readMeContent: "",
-    projectIdx: 1
-  },
-  mutations: {
-    setReadMeContent(state, contents) {
-      state.readMeContent = contents
-    }
-  },
-  actions: {
-    saveReadMe(context, contents) {
-      const url = "/pdtail/saveReadMe"
-      axios.post(url, null,{
-        params: {
-          prjctIdx: 1,
-          prjctReadMe: contents
-        }
-      })
-          .then(res => {
-            console.log(res)
-            if(res) {
-              context.commit("setReadMeContent", contents)
-            }
-          })
+    namespaced: true,
+    state: {
+        gantt: [],
+        progress: 0,
+        memberList: [],
+        gitCommit: [],
+        issue: [],
+        finishDay: 0,
+        boardList: [],
+        scheduleList: [],
+        readMeContent: "",
+        projectIdx: 1,
+        start: "",
+        end: ""
     },
-    mountGetData(context) {
-      const url = "/pdtail/getData"
-      axios.get(url, {
-        params: {
-          projectIdx: context.state.projectIdx,
-          startDate: "2021-01-01 00:11:11",
-          endDate: "2021-01-07 00:11:11"
+    mutations: {
+        setReadMeContent(state, contents) {
+            state.readMeContent = contents
+        },
+        setMemberList(state, item) {
+            state.memberList = item
         }
-      })
-          .then(res => {
-            console.log(res)
-          })
+    },
+    actions: {
+        saveReadMe(context, contents) {
+            const url = "/pdtail/saveReadMe"
+            axios.post(url, null, {
+                params: {
+                    prjctIdx: 1,
+                    prjctReadMe: contents
+                }
+            })
+                .then(res => {
+                    console.log(res)
+                    if (res) {
+                        context.commit("setReadMeContent", contents)
+                    }
+                })
+        },
+        mountGetData(context) {
+            const url = "/dashboard/getData"
+            axios.get(url, {
+                params: {
+                    prjctIdx: sessionStorage.getItem("project"),
+                }
+            })
+                .then(res => {
+                    console.log(res.data)
+                    context.commit("setMemberList", res.data.projectMemberList)
+                    // context.commit("setReadMeContent", res.data.project.prjctReadMe)
+                })
+        }
     }
-  }
 }
 
 export default dashBoard

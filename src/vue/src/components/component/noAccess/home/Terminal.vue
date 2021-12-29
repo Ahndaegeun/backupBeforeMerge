@@ -49,7 +49,7 @@ export default {
     }),
   },
   mounted() {
-    this.isLang();
+    this.isLang("en");
   },
   updated() {
     if (this.printToken) {

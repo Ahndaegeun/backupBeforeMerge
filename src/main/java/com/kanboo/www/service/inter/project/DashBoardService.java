@@ -5,5 +5,5 @@ import com.kanboo.www.dto.project.ProjectDTO;
 import java.util.Map;
 
 public interface DashBoardService {
-    ProjectDTO getDashBoard(Map<String, String> map);
+    void getDashBoard(Map<String, Object> result, Long prjctIdx);
 }

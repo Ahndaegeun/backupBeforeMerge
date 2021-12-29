@@ -6,15 +6,14 @@
                         <i class="fas fa-plus-circle"></i>
                     </div>
             </li>
-            <li class="list-item" v-for="item in projectList" :key="item">
+            <li class="list-item" v-for="item in this.$store.state.projectList.projectList" :key="item">
                 <a @click="moveToDashBoard(item)">
                     <div class="detail">
                         <div class="prjct-name">{{ item.prjctNm }}</div>
                         <div class="detail-wrap">
                             <span>기간: {{ item.prjctStartDate }} ~ {{ item.prjctEndDate }}</span>
-                            <span>진행도: {{ item.prjctProgress }}</span>
                         </div>
-                        <div>팀장: </div>
+                        <div>팀장: {{item.prjctManager}}</div>
                     </div>
                 </a>
             </li>
@@ -23,7 +22,7 @@
 </template>
 
 <script>
-import {mapMutations, mapState} from 'vuex'
+import {mapMutations} from 'vuex'
 
 
 export default {
@@ -32,11 +31,6 @@ export default {
         return {
 
         }
-    },
-    computed: {
-      ...mapState({
-        projectList : state => state.projectList.projectList
-      })
     },
     methods: {
         ...mapMutations({

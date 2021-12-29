@@ -3,7 +3,9 @@ const projectList = {
   state: {
     IsModalOpen: false,
     projectList: [],
-    member: {}
+    member: {},
+    progressLength: 0,
+    completeLength: 0
   },
   mutations: {
     changeIsModalOpen(state){
@@ -27,10 +29,21 @@ const projectList = {
       item.projectMemberDtoList.forEach(i => {
         state.projectList.push(i.project)
       })
+
+      state.projectList.forEach(item => {
+        if(item.prjctComplAt === "n" || item.prjctComplAt === "N") {
+          state.progressLength++
+        } else {
+          state.completeLength++
+        }
+      })
     },
     addCreatedProject(state, item) {
       state.projectList.push(item)
     },
+    listRest(state) {
+      state.projectList = []
+    }
   },
 
   actions: {

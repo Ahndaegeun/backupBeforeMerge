@@ -13,4 +13,5 @@ import java.util.List;
 
 @Repository
 public interface ProjectMemberRepository extends JpaRepository<ProjectMember, ProjectMemberId>, ProjectMemberDslRepository {
+    List<ProjectMember> findByProjectPrjctIdx(Long prjctIdx);
 }

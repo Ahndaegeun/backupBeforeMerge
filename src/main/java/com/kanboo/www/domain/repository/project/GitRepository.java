@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface GitRepository extends JpaRepository<Git, Long> {
+    Git findByProjectPrjctIdx(Long prjctIdx);
 }

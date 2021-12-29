@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -17,8 +18,10 @@ public class DashBoardController {
 
     private final DashBoardService dashBoardService;
 
-    @GetMapping("/getList")
-    public ProjectDTO getDashBoard(@RequestParam Map<String, String> map) {
-        return dashBoardService.getDashBoard(map);
+    @GetMapping("/getData")
+    public Map<String, Object> getDashBoard(@RequestParam Long prjctIdx) {
+        Map<String, Object> result = new HashMap<>();
+        dashBoardService.getDashBoard(result, prjctIdx);
+        return result;
     }
 }

@@ -19,6 +19,7 @@
             type="text"
             :value="inputStartDay"
             @click="showCal"
+            readonly
           />
           <input
             class="create-input"
@@ -27,6 +28,7 @@
             placeholder="End"
             :value="inputEndDay"
             @click="showCal"
+            readonly
           />
           <vue-cal
             locale="ko"
@@ -81,6 +83,7 @@ export default {
       addCreatedProject: 'projectList/addCreatedProject'
     }),
     pickDate(data) {
+      moment.locale("en")
       let today = moment().format("YYYY-MM-DD HH:mm");
       let todayWithOutTime = moment().format("YYYY-MM-DD");
       let selectDate = moment(data.format("YYYY-MM-DD"))._i;

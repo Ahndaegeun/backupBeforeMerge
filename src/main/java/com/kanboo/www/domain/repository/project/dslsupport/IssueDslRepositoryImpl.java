@@ -2,7 +2,9 @@ package com.kanboo.www.domain.repository.project.dslsupport;
 
 import com.kanboo.www.domain.entity.project.Issue;
 import com.kanboo.www.domain.entity.project.QIssue;
+import com.kanboo.www.domain.entity.project.QProject;
 import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
 import javax.persistence.EntityManager;
@@ -22,4 +24,23 @@ public class IssueDslRepositoryImpl implements IssueDslRepository {
 				.orderBy(qIssue.issueDate.desc())
 				.fetch();
 	}
+
+	@Override
+	public List<Issue> getDashBoardIssue(Long prjctIdx) {
+
+		QIssue issue = QIssue.issue;
+		QProject project = QProject.project;
+
+		JPAQueryFactory query = new JPAQueryFactory(em);
+		return query.selectFrom(issue)
+				.rightJoin(issue.project, project)
+				.fetchJoin()
+				.where(
+						issue.project.prjctIdx.eq(prjctIdx)
+				)
+				.limit(6).offset(0)
+				.fetch();
+	}
+
+
 }

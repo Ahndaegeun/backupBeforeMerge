@@ -7,5 +7,6 @@ import java.util.List;
 
 @Repository
 public interface IssueDslRepository {
-	List<Issue>  findAllByProjectIdxDesc(Long projectIdx);
+	List<Issue> findAllByProjectIdxDesc(Long projectIdx);
+	List<Issue> getDashBoardIssue(Long prjctIdx);
 }

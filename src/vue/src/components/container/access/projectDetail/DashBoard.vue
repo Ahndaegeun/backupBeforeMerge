@@ -38,10 +38,11 @@ import Member from '../../../component/acess/projectDetail/dashBoard/Member.vue'
 import Commit from '../../../component/acess/projectDetail/dashBoard/Commit.vue'
 import Schedule from '../../../component/acess/projectDetail/dashBoard/Schedule.vue'
 import Readme from '../../../component/acess/projectDetail/dashBoard/Readme.vue'
+import {mapActions} from "vuex";
 
 export default {
   name: "DashBoard",
-    Memberdata() {
+  data() {
     return {
 
     }
@@ -56,6 +57,14 @@ export default {
     Commit,
     Schedule,
     Readme,
+  },
+  methods: {
+    ...mapActions({
+      mountGetData: 'dashBoard/mountGetData'
+    })
+  },
+  mounted() {
+    this.mountGetData()
   }
 }
 </script>

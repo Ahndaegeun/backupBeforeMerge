@@ -32,6 +32,7 @@ public class ProjectDTO {
     private String prjctDelAt;
     private String prjctComplAt;
     private String prjctReadMe;
+    private String prjctManager;
 
     private List<ProjectMemberDTO> projectMembers = new ArrayList<>();
     private List<MemberDTO> Members = new ArrayList<>();

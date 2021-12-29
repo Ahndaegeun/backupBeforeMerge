@@ -1,20 +1,29 @@
 <template>
   <div class="container">
-    <h2>README.md<span> - {{lastModifyBy}}</span></h2>
-    <v-md-editor v-model="contents" 
+    <h2>README.md</h2>
+    <v-md-editor v-model="this.$store.state.dashBoard.readMeContent"
+                 @change="updateReadMe"
                   height="480px"/>
   </div>
 </template>
 
 <script>
+import {mapActions} from "vuex";
+
 export default {
   name: "readme",
   data() {
     return {
-      lastModifyBy: "kade",
-      contents: "Hello",
     }
-  }
+  },
+  methods: {
+    ...mapActions({
+      saveReadMe: 'dashBoard/saveReadMe'
+    }),
+    updateReadMe(origin) {
+      this.saveReadMe(origin)
+    }
+  },
 }
 </script>
 

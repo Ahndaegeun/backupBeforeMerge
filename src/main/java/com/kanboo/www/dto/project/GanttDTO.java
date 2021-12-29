@@ -2,6 +2,7 @@ package com.kanboo.www.dto.project;
 
 import com.kanboo.www.domain.entity.project.Gantt;
 import com.kanboo.www.domain.entity.project.Project;
+import com.kanboo.www.dto.member.MemberDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,8 +26,9 @@ public class GanttDTO {
     private int gtProgress;
     private LocalDateTime gtStartDate;
     private LocalDateTime gtEndDate;
-    private  String gtExplanation;
+    private String gtExplanation;
     private String gtTitle;
+    private MemberDTO member;
 
     public Gantt dtoToEntity() {
         return Gantt.builder()
