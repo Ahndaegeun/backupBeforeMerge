@@ -10,61 +10,55 @@
 import axios from 'axios';
 export default {
   methods :{
+
     postModify(){
-      if(confirm("수정할거여?")){
-        axios.post('',{
-          params : {
-            selectMemberList : this.$store.state.setting.selectMemberList,
-            startDate :  this.$store.state.setting.startDate,
-            endDate : this.$store.state.setting.endDate
-          }
+        axios.post('/setting/modifyProjectMember',{
+          params : this.$store.state.setting.projectMemberList
+
         }).then(res =>{
           console.log(res.data);
-          alert("정상적으로 수정되었습니다..");
+          alert("정상적으로 수정되었습니다.");
         }).catch(err =>{
           console.log(err.data);
           alert("수정에 실패했습니다.");
         });
-      }else{
-        alert("취소했음");
-      }
-
     },
 
     postDelete(){
-      if(confirm("삭제할거여?")){
-        axios.post('', {
-          params : {
-            projectIdx : this.$store.state.setting.projectIdx
-          }
-        }).then(res =>{
-          console.log(res.data);
-          alert("정상적으로 수정되었습니다..");
-        }).catch(err =>{
-          console.log(err.data);
-          alert("수정에 실패했습니다.");
-        });
+      if(confirm("삭제하시겠습니까?")){
+        this.$store.state.setting.projectData.prjctDelAt = "y";
+          axios.post('/setting/modifyProject', {
+            params : this.$store.state.setting.projectData
 
+          }).then(res =>{
+            console.log(res.data);
+            alert("정상적으로 삭제되었습니다..");
+          }).catch(err =>{
+            console.log(err.data);
+            alert("삭제에 실패했습니다.");
+          });
       }else{
-        alert("취소했음")
+        alert("취소되었습니다.")
       }
     },
     postEnd(){
-      if(confirm("마칠거여??")){
-        axios.post('', {
-          params : {
-            projectIdx : this.$store.state.setting.projectIdx
-          }
-        }).then(res =>{
-          console.log(res.data);
-          alert("정상적으로 수정되었습니다..");
-        }).catch(err =>{
-          console.log(err.data);
-          alert("수정에 실패했습니다.");
-        });
 
+      if(confirm("프로젝트를 종료하시겠습니까?")){
+          this.$store.state.setting.projectData.prjctComplAt = "y";
+          console.log(this.$store.state.setting.projectData);
+
+          axios.post('/setting/modifyProject', {
+            params : this.$store.state.setting.projectData
+
+          }).then(res =>{
+            console.log(res.data);
+            alert("정상적으로 종료되었습니다..");
+          }).catch(err =>{
+            console.log(err.data);
+            alert("종료에 실패했습니다.");
+          });
       }else{
-        alert("취소했음")
+        alert("취소되었습니다.")
       }
     },
 

@@ -13,5 +13,9 @@ public interface ProjectMemberDslRepository {
 
     List<ProjectMember> findAllByMemIdx(Long MemIdx);
 
-    List<ProjectMember> getAllProjectMemberList(String selected, String key,int articleOnView);
+    List<ProjectMember> getAllProjectMemberList(String selected, String key, int articleOnView);
+
+    List<ProjectMember> getAllProjectMember(Long prjctIdx);
+
+    void insertProjectMember(ProjectMember projectMember);
 }

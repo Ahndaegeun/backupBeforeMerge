@@ -4,33 +4,25 @@
       <div class="main-start-text"><h3>멤버 추가</h3></div>
       <ul class="select-member-list" id="select-member-list">
         <li v-for="(item, index) in this.$store.state.setting.selectMemberList" :key="index" class="select-member-info"
-            id="select-member-info(`${index}`)">
+            :id="`select-member-info${index}`">
           <div class="select-member-image">
-            <img :src="this.$store.state.setting.selectMemberList[index].img" class="member-image"/>
+            <img :src="item.memImg" class="member-image" alt=""/>
           </div>
           <div class="select-member-text">
-            {{$store.state.setting.selectMemberList[index].nickname}}
-            {{$store.state.setting.selectMemberList[index].kTag}}
+            {{item.memNick}}
+            {{item.memTag}}
           </div>&nbsp;
           <div class="select-member-job">
-            <select @v-model="state.selectedPosition">
-              <option v-for="(a, i) in this.$store.state.setting.roleList" :key="i" value="a"
-                      @click="setMemberRole(this.$store.state.setting.selectMemberList[i].idx, a)">{{a}}</option>
-              <!-- <option value="PL">PL</option>
-              <option value="DA">DA</option>
-              <option value="TA">TA</option>
-              <option value="AA">AA</option>
-              <option value="UA">UA</option>
-              <option value="BA">BA</option>
-              <option value="EA">EA</option>
-              <option value="SA">SA</option> -->
+            <select @change="setMemberRole(item, $event)">
+              <option value="none" selected>Role</option>
+              <option v-for="(a, i) in this.$store.state.setting.roleList" :key="i">{{a}}</option>
+
             </select>
           </div>
           <div class="cancel-btn">
-            <button id="`${select-member-insert-cancel-btn[index]}`"
-                    @click = "insertCancel(this.$store.state.setting.selectMemberList[index].idx,
-                    this.$store.state.setting.selectMemberList[index].nickname, this.$store.state.setting.selectMemberList[index].kTag,
-                    this.$store.state.setting.selectMemberList[index].img, index), leftTextHideFunction()" >x</button>
+            <button :id="`select-member-insert-cancel-btn${index}`"
+                    @click = "insertCancel(item, index),
+                    leftTextHideFunction()" >X</button>
           </div>
         </li>
       </ul>
@@ -38,66 +30,78 @@
         우측에서 검색 후 추가할 멤버를 클릭해 주세요
       </div>
       <div>
-        <button class="select-member-insert-btn" @click="testBtn">멤버 추가</button>
+        <button class="select-member-insert-btn" @click="addBtn">멤버 추가</button>
       </div>
     </div>
 
-    <!-- <div class="main-center-div">
-        test2
-
-    </div> -->
-
     <div class="main-right-div">
-      <input type="text" class="search-input" id="search-member" v-model="inputName" @keyup="searchName">
+      <input type="text" class="search-input" id="search-member" v-model="searchKeyword" @keyup="searchName(searchKeyword)">
       <ul class="search-member-result-list">
-        <li id="selectMember(index)" @click="searchMemberSelect(this.$store.state.setting.searchMemberList[index].nickname,
-             this.$store.state.setting.searchMemberList[index].kTag, this.$store.state.setting.searchMemberList[index].img,
-              this.$store.state.setting.searchMemberList[index].idx, index),
+        <li :id="`selectMember-${index}`" @click="searchMemberSelect(item, index),
              leftTextHideFunction()" v-for="(item, index) in
-             this.$store.state.setting.searchMemberList" :key="item" class="search-member-result">
+             this.$store.state.setting.searchMemberList" :key="index" class="search-member-result">
           <div class="search-member-result-image">
-            <img :src="this.$store.state.setting.searchMemberList[index].img" class="member-image"/>
+            <img :src="item.img" class="member-image" alt=""/>
           </div>
           <div class="search-member-result-text">
-            {{$store.state.setting.searchMemberList[index].nickname}}&nbsp;
-            {{$store.state.setting.searchMemberList[index].kTag}}
+            {{item.memNick}}&nbsp;
+            {{item.memTag}}
           </div>
         </li>
       </ul>
     </div>
-    <!-- <img src="../../../../../testData/0.png"/>
-    <img src="@/testData/0.png"/> -->
   </div>
 </template>
 
 <script>
 
-import axios from 'axios';
+
+import {mapMutations} from "vuex";
+import axios from "axios";
+
 
 export default {
+  data() {
+    return{
+      receivedData : false,
+      searchKeyword : "",
+      selectMember : [
+
+      ],
+      searchMember : [
+      ],
+    }
+  },
+
+
   methods: {
-    setMemberRole(idx, position){
-      alert("들어옴")
-      for(var i in this.$store.state.setting.selectMemberList[i]){
-        if(this.$store.state.setting.selectMemberList[i].idx == idx){
-          this.$store.state.setting.selectMemberList[i].position = position;
-        }
+    ...mapMutations({
+      addBtn : 'setting/addBtn'
+    }),
+
+    setMemberRole(item, event){
+      let position = event.target.value;
+
+      if(position === 'PM'){
+        alert("PM은 추가할 수 없습니다.")
+      }else{
+        const tempRole = position
+        item.tempRole = tempRole;
+        console.log(item)
+
       }
-    },
-    testBtn(){
-      console.log(this.$store.state.setting.selectMemberList)
+
     },
 
-    searchName: function(){
-      this.$store.state.setting.searchMemberList = [];
-      axios.post('', this.searchName).then(res =>{//나중에 URL 기입
-        this.$store.state.setting.searchMemberList.push(res.data)
-
+    searchName(searchKeyword){
+      axios.post('/setting/searchProjectMember', {
+        searchKeyword : searchKeyword
+      }).then((res) => {
+        this.$store.state.setting.searchMemberList = [];
+        this.$store.state.setting.searchMemberList = res.data;
       })
 
     },
-
-
 
     leftTextHideFunction(){
       if((Object.keys(this.$store.state.setting.selectMemberList).length) >0){
@@ -106,27 +110,14 @@ export default {
         document.getElementById('plzClick').style.display = 'block';
       }
     },
-    insertCancel(idx,nickname,kTag,img,index){
-      const temp = {
-        nickname : nickname,
-        kTag : kTag,
-        img : img,
-        idx : idx
-      }
+    insertCancel(item,index){
 
-      this.$store.state.setting.searchMemberList.push(temp);
+      this.$store.state.setting.searchMemberList.push(item);
       this.$store.state.setting.selectMemberList.splice(index, 1);
     },
-    searchMemberSelect(nickname, kTag, img, idx, index){
-      // console.log("test : " + JSON.stringify(this.searchMember));
-      const temp = {
-        nickname : nickname,
-        kTag : kTag,
-        img : img,
-        idx : idx
-      }
+    searchMemberSelect(item, index){
       this.$store.state.setting.searchMemberList.splice(index, 1)
-      this.$store.state.setting.selectMemberList.push(temp);
+      this.$store.state.setting.selectMemberList.push(item);
     }
   },
 
@@ -134,32 +125,9 @@ export default {
   mounted() {
     this.leftTextHideFunction();
 
-    window.addEventListener("keyup", (e)=>{
-      e;
-      this.axios.post('', this.inputName).then(res =>{
-        this.resultMember.push(res.data);
-
-      })
-
-
-    })
-
   },
 
-  data() {
-    return{
-      receivedData : false,
-      inputName : "",
-      selectMember : [
 
-      ],
-      searchMember : [
-
-
-
-      ],
-    }
-  }
 }
 </script>
 
@@ -172,10 +140,8 @@ export default {
   justify-content : space-around;
   align-items : flex-start;
   color : white;
-  width : 60vw;
-  margin-top : 20px;
-  margin-bottom : 20px;
-  height : 250px;
+  width: 100%;
+  height: 100%;
 
 
 }
@@ -191,7 +157,9 @@ export default {
 
 .main-right-div{
   width : 50%;
+  height: 100%;
   margin-left: 20px;
+  overflow: hidden;
 }
 
 .select-member-info{
@@ -200,8 +168,8 @@ export default {
   margin : 4px;
   padding : 5px;
   white-space:nowrap;
-
 }
+
 .select-member-image{
   border-radius: 70%;
   overflow: hidden;
@@ -238,7 +206,7 @@ export default {
 
 .search-input{
   background-color : #414556;
-  border : 0px;
+  border : 0;
   border-radius : 5px;
   width : 170px;
   height : 30px;
@@ -251,12 +219,11 @@ export default {
   display: grid;
   grid-template-columns: 1fr 1fr ;
   grid-auto-rows: 30px;
-  margin-top : 20px;
-  width: 400px;
-  height: 200px;
+  height: 70%;
   font-size : 20px;
 
 }
+
 .search-member-result-list::-webkit-scrollbar{
   display: none;
 }
@@ -264,6 +231,7 @@ export default {
   display : flex;
   color : white;
   padding : 3px;
+  cursor: Pointer;
 }
 .select-member-insert-btn{
   border-radius: 5px;
@@ -271,6 +239,7 @@ export default {
   height : 30px;
   background-color : #FF8906;
   margin-top : 5px;
+  color: white;
 }
 
 .select-member-list{
@@ -282,6 +251,7 @@ export default {
   overflow-x: hidden;
   overflow-y: auto;
 }
+
 .select-member-list::-webkit-scrollbar{
   display: none;
 }
@@ -290,4 +260,5 @@ export default {
   margin: 10px;
   font-size : 22px;
 }
+
 </style>

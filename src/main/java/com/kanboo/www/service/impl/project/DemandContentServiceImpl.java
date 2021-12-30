@@ -1,7 +1,9 @@
 package com.kanboo.www.service.impl.project;
 
+import com.kanboo.www.domain.entity.project.Demand;
 import com.kanboo.www.domain.entity.project.DemandContent;
 import com.kanboo.www.domain.repository.project.DemandContentRepository;
+import com.kanboo.www.domain.repository.project.DemandRepository;
 import com.kanboo.www.dto.project.DemandContentDTO;
 import com.kanboo.www.dto.project.DemandDTO;
 import com.kanboo.www.dto.project.ProjectDTO;
@@ -12,8 +14,10 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -25,6 +29,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DemandContentServiceImpl implements DemandContentService {
     private final DemandContentRepository demandContentRepository;
+    private final DemandRepository demandRepository;
 
 
     @Override
@@ -36,7 +41,8 @@ public class DemandContentServiceImpl implements DemandContentService {
     @Override
     public List<DemandContentDTO> loadDemandContent(Long idx) {
         List<DemandContentDTO> demandContentDTOList = new ArrayList<>();
-        List<DemandContent> demandContentList = demandContentRepository.findByDemandIdx(idx);
+        Demand demand = demandRepository.findByProjectPrjctIdx(idx);
+        List<DemandContent> demandContentList = demandContentRepository.findByDemandIdx(demand.getDemandIdx());
 
         for(DemandContent demandContent : demandContentList){
             demandContentDTOList.add(demandContent.entityToDto());
@@ -46,10 +52,27 @@ public class DemandContentServiceImpl implements DemandContentService {
     }
 
     @Override
+    @Transactional
     public void updateDemandContent(List<DemandContentDTO> demandContentDTO) {
+        Long prjctIdx = demandContentDTO.get(0).getDemand().getProject().getPrjctIdx();
+        Demand demand = demandRepository.findByProjectPrjctIdx(prjctIdx);
+
         demandContentDTO.forEach(item -> {
-            demandContentRepository.save(item.dtoToEntity());
+            DemandContent content = DemandContent.builder()
+                    .demand(demand)
+                    .demandCnIdx(item.getDemandCnIdx())
+                    .demandCnNum(item.getDemandCnNum())
+                    .demandCnSe(item.getDemandCnSe())
+                    .demandCnId(item.getDemandCnId())
+                    .demandCnNm(item.getDemandCnNm())
+                    .demandCnDetail(item.getDemandCnDetail())
+                    .demandCnRequstNm(item.getDemandCnRequstNm())
+                    .demandCnRm(item.getDemandCnRm())
+                    .build();
+
+            demandContentRepository.save(content);
         });
+        demand.updateDemandReviseDate();
     }
 
     @Override
@@ -118,17 +141,20 @@ public class DemandContentServiceImpl implements DemandContentService {
             cell = row.createCell(6);
             cell.setCellValue(demandContentDTOList.get(i).getDemandCnRm());
         }
+        File f = new File("");
+        String basePath = f.getAbsolutePath();
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream("src/main/resources/storage/demand/excel/save/"+
+            FileOutputStream fileOutputStream = new FileOutputStream(basePath + "/src/main/resources/storage/demand/excel/save/"+
                     demandContentDTOList.get(0).getDemand().getProject().getPrjctNm() + "-" +
                     demandContentDTOList.get(0).getDemand().getProject().getPrjctIdx() +  ".xlsx");
             workBook.write(fileOutputStream);
 
         } catch (IOException e) {
-            System.out.println("에러 ㅜ");
             e.printStackTrace();
         }
-        return new FileSystemResource("src/main/resources/storage/demand/excel/save/"+
+
+
+        return new FileSystemResource(basePath + "/src/main/resources/storage/demand/excel/save/"+
                 demandContentDTOList.get(0).getDemand().getProject().getPrjctNm() + "-" +
                 demandContentDTOList.get(0).getDemand().getProject().getPrjctIdx() +  ".xlsx");
     }
@@ -140,20 +166,17 @@ public class DemandContentServiceImpl implements DemandContentService {
         try {
             XSSFWorkbook workBook = new XSSFWorkbook(fis);
             List<Map<Integer, String>> list = new ArrayList<Map<Integer, String>>();
-            int rowindex = 0;
-            int columnindex = 0;
-            //시트 수 (첫번째에만 존재하므로 0을 준다)
-            //만약 각 시트를 읽기위해서는 FOR문을 한번더 돌려준다
             XSSFSheet sheet = workBook.getSheetAt(0);
             int rows=sheet.getPhysicalNumberOfRows(); //행의 수
-            for(rowindex = 0; rowindex < rows; rowindex++){
+            int columnIndex = 0;
+            for(int rowindex = 0; rowindex < rows; rowindex++){
                 Map<Integer, String> map = new HashMap<>();
                 XSSFRow row = sheet.getRow(rowindex);//행을읽는다
                 if(row !=null){
                     int cells = row.getPhysicalNumberOfCells();//셀의 수
-                    for(columnindex = 0; columnindex <= cells; columnindex++){
+                    for(columnIndex = 0; columnIndex <= cells; columnIndex++){
 
-                        XSSFCell cell = row.getCell(columnindex);//셀값을 읽는다
+                        XSSFCell cell = row.getCell(columnIndex);//셀값을 읽는다
                         String value = "";
                         if(cell == null){//셀이 빈값일경우를 위한 널체크
                             value = "";
@@ -174,14 +197,12 @@ public class DemandContentServiceImpl implements DemandContentService {
                                     break;
                             }
                         }
-                        System.out.println(rowindex + "번 행 : " + columnindex + "번 열 값은: "+ value);
-                        map.put(columnindex, value);
+                        map.put(columnIndex, value);
                     }
                 }
                 list.add(map);
             }
 
-            System.out.println("Size : " + list.size());
             demandContentRepository.deleteDemandContentAllByDemandIdx(idx);
             List<DemandContentDTO> demandContentDTOList = new ArrayList<>();
             for (int i = 2; i < list.size(); i++) {
@@ -195,7 +216,12 @@ public class DemandContentServiceImpl implements DemandContentService {
                 demandContentDTO.setDemandCnDetail(list.get(i).get(4));
                 demandContentDTO.setDemandCnRequstNm(list.get(i).get(5));
                 demandContentDTO.setDemandCnRm(list.get(i).get(6));
-                demandContentDTOList.add(demandContentDTO);
+                if (!demandContentDTO.getDemandCnNum().equals("") || !demandContentDTO.getDemandCnSe().equals("") ||
+                        !demandContentDTO.getDemandCnId().equals("") || !demandContentDTO.getDemandCnNm().equals("") ||
+                        !demandContentDTO.getDemandCnDetail().equals("") || !demandContentDTO.getDemandCnRequstNm().equals("") ||
+                        !demandContentDTO.getDemandCnRm().equals("")) {
+                    demandContentDTOList.add(demandContentDTO);
+                }
             }
 
 
@@ -203,10 +229,30 @@ public class DemandContentServiceImpl implements DemandContentService {
                 demandContentRepository.save(item.dtoToEntity());
             });
         } catch (IOException e) {
-            System.out.println("IOException");
         }
     }
 
+    @Transactional
+    @Override
+    public ResponseEntity<?> importDocument(MultipartFile[] uploadFile, Long projectIdx) {
+        Demand demand = demandRepository.findByProjectPrjctIdx(projectIdx);
+        File f = new File("");
+        String basePath = f.getAbsolutePath();
+        String uploadFolder = basePath + "/src/main/resources/storage/demand/excel/userInput";
+        File uploadPath = new File(uploadFolder);
+        for(MultipartFile multipartFile : uploadFile){
+            String uploadFileName = multipartFile.getOriginalFilename();
+            uploadFileName = uploadFileName.substring(uploadFileName.lastIndexOf("/") + 1);
+            File saveFile = new File(uploadPath, uploadFileName);
+            try {
+                multipartFile.transferTo(saveFile);
+                checkDocument(demand.getDemandIdx(), saveFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return ResponseEntity.ok("??");
+    }
 
 
 

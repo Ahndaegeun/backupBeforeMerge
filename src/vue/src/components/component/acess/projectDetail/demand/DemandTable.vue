@@ -5,36 +5,38 @@
         <tr class="demand-table-tr" v-for="(item, index) in this.$store.state.demand.rows" :key="index">
           <td class="demand-table-td-chk-td" >
             <input :id="`demand-chk-${item.demandCnIdx}`" class="demand-table-chk" type="checkbox"
-                   @change="clickCheckBox(item.demandCnIdx)" :value="`demand-chk-${item.demandCnIdx}`">
-          <label class="demand-table-td-label" :for="`demand-chk-${item.demandCnIdx}`" />
+                   :value="`demand-chk-${item.demandCnIdx}`">
+            <label @click="clickCheckBox(item.demandCnIdx)" class="demand-table-td-label" :for="`demand-chk-${item.demandCnIdx}`">
+              <i class="fa fa-check" id="awesome-light"></i>
+            </label>
           </td>
           <td class="demand-table-td-no"><input :id="`demand-no-${item.demandCnNum}`"
                                                 @keyup.enter="save" class="demand-table-td-input" type="text"
-                                                v-model="item.demandCnNum">
+                                                v-model="item.demandCnNum" autocomplete="off">
           </td>
           <td class="demand-table-td-category"><input :id="`demand-category-${item.demandCnNum}`"
                                                       @keyup.enter="save" class="demand-table-td-input" type="text"
-                                                      v-model="item.demandCnSe">
+                                                      v-model="item.demandCnSe" autocomplete="off">
           </td>
           <td class="demand-table-td-id"><input :id="`demand-demandId-${item.demandCnNum}`"
                                                 @keyup.enter="save" class="demand-table-td-input" type="text"
-                                                v-model="item.demandCnId">
+                                                v-model="item.demandCnId" autocomplete="off">
           </td>
           <td class="demand-table-td-name"><input :id="`demand-demandName-${item.demandCnNum}`"
                                                   @keyup.enter="save" class="demand-table-td-input" type="text"
-                                                  v-model="item.demandCnNm">
+                                                  v-model="item.demandCnNm" autocomplete="off">
           </td>
           <td class="demand-table-td-detail"><input :id="`demand-detail-${item.demandCnNum}`"
                                                     @keyup.enter="save" class="demand-table-td-input" type="text"
-                                                    v-model="item.demandCnDetail">
+                                                    v-model="item.demandCnDetail" autocomplete="off">
           </td>
           <td class="demand-table-td-requester"><input :id="`demand-requester-${item.demandCnNum}`"
                                                        @keyup.enter="save" class="demand-table-td-input" type="text"
-                                                       v-model="item.demandCnRequstNm">
+                                                       v-model="item.demandCnRequstNm" autocomplete="off">
           </td>
           <td class="demand-table-td-remark"><input :id="`demand-remark-${item.demandCnNum}`"
                                                     @keyup.enter="save" class="demand-table-td-input" type="text"
-                                                    v-model="item.demandCnRm">
+                                                    v-model="item.demandCnRm" autocomplete="off">
           </td>
         </tr>
       </table>
@@ -77,13 +79,14 @@ export default {
 }
 
 .demand-table-tr {
-  height: 4.5vh;
+  height: 4.8vh;
   padding: 10px 0;
   border: 1px solid #999;
 }
 
 .demand-table-td-chk-td{
   width: 1.5%;
+  height: 100%;
 }
 
 .demand-table-td-input {
@@ -115,15 +118,21 @@ export default {
 
 input[type="checkbox"] + label {
   display: inline-block;
-  width: 20px;
-  height: 20px;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   cursor: pointer;
-
+  color: #16161A;
 }
+
 input[type="checkbox"]:checked + label {
-  background-color: lightslategray;
-  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /*border: 1px solid blue;*/
+  color : white;
 }
 
 input[type="checkbox"] {
@@ -148,5 +157,6 @@ input[type="checkbox"] {
 .demand-table-td-remark {
   width: 10%;
 }
+
 
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="project-date-div" >
-    <div class="modal-background" v-if="modalState == true" >
+    <div class="modal-background" v-if="modalState === true" >
       <vue-cal
           class="vuecal--date-picker"
           xsmall
@@ -19,9 +19,13 @@
     </div>
     <div class="date-div">
       <label for="start-date">Start</label>&nbsp;
-      <input type="text" class="date-input" id="start-date" @click="clickStartDateFunction" v-model="inputStartDate">&nbsp;
+      <input type="text" class="date-input" id="start-date" @click="clickStartDateFunction"
+             v-model="this.$store.state.setting.projectData.prjctStartDate"
+        autocomplete="off">&nbsp;
       <label for="end-date">End</label>&nbsp;
-      <input type="text" class="date-input" id="end-date" @click="clickEndDateFunction" v-model="inputEndDate">
+      <input type="text" class="date-input" id="end-date" @click="clickEndDateFunction"
+             v-model="this.$store.state.setting.projectData.prjctEndDate"
+        autocomplete="off">
     </div>
   </div>
 </template>
@@ -30,12 +34,13 @@
 import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
 import moment from 'moment'
+import {mapMutations} from "vuex";
+import axios from "axios";
 
 export default {
   data() {
     return {
-      inputStartDate : "",
-      inputEndDate : "",
+
       clickStart : false,
       clickEnd : false,
       modalState : false,
@@ -46,57 +51,75 @@ export default {
     VueCal,
   },
   methods : {
+    ...mapMutations({
+      changeDate : 'setting/changeDate'
+    }),
     selectedDate(e){
+      if(this.clickStart === true){
 
-      // console.log(moment(e).format('YYYY/MM/DD'))
-      // this.selectedDate = moment(e).format('YYYY/MM/DD')
-      if(this.clickStart == true){
-        this.inputStartDate = moment(e).format('YYYY/MM/DD')
-        this.$store.state.setting.projectDate.startDate = moment(e).format('YYYY/MM/DD')
-        if(this.checkDate(this.inputStartDate, this.$store.state.setting.projectDate.endDate) == false){
-          this.inputStartDate = ""
+        this.$store.state.setting.projectData.prjctStartDate = moment(e).format('YYYY/MM/DD')
+        this.$store.state.setting.projectData.prjctStartDate = moment(e).format('YYYY/MM/DD')
+        if(this.checkDate(this.$store.state.setting.projectData.prjctStartDate,
+            this.$store.state.setting.projectData.prjctEndDate) === false){
+          this.$store.state.setting.projectData.prjctStartDate = ""
         }
-      }else if(this.clickEnd == true){
-        this.inputEndDate = moment(e).format('YYYY/MM/DD')
-        this.$store.state.setting.projectDate.endDate = moment(e).format('YYYY/MM/DD')
-        if(this.checkDate(this.$store.state.setting.projectDate.startDate, this.inputEndDate) == false){
-          this.inputEndDate = ""
+      }else if(this.clickEnd === true){
+        this.$store.state.setting.projectData.prjctEndDate = moment(e).format('YYYY/MM/DD')
+        this.$store.state.setting.projectData.prjctEndDate = moment(e).format('YYYY/MM/DD')
+        if(this.checkDate(this.$store.state.setting.projectData.prjctStartDate,
+            this.$store.state.setting.projectData.prjctEndDate) === false){
+          this.$store.state.setting.projectData.prjctStartDate = ""
         }
       }
-      console.log(this.$store.state.setting.projectDate)
       this.modalState = false;
       this.clickStart = false;
       this.clickEnd = false;
-      this.checkDate(this.inputStartDate, this.inputEndDate)
+      this.checkDate(this.$store.state.setting.projectData.prjctStartDate, this.$store.state.setting.projectData.prjctEndDate)
+      console.log(this.$store.state.setting.projectData.prjctStartDate)
+      console.log(this.$store.state.setting.projectData.prjctEndDate)
     },
     clickStartDateFunction(){
-      if(this.modalState == false){ this.modalState = true; this.clickStart = true;}
+      if(this.modalState === false){ this.modalState = true; this.clickStart = true;}
 
       else {this.modalState = false; }
     },
     clickEndDateFunction(){
-      if(this.modalState == false){ this.modalState = true; this.clickEnd = true;}
+      if(this.modalState === false){ this.modalState = true; this.clickEnd = true;}
       else this.modalState = false
     },
-    loadStoreDate(){
-      this.inputStartDate = this.$store.state.setting.projectDate.startDate;
-      this.inputEndDate = this.$store.state.setting.projectDate.endDate;
-    },
+
     checkDate(start, end){
-      var startDate = moment(start).format('YYYYMMDD')
-      var endDate = moment(end).format('YYYYMMDD')
+      let startDate = moment(start).format('YYYYMMDD')
+      let endDate = moment(end).format('YYYYMMDD')
       if(endDate - startDate < 0){
-        alert("날짜가 잘못됐다...")
+        alert("날짜가 잘못되었습니다.")
+        this.$store.state.setting.projectData.prjctStartDate = "";
+        this.$store.state.setting.projectData.prjctEndDate = "";
         return false;
-      } else if(startDate == 0 && startDate == null && endDate == 0 && endDate == null){
+      } else if(startDate === '0' && startDate == null && endDate === '0' && endDate == null){
         return false;
+      } else {
+        let axiosStartDate = moment(start).format('YYYY-MM-DD')
+        let axiosEndDate = moment(end).format('YYYY-MM-DD')
+        this.$store.state.setting.projectData.prjctStartDate = axiosStartDate;
+        this.$store.state.setting.projectData.prjctEndDate = axiosEndDate;
+
+        console.log("changeDate")
+        axios.post('/setting/changeProjectDate', {
+          params: this.$store.state.setting.projectData
+        }).then(() => {
+          console.log("잘됨ㅋㅋ");
+        }).catch( () => {
+
+        })
       }
+
     }
 
 
   },
   mounted() {
-    this.loadStoreDate();
+    // this.loadStoreDate();
   }
 }
 </script>
@@ -109,13 +132,12 @@ export default {
   display :flex;
   justify-content : space-around;
   flex-direction : column;
-  width: 60vw;
-  height : 120px;
   box-sizing: border-box;
   background-color : #2C2F3B;
   color : white;
-  /* margin-top: auto; */
-  margin-bottom : auto;
+  width: 100%;
+  height: 100%;
+
 }
 .date-div{
 

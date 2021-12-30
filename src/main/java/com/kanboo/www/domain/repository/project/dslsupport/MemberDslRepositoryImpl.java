@@ -96,4 +96,17 @@ public class MemberDslRepositoryImpl implements MemberDslRepository{
 				fetchCount();
 	}
 
+	@Override
+	public List<Member> searchMemberByKeyword(String keyword) {
+		JPAQueryFactory query = new JPAQueryFactory(em);
+		QMember member = QMember.member;
+
+		return query
+				.select(member)
+				.from(member)
+				.where(member.memNick.contains(keyword))
+				.fetch();
+
+	}
+
 }

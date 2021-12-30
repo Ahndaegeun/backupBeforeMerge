@@ -2,6 +2,8 @@ package com.kanboo.www.service.inter.project;
 
 import com.kanboo.www.dto.project.DemandContentDTO;
 import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,4 +19,6 @@ public interface DemandContentService {
     void checkDocument(Long idx, File file) throws FileNotFoundException;
 
     void deleteDemandContent(Long demandIdx, Long demandCnIdx);
+
+    ResponseEntity<?> importDocument(MultipartFile[] uploadFile, Long demandIdx);
 }

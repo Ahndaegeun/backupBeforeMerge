@@ -25,7 +25,7 @@ public class DemandContentDslRepositoryImpl implements DemandContentDslRepositor
                 where(qDemandContent.demand.demandIdx.eq(idx));
         return query.fetchOne();
     }
-    
+
     @Override
     public List<DemandContent> findByDemandIdx(Long idx){
         QDemandContent qDemandContent = QDemandContent.demandContent;

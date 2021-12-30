@@ -27,6 +27,10 @@ public class Demand {
     @Column(name = "demand_revise_date")
     private LocalDateTime demandReviseDate;
 
+    public void updateDemandReviseDate() {
+        this.demandReviseDate = LocalDateTime.now();
+    }
+
     public DemandDTO entityToDto() {
         return DemandDTO.builder()
                 .demandIdx(demandIdx)

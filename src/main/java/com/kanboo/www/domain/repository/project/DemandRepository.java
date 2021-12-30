@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DemandRepository extends JpaRepository<Demand, Long>, DemandDslRepository {
+    Demand findByProjectPrjctIdx(Long prjctIdx);
 }

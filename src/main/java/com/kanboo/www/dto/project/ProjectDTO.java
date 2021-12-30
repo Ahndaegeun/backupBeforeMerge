@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Column;
 import javax.persistence.OneToMany;
@@ -26,8 +27,13 @@ public class ProjectDTO {
 
     private Long prjctIdx;
     private String prjctNm;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate prjctStartDate;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate prjctEndDate;
+
     private int prjctProgress;
     private String prjctDelAt;
     private String prjctComplAt;

@@ -109,4 +109,37 @@ public class ProjectMemberDslRepositoryImpl implements ProjectMemberDslRepositor
                 .limit(10)
                 .fetch();
     }
+
+    @Override
+    public List<ProjectMember> getAllProjectMember(Long prjctIdx) {
+
+        QProjectMember qProjectMember = QProjectMember.projectMember;
+        QMember qMember = QMember.member;
+        QProject qProject = QProject.project;
+
+        JPAQueryFactory query = new JPAQueryFactory(em);
+
+        return query.select(qProjectMember)
+                .from(qMember, qProjectMember)
+                .where(qMember.memIdx.eq(qProjectMember.member.memIdx).and(
+                        qProjectMember.project.prjctIdx.eq(prjctIdx)
+
+                )).fetch();
+
+    }
+
+    @Override
+    public void insertProjectMember(ProjectMember projectMember) {
+        QProjectMember qProjectMember = QProjectMember.projectMember;
+        QMember qMember = QMember.member;
+        QProject qProject = QProject.project;
+
+        JPAQueryFactory query = new JPAQueryFactory(em);
+
+        query.insert(qProjectMember).
+                columns(qMember.memIdx, qProject.prjctIdx, qProjectMember.prjctMemRole,
+                        qProjectMember).execute();
+
+    }
+
 }

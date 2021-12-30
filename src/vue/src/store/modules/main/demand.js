@@ -1,26 +1,22 @@
 import axios from 'axios';
-// import html2canvas from 'html2canvas';
-// import jsPDF from "jspdf";
-// import jsPDF from 'jspdf/dist/jspdf.node.debug'
-// import html2pdf from "html2pdf.js/src";
-
-// import autoTable from "jspdf-autotable";
-// import malgun from "@/assets/malgunBase64.js"
-
+import jsPDF from "jspdf";
+import moment from 'moment'
+import autoTable from "jspdf-autotable";
+import malgun from "@/assets/malgunBase64.js"
 const demand = {
     namespaced: true,
     state: {
-        projectName : "Test_Project",
-        modifiedDate : "2021-01-01 11:00",
+        projectName : "",
+        modifiedDate : "",
         checkedArr : [],
         checkedAll : false,
-        storeDemandIdx : "1", // 이거 받아오는 로직 마들기
-
+        storeDemandIdx : "",
+        sideBar : "false",
         columns : [
             {
-              name : "chk",
-              prop : "chk",
-              size : 35
+                name : "chk",
+                prop : "chk",
+                size : 35
             },
             {
                 name : "No",
@@ -58,12 +54,7 @@ const demand = {
             }
 
         ],
-
-        rows : [
-
-        ],
-
-
+        rows : [],
     },
     mutations: {
 
@@ -71,13 +62,10 @@ const demand = {
             state.rows.push({
                 chk : "",
                 demand: {
-                    demandIdx : "1", // 스토어에서 디맨드idx받아오는거 만들기
                     project : {
-                        prjctIdx : "",
-                        prjctNm : ""
+                        prjctIdx : sessionStorage.getItem("project")
                     }
                 },
-                // demandCnIdx : state.rows[state.rows.length].demandCnIdx,
                 demandCnIdx : "",
                 demandCnNum : "",
                 demandCnSe : "",
@@ -94,14 +82,8 @@ const demand = {
             }
             axios.post('/demand/postRows', {
                 params : arr
-            }).then((res) => {
-
-                state.rows = [];
-                for (const resKey in res.data) {
-                    state.rows.push(res.data[resKey])
-                }
-                console.log(state.rows);
-            }).catch( () => {
+            }).then(() => {
+                state.modifiedDate = moment().format("YYYY-MM-DD HH:mm:SS")
             })
         },
 
@@ -112,179 +94,191 @@ const demand = {
             }
             axios.post('/demand/postRows', {
                 params: arr
-            }).then(() => {
-                console.log("잘됨ㅋㅋ");
-            }).catch( () => {
             })
         },
         load(state){
-            axios.post('/demand/load', {
-                idx : 1 // 나중에 여기에 스토어에서 프로젝트 데이터 빼오자
+            let sessionIdx = sessionStorage.getItem("project");
+            axios.post('/demand/load',  {
+                idx : sessionIdx
             }).then(res => {
+                state.rows = []
+                const dateForm = res.data[0].demand.demandReviseDate.split('T')
+                state.modifiedDate = `${dateForm[0]} ${dateForm[1]}`
                 for (const resKey in res.data) {
                     state.rows.push(res.data[resKey])
                 }
-                console.log(state.rows)
             }).catch(() =>{
-                console.log("요구사항 정의서 상세정보를 불러오는데 실패했습니다.");
+                alert("요구사항 정의서 상세정보를 불러오는데 실패했습니다.");
             });
         },
         uploadFile(state){
+            let sessionIdx = sessionStorage.getItem("project")
             if(confirm("업로드 시 기존 요구사항 내용이 삭제됩니다. 진행하시겠습니까?") === true){
-                console.log("uploadFIle")
                 const frm = new FormData();
-                let demandIdx = state.storeDemandIdx;
-                var uploadFile = document.getElementById("uploadFile");
+                let uploadFile = document.getElementById("uploadFile");
 
                 frm.append("uploadFile", uploadFile.files[0]);
-                frm.append('demandIdx', demandIdx);
-                console.log(demandIdx)
+                frm.append('demandIdx', sessionIdx);
                 axios.post('/demand/importDocument', frm, {
                     headers : {
                         'Content-Type' : 'multipart/form-data'
                     }
-                }).then((res) =>{
-                    res
-                    location.reload();
+                }).then(() =>{
+                    axios.post('/demand/load', {
+                        idx : sessionIdx // 나중에 여기에 스토어에서 프로젝트 데이터 빼오자
+                    }).then(res => {
+                        state.rows = [];
+                        for (const resKey in res.data) {
+                            state.rows.push(res.data[resKey])
+                        }
+                    }).catch(() =>{
+                        alert("요구사항 정의서 상세정보를 불러오는데 실패했습니다.");
+                    });
                 })
+            } else{
+                alert("취소되었습니다.")
             }
         },
         down(state, event){
             let input = event.target.value;
             if(input === "Excel") {
                 axios({
-                    url: '/demand/downDocument', //your url
+                    url: '/demand/downDocument',
                     method: 'POST',
                     responseType: 'blob',
                     data: {
                         "idx" : state.rows[0].demand.demandIdx,
                         "prjctNm" : state.rows[0].demand.project.prjctNm
-                    }// important
+                    }
                 }).then((response) => {
                     const url = window.URL.createObjectURL(new Blob([response.data]));
                     const link = document.createElement('a');
                     link.href = url;
-                    link.setAttribute('download', 'test.xlsx'); //or any other extension
+                    link.setAttribute('download', state.projectName + ' demand.xlsx');
                     document.body.appendChild(link);
                     link.click();
                 });
             } else if(input === "PDF"){
-                console.log("여기 수정")
-                // const doc = new jsPDF();
-                // var font = malgun.malgun
-                // doc.addFileToVFS('malgun.ttf', font);
-                // doc.addFont('malgun.ttf', 'malgun', 'normal');
-                // doc.setFont('malgun')
-                // console.log(doc.getFontList())
-                // const data = [];
-                // for(let i = 0; i < state.rows.length; i++){
-                //     const obj = [];
-                //
-                //     obj[i] = [
-                //         state.rows[i].demandCnNum,
-                //         state.rows[i].demandCnSe,
-                //         state.rows[i].demandCnId,
-                //         state.rows[i].demandCnNm,
-                //         state.rows[i].demandCnDetail,
-                //         state.rows[i].demandCnRequstNm,
-                //         state.rows[i].demandCnRm
-                //     ]
-                //     data.push(obj[i])
-                // }
-                // console.log(data)
-                // autoTable(doc,{
-                //     styles : { font : "malgun", fontStyle : "normal"},
-                //     head : [['No', 'Category', 'Demand ID', 'Demand Name', 'Demand Description',
-                //         'Requester', 'Remark']],
-                //     body : data,
-                // })
-                // doc.save('test.pdf')
-            }else{
-                return;
+                const doc = new jsPDF('l', 'mm', 'a4');
+                const font = malgun.malgun;
+                doc.addFileToVFS('malgun.ttf', font);
+                doc.addFont('malgun.ttf', 'malgun', 'normal');
+                doc.setFont('malgun');
+                const data = [];
+                for(let i = 0; i < state.rows.length; i++){
+                    const obj = [];
+                    obj[i] = [
+                        state.rows[i].demandCnNum,
+                        state.rows[i].demandCnSe,
+                        state.rows[i].demandCnId,
+                        state.rows[i].demandCnNm,
+                        state.rows[i].demandCnDetail,
+                        state.rows[i].demandCnRequstNm,
+                        state.rows[i].demandCnRm
+                    ]
+                    data.push(obj[i])
+                }
+                autoTable(doc,{
+                    styles : { font : "malgun", fontStyle : "normal"},
+                    head : [['No', 'Category', 'Demand ID', 'Demand Name', 'Demand Description',
+                        'Requester', 'Remark']],
+                    body : data,
+                })
+                doc.save('test.pdf');
             }
+
+            const sel = document.querySelector('#export-select');
+            sel.value = 'none'
+
         },
         clickAllCheckBox(state){
-            var headCheckBox = document.querySelector('.headCheckBox');
-            var allCheckBox = document.querySelectorAll('.demand-table-chk');
-            console.log(headCheckBox.checked)
-            if(headCheckBox.checked === false) {
-                for(let i = 0; i < allCheckBox.length; i++){
-                    allCheckBox[i].checked = false;
-                }
-                state.checkedArr = [];
+            let headCheckBox = document.querySelector('.headCheckBox');
+            let allCheckBox = document.querySelectorAll('.demand-table-chk');
 
-            }else {
-                for(let i = 0; i < allCheckBox.length; i++){
-                    allCheckBox[i].checked = true;
-                }
-                for(let i = 0; i< state.rows.length; i++){
-                    const temp = {demandCnIdx : state.rows[i].demandCnIdx,
-                        demand : {
-                            demandIdx: state.rows[0].demand.demandIdx
-                        }
-                    }
-                    state.checkedArr.push(temp)
-                }
+            state.checkedAll = headCheckBox.checked
+
+            if(state.checkedAll) {
+                allCheckBox.forEach(ele => {
+                    ele.checked = true
+                })
+                state.rows.forEach(ele => {
+                    state.checkedArr.push({...ele})
+                })
+            } else {
+                allCheckBox.forEach(ele => {
+                    ele.checked = false
+                })
+                state.checkedArr = []
             }
         },
         clickCheckBox(state, item){
-            if(state.checkedArr.includes(item)){
-                let delPoint = state.checkedArr.indexOf(item);
-                state.checkedArr.splice(delPoint, 1);
-            }else{
-                const temp = {demandCnIdx : item,
+            if(state.checkedAll) {
+                state.checkedAll = false
+            }
+
+            let isExist = false
+            state.checkedArr.forEach(ele => {
+                if(ele.demandCnIdx === item) {
+                    isExist = true
+                }
+            })
+
+            if(!isExist){
+                const temp = {
+                    demandCnIdx : item,
                     demand : {
                         demandIdx: state.rows[0].demand.demandIdx
                     }
-
                 }
-                state.checkedArr.push(temp)
+                state.checkedArr.push(temp);
+            } else {
+                for(let i = 0; i < state.checkedArr.length; i++) {
+                    if(state.checkedArr[i].demandCnIdx === item) {
+                        state.checkedArr.splice(i, 1)
+                    }
+                }
+            }
+
+            if(state.checkedArr.length === state.rows.length) {
+                let headCheckBox = document.querySelector('.headCheckBox');
+                state.checkedAll = true
+                headCheckBox.checked = true
             }
         },
         deleteRow(state){
+            let sessionIdx = sessionStorage.getItem("project")
             if(confirm("삭제하시겠습니까?") === true){
-
+                if(state.checkedArr.length === 0) {
+                    alert("삭제할 행이 없습니다.")
+                    return
+                }
                 const arr = []
                 for(let item of state.checkedArr) {
                     arr.push({...item});
                 }
-                console.log(arr)
                 axios.post('/demand/deleteRows', {
                     params: arr
                 }).then(() => {
-                    location.reload();
-
-                }).catch(() => {
+                    axios.post('/demand/load', {
+                        idx : sessionIdx
+                    }).then(res => {
+                        state.rows.splice(0, state.rows.length);
+                        for (const resKey in res.data) {
+                            state.rows.push(res.data[resKey])
+                        }
+                        let headCheckBox = document.querySelector('.headCheckBox');
+                        state.checkedArr = []
+                        headCheckBox.checked = false
+                    })
                 })
             }else{
-                alert("취소되었습니다.")
+                alert("취소되었습니다.");
             }
         },
-        // addDefaultRow(state){
-        //     console.log("들옴")
-        //     if(state.rows.length === 0){
-        //         state.rows.push({
-        //             chk : "",
-        //             demand: {
-        //                 demandIdx : 1,
-        //                 project : {
-        //                     prjctIdx : "",
-        //                     prjctNm : ""
-        //                 }
-        //             },
-        //             demandCnIdx : "",
-        //             demandCnNum : "",
-        //             demandCnSe : "",
-        //             demandCnId : "",
-        //             demandCnNm : "",
-        //             demandCnDetail : "",
-        //             demandCnRequstNm : "",
-        //             demandCnRm : ""
-        //
-        //         })
-        //     }
-        // }
 
+        getSideBar(state){
+            state.sideBar = state.rows !== null;
+        }
 
 
     },
