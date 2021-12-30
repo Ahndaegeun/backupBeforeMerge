@@ -36,7 +36,9 @@ export default {
           unshiftToBoardList : 'community/unshiftToBoardList',
           changeWriteIsOpen : 'community/changeWriteIsOpen',
           changeUpdateCheck : 'community/changeUpdateCheck',
-          setArticlesOnView: 'community/setArticlesOnView'
+          setArticlesOnView: 'community/setArticlesOnView',
+          increaseNumOfArticleAfterInsert : 'community/increaseNumOfArticleAfterInsert',
+          resetBoardList: 'community/resetBoardList'
         }),
 
         insert(){
@@ -67,7 +69,9 @@ export default {
         },
         
         getContent(e) {
-            console.log('안뇽이냐??')
+            if(this.boardList.length === 1 && this.boardList[0].isNull) {
+              this.resetBoardList()
+            }
             let fileAt = ''
             let formData = new FormData()
             let boardIdxToInsertFile = 0
@@ -77,6 +81,11 @@ export default {
             } else {
               fileAt = 'N'
             }
+            let projectIdx = 0
+            if(sessionStorage.getItem("project") !== null){
+              projectIdx = sessionStorage.getItem("project")
+            }
+
             this.axios({
                 method: 'post',
                 url: '/insertBoard',
@@ -88,13 +97,14 @@ export default {
                   totalComments: 0,
                   totalLikes: 0,
                   fileAt: fileAt,
-                  token: "#1921"
+                  token: sessionStorage.getItem("token"),
+                  projectIdx : projectIdx,
                 }
               }).then(ele =>{
                 boardIdxToInsertFile = ele.data.boardIdx
                 this.changeUpdateCheck()
                 this.changeWriteIsOpen()
-
+                this.increaseNumOfArticleAfterInsert()
 
                 if(e._file !== ''){
                   this.makeFormData(e, formData, boardIdxToInsertFile)
@@ -124,7 +134,10 @@ export default {
           const fileName = ele._file.name
           console.log(fileName)
           const extension = ele._file.name.substring( fileNameAndExtension, ele._file.name.length)
-
+          let projectIdx = 0
+          if(sessionStorage.getItem("project") !== null){
+            projectIdx = sessionStorage.getItem("project")
+          }
           obj.append('file', ele._file)
           obj.append('fileSize', fileSize)
           obj.append('fileName', fileName)
@@ -132,6 +145,8 @@ export default {
           obj.append('boardIdxToInsertFile', boardIdxToInsertFile)
           obj.append('category', this.category)
           obj.append('checkInsertOrUpdate', "insert")
+          obj.append('token', sessionStorage.getItem("token"))
+          obj.append('projectIdx', projectIdx)
         }
     },
 

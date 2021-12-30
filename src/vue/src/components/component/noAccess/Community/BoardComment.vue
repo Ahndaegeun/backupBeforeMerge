@@ -3,62 +3,72 @@
     <div>
       <ul>
         <li class="comment-li" v-for="(item, index) in board.commentList" :key="index">
-          <div class="content-wrapper">
-            <div class="info-wrapper">
-              <span class="name">{{item.member.memNick}}</span>
-              <span class="date">{{item.answerDate}}</span>
+          <div v-if="item.answerDelAt === 'N'" class="content-wrapper">
+            <div>
+              <div class="info-wrapper">
+                <span class="name">{{ item.member.memNick }}</span>
+                <span class="date">{{ item.answerDate.substring(0, 19).replace("T", " ") }}</span>
+              </div>
+              <textarea class="text-area" v-model="item.answerCn" :readonly="item.isModify"></textarea>
             </div>
-            <textarea @keyup="update" class="text-area" :value="item.answerCn" :readonly="item.isModify"></textarea>
-          </div>
-          <div>
-            <i @click="this.changeCommentsIsOpen(item)" v-if="item.isOpen==false" class="fas fa-ellipsis-h"></i>
-            <!-- 여기서 토큰 값을 비교해서 본인의 게시글일 경우 수정,삭제 아이콘을 보여주고
-                  본인의 글이 아니면 신고 버튼을 보여준다. v-if를 통해서
-                  <div>
-                    <i>신고</i>
+            <div v-if="getPosition()">
+              <i @click="this.changeCommentsIsOpen(item)"
+                 v-if="(item.isOpen === false && board.codeDetail.codeDetailIdx === '7')
+                        ||(item.isOpen === false && board.codeDetail.codeDetailIdx === '9')" class="fas fa-ellipsis-h"></i>
+              <div v-else>
+                <div v-if="item.member.memIdx === this.$store.state.community.signMember.memIdx">
+                  <div class="box" v-if="item.isOpen === true && item.isFinish === false">
+                    <i @click="this.changeIsModify(item); this.changeIsFinish(item)" class="fas fa-edit"></i>
+                    <i @click="confirmDeleteComment(item, board)" class="far fa-trash-alt"></i>
+                    <i @click="this.changeCommentsIsOpen(item)" class="fas fa-long-arrow-alt-left"></i>
                   </div>
-            -->
-            <div class="box" v-if="item.isOpen==true && item.isFinish == false">
-              <i @click="toUpdate(item); this.changeIsFinish(item)" class="fas fa-edit"></i>
-              <i @click="deleteComment" class="far fa-trash-alt"></i>
-              <i @click="this.changeCommentsIsOpen(item)" class="fas fa-long-arrow-alt-left"></i>
-            </div>
 
-            <div id="finish-id" v-if="item.isOpen == true && item.isFinish == true" 
-                  @click="toUpdate(item); this.changeIsFinish(item)">Finish</div>
+                  <div id="finish-id" v-if="item.isOpen === true && item.isFinish === true"
+                       @click="toUpdate(item); this.changeIsFinish(item)">Finish
+                  </div>
+                </div>
+
+                <div v-else>
+                  <div id="report-div">
+                      <span @click="report(item)" v-if="!item.report">
+                        <img class="no-report" src="@/assets/noneReport.png">
+                      </span>
+                      <span @click="report(item)" v-else>
+                        <img class="report" src="@/assets/report.png">
+                      </span>
+                  </div>
+                  <div>
+                    <i @click="this.changeCommentsIsOpen(item)" class="fas fa-long-arrow-alt-left"></i>
+                  </div>
+                </div>
+              </div>
+
+
+            </div>
           </div>
-        </li>  
+        </li>
       </ul>
       <div id="btn-div">
-        {{board.totalComments}}<br>{{board.commentList.length}}
-        <button v-if="board.totalComments - board.commentList.length !== 0"
+        <button v-if="board.totalComments - board.commentList.length !== 0
+                      && board.totalComments - board.commentList.length > 0"
                 id="more-btn"
-                @click="this.extraComments(board)">더 보기</button>
+                @click="this.extraComments(board)">더 보기
+        </button>
       </div>
-        {{ board.totalComments - board.commentList.length }}
     </div>
   </div>
 </template>
 <script>
-import { mapActions, mapMutations } from 'vuex'
+import {mapActions, mapMutations} from 'vuex'
 
 export default {
   name: 'BoardComment',
   data() {
-    return {
-      numberOfComments : this.board.댓글수,
-      updateContent : '',
-    }
+    return {}
   },
 
   props: {
     board: Object
-  },
-
-  computed : {
-        ...mapActions({
-          getComments : 'community/getComments',
-        }),
   },
 
   methods: {
@@ -67,32 +77,86 @@ export default {
     }),
 
     ...mapMutations({
-      changeCommentsIsOpen : 'community/changeCommentsIsOpen',
-      changeCommentsIsUpdate : 'community/changeCommentsIsUpdate',
-      changeIsFinish : 'community/changeIsFinish',
-      changeIsModify : 'community/changeIsModify'
+      changeCommentsIsOpen: 'community/changeCommentsIsOpen',
+      changeCommentsIsUpdate: 'community/changeCommentsIsUpdate',
+      changeIsFinish: 'community/changeIsFinish',
+      changeIsModify: 'community/changeIsModify'
     }),
-    
-    //댓글 삭제
-    deleteComment(item){
-      this.axios.delete('', null, { params : { idx : item.idx}})
-                .then(e => {
-                    console.log(e)
-                  })
+
+    confirmDeleteComment(item, board) {
+      if (confirm("해당 댓글을 삭제하시겠습니까?")) {
+        this.deleteComment(item, board)
+      }
     },
-    //댓글 수정 컨트롤러에 보내줌
-    updateComment(item){
-      this.axios.put('',null, { params : {idx : item.idx, content : this.updateContent}}).then(e => {
-        console.log(e)
+
+    getReportPrompt(item){
+      item.reportResn = prompt("신고 사유를 입력해주세요")
+    },
+
+    report(item){
+      if(item.report === false){
+        this.getReportPrompt(item)
+        if(item.reportResn === null){
+          alert('신고를 취고하셨습니다')
+          return
+        }
+        if(item.reportResn.trim() === ''){
+          alert('신고 사유를 정확히 입력해주세요')
+          return
+        }
+        this.initReport(item)
+      } else {
+        this.cancelReport(item)
+      }
+      item.report = !item.report
+    },
+
+    initReport(item){
+      this.axios.post('/updateCommentReport', {
+        answerIdx : item.answerIdx,
+        reportReason : item.reportResn,
+        token : sessionStorage.getItem("token")
       })
     },
-    toUpdate(item){
-      this.changeIsModify(item)
+
+    cancelReport(item){
+      this.axios.post('/deleteCommentReport', {
+        answerIdx : item.answerIdx,
+        token : sessionStorage.getItem("token")
+      });
     },
-    //keyup될 때마다 새로쓰는 댓글 내용 지역변수에 저장
-    update(e){
-      this.updateContent = e.target.value
+    //댓글 삭제
+    deleteComment(item, board) {
+      this.axios.post('/deleteComment', {
+        answerIdx: item.answerIdx,
+        token: sessionStorage.getItem("token")
+      })
+          .then(e => {
+            item.answerDelAt = e.data.answerDelAt
+            board.commentsOnView -= 1
+            board.totalComments = e.data.board.totalComments
+          })
     },
+
+    toUpdate(item) {
+      this.axios.post('/updateComment', {
+        token: sessionStorage.getItem("token"),
+        answerIdx: item.answerIdx,
+        content: item.answerCn
+      }).then(() => {
+        this.changeIsModify(item)
+      })
+
+    },
+
+    getPosition(){
+      const token = sessionStorage.getItem("token")
+      if(token === null){
+        return false
+      }
+      return true
+    },
+
   },
 }
 </script>
@@ -103,10 +167,6 @@ export default {
   padding-left: 20px;
 }
 
-.name-span {
-  margin-right: 10px;
-}
-
 .comment-li {
   margin-top: 20px;
   display: flex;
@@ -114,13 +174,25 @@ export default {
   align-items: center;
 }
 
+img {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+
 .content-wrapper {
   background-color: #414556;
   padding: 10px;
   font-size: 14px;
   border-radius: 5px;
-  width: 100%;
+  width: 95%;
   height: fit-content;
+  display: flex;
+  justify-content: space-between;
+}
+
+.content-wrapper > div:first-child {
+  width: 100%;
 }
 
 .info-wrapper {
@@ -140,7 +212,8 @@ export default {
   display: flex;
   flex-direction: column;
   font-size: 12px;
-  gap:8px;
+  gap: 8px;
+  height: 20px;
 }
 
 i {
@@ -148,10 +221,10 @@ i {
 }
 
 .comment-div {
-    display: flex;
-    justify-content: right;
-    padding-right: 20px;
-    padding-bottom: 20px;
+  display: flex;
+  justify-content: right;
+  padding-right: 20px;
+  padding-bottom: 20px;
 }
 
 #comment-btn {
@@ -165,9 +238,10 @@ textarea {
   resize: none;
   outline: none;
   border: none;
-  margin : 0;
+  margin: 0;
   padding: 0;
   overflow: hidden;
+  width: 100%;
 }
 
 #finish-id {
@@ -185,5 +259,9 @@ textarea {
   background-color: coral;
   border-radius: 10px;
   padding: 5px 10px;
+}
+
+#report-div {
+  padding-bottom: 15px;
 }
 </style>

@@ -29,6 +29,7 @@ public class LikeServiceImpl implements LikeService {
 
         return LikesDTO.builder()
                 .likeIdx(savedLike.getLikeIdx())
+                .member(member.entityToDto())
                 .build();
     }
 

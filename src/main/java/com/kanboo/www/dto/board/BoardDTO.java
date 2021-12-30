@@ -35,6 +35,7 @@ public class BoardDTO {
     private int totalLikes;
     private BoardFileDTO boardFileDTO;
     private boolean isLike;
+    private boolean isReport;
     private List<CommentDTO> commentList = new ArrayList<>();
 
     public void changeMember(long memberIdx){

@@ -28,6 +28,7 @@ public class CommentDTO {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime answerDate;
     private String answerDelAt;
+    private boolean isReport;
 
     public Comment dtoToEntity() {
         return Comment.builder()

@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -33,11 +35,27 @@ public class Comment {
     private LocalDateTime answerDate;
     private String answerDelAt;
 
+    @OneToMany(mappedBy = "comment")
+    private List<CommentReport> commentReportList = new ArrayList<>();
+
+    public void changeCommentCn(String commentCn){
+        this.answerCn = commentCn;
+    }
+    public void changeAnswerDelAt(String answerDelAt){
+        this.answerDelAt = answerDelAt;
+    }
+
     public CommentDTO entityToDto() {
+        boolean isReport = false;
+        if(!commentReportList.isEmpty()){
+            isReport = true;
+        }
+
         return CommentDTO.builder()
                 .answerIdx(answerIdx)
                 .board(board.entityToDto())
                 .member(member.entityToDto())
+                .isReport(isReport)
                 .answerCn(answerCn)
                 .answerDate(answerDate)
                 .answerDelAt(answerDelAt)

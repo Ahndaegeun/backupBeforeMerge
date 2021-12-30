@@ -28,7 +28,7 @@ public class AccessController {
         if(member == null) {
             return null;
         }
-        return jwtSecurityService.createToken(member.getMemTag(), (60L * 60 * 1000));
+        return jwtSecurityService.createToken(member.getMemTag(), (60L * 60 * 100000));
     }
 
 

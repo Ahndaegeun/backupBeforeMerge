@@ -129,6 +129,7 @@ export default {
         e.target.value = ''
         return
       }
+
       const obj = {
         ele: "insertImage",
         img: ""
@@ -143,7 +144,6 @@ export default {
         reader.readAsBinaryString(file)
       }
       this.exportFile = ''
-
     }
   },
   watch: {

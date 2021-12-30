@@ -5,17 +5,16 @@
         <div class="left-container">
           <router-link @click="changeCodeDetail(7);
                             emptyInputBox();
-                            step=0;
                             category='7';
                             "
                        class ="board-direction" to="/community/free">자유게시판</router-link>
           <router-link @click="changeCodeDetail(8);
                             emptyInputBox();
-                            step=0;
                             category='8';
                             "
+                       v-if="getPosition()"
                        class ="board-direction" to="/community/qna">문의 게시판</router-link>
-          <button  @click="[changeWriteIsOpen(), step=1, this.changeUpdateCheck()]" class="board-direction" :disabled="blockWrite == true">글 작성</button>
+          <button v-if="getPosition()" @click="[changeWriteIsOpen(), step=1, this.changeUpdateCheck(), changeUpdateCheckingForReal()]" class="board-direction" :disabled="blockWrite == true">글 작성</button>
         </div>
         <div class="input-container">
           <select v-model="selected" id="select" @change="sendingSelected">
@@ -75,6 +74,8 @@ export default {
       changeCodeDetail : 'community/changeCodeDetail',
       resetData: 'community/resetData',
       changeWriteIsOpen : 'community/changeWriteIsOpen',
+      changeUpdateCheckingForReal : 'community/changeUpdateCheckingForReal',
+      resetBoardList: 'community/resetBoardList'
     }),
 
     ...mapActions({
@@ -84,7 +85,6 @@ export default {
 
     click(){
       this.isOpen = !this.isOpen;
-      console.log(this.isOpen)
     },
 
     sendingSelected() {
@@ -100,17 +100,13 @@ export default {
     },
 
     emptyInputBox(){
-      // document.querySelector('.search-input').value = null
-      this.key = ''
-      this.selected = 'All'
       const object= {
-        "key" : this.key,
-        "selected" : this.selected
+        "key" : '',
+        "selected" : 'All'
       }
       this.getSelectedAndKey(object)
       this.resetData()
       this.getBoardNum(null)
-
       this.getBoardList(null)
     },
 
@@ -118,11 +114,17 @@ export default {
       const position = this.$route.fullPath.split('/')[2]
       if(position === 'qna'){
         this.category = '8'
-        console.log(this.category)
       } else if(position === 'free'){
         this.category = '7'
-        console.log(this.category)
       }
+    },
+
+    getPosition(){
+      const token = sessionStorage.getItem("token")
+      if(token === null){
+        return false
+      }
+      return true
     },
 
   },
@@ -133,7 +135,6 @@ export default {
   },
   mounted() {
     const position = this.$route.fullPath.split('/')[2]
-    console.log(position)
     this.getBoardList(position)
     this.getBoardNum(position)
 
@@ -206,14 +207,6 @@ img {
   transform: translate(-50%,-50%);
   top: 50%;
   right: 5px;
-}
-
-.write-div {
-  width: 60vw;
-  height: 80%;
-  background-color: #2C2F3B;
-  margin-bottom: 20px;
-  position : relative;
 }
 
 #select {

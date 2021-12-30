@@ -63,7 +63,19 @@ const routes = [
       },
       {
         path: "qna",
-        component: QnA
+        component: QnA,
+        beforeEnter: (to, from, next) => {
+          const repData = {
+            url : '/token/check',
+            method : 'post',
+            falsePath: '/false',
+            next: next,
+            data: {
+              token : sessionStorage.getItem("token")
+            }
+          }
+          roleCheck(repData)
+        }
       },
     ]
   },

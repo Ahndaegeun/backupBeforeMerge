@@ -9,7 +9,9 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -40,10 +42,13 @@ public class Board {
     private BoardFile boardFile;
 
     @OneToMany(mappedBy = "board")
-    List<Likes> likesList = new ArrayList<>();
+    Set<Likes> likesList = new HashSet<>();
 
     @OneToMany(mappedBy = "board")
     private List<Comment> commentList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "board")
+    private Set<BoardReport> reportsList = new HashSet<>();
 
     public void changeDelAt(String delAt) {
         this.delAt = delAt;
@@ -84,6 +89,11 @@ public class Board {
             isLike = true;
         }
 
+        boolean isReport = false;
+        if(!reportsList.isEmpty()) {
+            isReport = true;
+        }
+
         return BoardDTO.builder()
                 .boardIdx(boardIdx)
                 .member(member.entityToDto())
@@ -95,6 +105,7 @@ public class Board {
                 .totalComments(totalComments)
                 .totalLikes(totalLikes)
                 .isLike(isLike)
+                .isReport(isReport)
                 .boardFileDTO(bfd)
                 .build();
     }

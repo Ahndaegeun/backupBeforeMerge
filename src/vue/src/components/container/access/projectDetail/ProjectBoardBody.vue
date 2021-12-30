@@ -12,42 +12,31 @@
               </div>
               <!-- 이 부분에다가 v-if로 토큰값 비교해서 작성자일 경우 수정,삭제 버튼.. 아닐경우 신고 버튼-->
               <div class="kade-wrap">
-                <div class="file-report-wrap" v-if="signMember !== null">
-                  <div class="file-link" v-if="item.fileAt === 'Y'">
-                    <button @click="downloadFile(item)" id="file-btn" v-text="`첨부파일: ${
+                <div v-if="item.fileAt === 'Y'">
+                  <button @click="downloadFile(item)" id="file-btn" v-text="`첨부파일: ${
                       item.boardFileDTO.fileName.length > 20 ?
                       item.boardFileDTO.fileName.substring(0, 20) + '...' :
                       item.boardFileDTO.fileName
                     }`"></button>
-                  </div>
+                </div>
 
-                  <div class="icon-container" v-if="item.수정했니 === false && item.member.memIdx === signMember.memIdx">
-                    <div class="icon-div">
-                      <i @click="this.changeBoardIsModify(item);
+                <div class="icon-container" v-if="item.수정했니 === false && item.member.memIdx === signMember.memIdx">
+                  <div class="icon-div">
+                    <i @click="this.changeBoardIsModify(item);
                                       this.changeIsUpdate(item)
                                       changeUpdateCheckingForReal();"
-                         class="fas fa-edit"
-                         v-if="this.updateCheck == false"></i>
-                    </div>
-                    <div class="icon-div">
-                      <i @click="confirmDelete(item)" class="far fa-trash-alt"></i>
-                    </div>
+                       class="fas fa-edit"
+                       v-if="this.updateCheck == false"></i>
                   </div>
-
-                  <div class="report-div" v-else-if="item.member.memIdx !== signMember.memIdx">
-                      <span @click="report(item)" v-if="!item.report">
-                          <img class="no-report" src="@/assets/noneReport.png">
-                      </span>
-                    <span @click="report(item)" v-else>
-                          <img class="report" src="@/assets/report.png">
-                      </span>
+                  <div class="icon-div">
+                    <i @click="confirmDelete(item)" class="far fa-trash-alt"></i>
                   </div>
-                  <div v-else></div>
                 </div>
-                <div id="finish-div" v-if="item.수정했니 === true"
-                     @click='increasingIsExportUpdate()'
-                >Finish
-                </div>
+                <div v-else></div>
+              </div>
+              <div id="finish-div" v-if="item.수정했니 === true"
+                   @click='increasingIsExportUpdate()'
+              >Finish
               </div>
             </div>
             <div class="content-div no-read-only" v-if="item.isModify == true" v-html="item.boardCn">
@@ -58,26 +47,19 @@
                       class="content-div"/>
             </div>
             <div id="btn-div">
-              <div v-if="getPosition()">
-                <div class="like-div" v-if="!item.like">
-                  <div @click="like(item)" class="heart unclick"></div>
-                  <span>{{ item.totalLikes }} 개</span>
-                </div>
-                <div class="like-div" v-else>
-                  <div @click="like(item)" class="heart clicked"></div>
-                  <span>{{ item.totalLikes }} 개</span>
-                </div>
+              <div class="like-div" v-if="!item.like">
+                <div @click="like(item)" class="heart unclick"></div>
+                <span>{{ item.totalLikes }} 개</span>
               </div>
-              <div class="like-div" v-else>
-                <div v-if="item.totalLikes !== 0" class="heart clicked"></div>
-                <div v-else class="heart unclick"></div>
+              <div @click="like(item)" class="like-div" v-else>
+                <div class="heart clicked"></div>
                 <span>{{ item.totalLikes }} 개</span>
               </div>
               <div>
                 <button @click="getCommentList(item)" class="comment-btn">댓글 {{ item.totalComments }}개</button>
               </div>
             </div>
-            <div class="comment-wrapper" v-if="getPosition()">
+            <div class="comment-wrapper">
               <input class="comment-input" v-model="item.insertComment" type="text" placeholder="댓글을 입력하세요">
               <button id="button-id" class="comment-btn" @click="insertComment(item)">등록</button>
             </div>
@@ -96,10 +78,10 @@
 <script>
 import BoardComment from '@/components/component/noAccess/Community/BoardComment.vue'
 import {mapActions, mapMutations, mapState} from 'vuex'
-import editor from '../../global/editor.vue'
+import editor from '@/components/component/global/editor'
 
 export default {
-  name: 'Free',
+  name: 'ProejctBoard',
 
   data() {
     return {
@@ -109,7 +91,7 @@ export default {
       isReportClick: false,
       likeToggle: false,
       isBoardNull: false,
-      category: 7,
+      category: 9,
       updateChecking: false,
     }
   },
@@ -177,7 +159,6 @@ export default {
       } else if (e._file !== '') {
         fileAt = 'Y'
       }
-
       this.axios({
         method: 'post',
         url: '/updateBoard',
@@ -185,11 +166,12 @@ export default {
           boardCn: e._data,
           boardIdx: e._boardIdx,
           fileAt: fileAt,
-          token: sessionStorage.getItem("token"),
+          token: sessionStorage.getItem("token")
         }
       }).then(ele => {
         boardIdxToInsertFile = ele.data.boardIdx
         e.originContent.fileAt = ele.data.fileAt
+        this.increaseNumOfArticleAfterInsert()
 
         if (e._file !== '') {
           this.makeFormData(modifiedFile, formData, boardIdxToInsertFile)
@@ -198,7 +180,6 @@ export default {
           this.axios.post("/insertFile", formData,
               {headers: {'Content-Type': 'multipart/form-data'}})
               .then(res => {
-                console.log('here?')
                 e.originContent.boardFileDTO = res.data
               })
         }
@@ -210,7 +191,10 @@ export default {
       const fileNameAndExtension = ele.name.lastIndexOf('.')
       const fileName = ele.name
       const extension = ele.name.substring(fileNameAndExtension, ele.name.length)
-
+      let projectIdx = 0
+      if (sessionStorage.getItem("project") !== null) {
+        projectIdx = sessionStorage.getItem("project")
+      }
       obj.append('file', ele)
       obj.append('fileSize', fileSize)
       obj.append('fileName', fileName)
@@ -219,7 +203,7 @@ export default {
       obj.append('category', this.category)
       obj.append("checkInsertOrUpdate", "update")
       obj.append("token", sessionStorage.getItem("token"))
-      obj.append("projectIdx", 0)
+      obj.append("projectIdx", projectIdx)
     },
 
     downloadFile(item) {
@@ -228,7 +212,10 @@ export default {
       const memIdx = item.member.memIdx
       const fileName = item.boardFileDTO.fileName
       const codeDetail = item.codeDetail.codeDetailIdx
-
+      let projectIdx = 0
+      if (sessionStorage.getItem("project") !== null) {
+        projectIdx = sessionStorage.getItem("project")
+      }
       this.axios({
         url: url,
         method: 'post',
@@ -237,12 +224,12 @@ export default {
           boardIdx: boardIdx,
           memIdx: memIdx,
           fileName: fileName,
-          codeDetail: codeDetail
+          codeDetail: codeDetail,
+          projectIdx: projectIdx
         }
       }).then(e => {
         const url = window.URL.createObjectURL(new Blob([e.data]));
         const link = document.createElement('a')
-
         link.href = url
         link.setAttribute('download', fileName)
         document.body.appendChild(link)
@@ -286,45 +273,10 @@ export default {
       })
     },
 
-    getReportPrompt(item) {
-      item.reportResn = prompt("신고 사유를 입력해주세요")
-    },
-
-    report(item) {
-      if (item.report === false) {
-        this.getReportPrompt(item)
-        if (item.reportResn === null) {
-          alert('신고를 취고하셨습니다')
-          return
-        }
-        if (item.reportResn.trim() === '') {
-          alert('신고 사유를 정확히 입력해주세요')
-          return
-        }
-        this.initReport(item)
-      } else {
-        this.cancelReport(item)
-      }
-      item.report = !item.report
-    },
-
-    initReport(item) {
-      this.axios.post('/updateReport', {
-        boardIdx: item.boardIdx,
-        reportReason: item.reportResn,
-        token: sessionStorage.getItem("token")
-      })
-          .then(e => console.log(e))
-    },
-
-    cancelReport(item) {
-      this.axios.post('/cancelReport', {
-        boardIdx: item.boardIdx,
-        token: sessionStorage.getItem("token")
-      });
-    },
-
     exportFinish(item) {
+      console.log('============')
+      console.log(item)
+      console.log('============')
       this.changeIsUpdate(item);
       this.changeBoardIsModify(item);
     },
@@ -334,6 +286,8 @@ export default {
     },
 
     getArticle(e) {
+      console.log(this.articlesOnView)
+      console.log(this.numberOfArticle)
       if (this.articlesOnView === this.numberOfArticle) {
         return
       }
@@ -341,8 +295,12 @@ export default {
       const nowScroll = e.target.scrollTop
       const position = this.$route.fullPath.split('/')[2]
 
-      if ((fullScroll - nowScroll) < (fullScroll / 1.5) && !this.axiosState) {
+      if (this.articlesOnView <= 4) {
         this.getMoreList(position)
+      } else {
+        if ((fullScroll - nowScroll) < (fullScroll / 1.5) && !this.axiosState) {
+          this.getMoreList(position)
+        }
       }
     },
 
@@ -355,13 +313,17 @@ export default {
     //게시판 삭제
     // token : sessionStorage.getItem('token')
     deleteBoard(item) {
+      let projectIdx = 0;
+      if (sessionStorage.getItem("project")) {
+        projectIdx = sessionStorage.getItem("project")
+      }
       this.axios
           .get('/DeleteBoard', {
             params: {
               boardIdx: item.boardIdx,
               token: sessionStorage.getItem("token"),
-              projectIdx: 0,
-              codeDetailIdx: parseInt(item.codeDetail.codeDetailIdx)
+              projectIdx: projectIdx,
+              codeDetailIdx: item.codeDetail.codeDetailIdx
             }
           })
           .then(e => {
@@ -417,14 +379,6 @@ export default {
     backToFirst() {
       document.querySelector('.router-wrapper').scroll(0, 0)
     },
-
-    getPosition() {
-      const token = sessionStorage.getItem("token")
-      if (token === null) {
-        return false
-      }
-      return true
-    },
   },
 
   watch: {
@@ -434,13 +388,18 @@ export default {
       if (editor) {
         let _data = editor.innerHTML
         let _files = multipleFiles.files
-        _data
-        _files
+        console.log(_data)
+        console.log(_files)
       }
     }
 
 
   },
+
+  Mounted() {
+    // this.getBoardNum()
+  },
+
   components: {
     BoardComment,
     editor,
@@ -489,6 +448,8 @@ export default {
 }
 
 .report-div {
+  padding-left: 200px;
+  padding-top: 20px;
 }
 
 .read-only {
@@ -523,12 +484,11 @@ export default {
   background-color: #414556;
   height: 20px;
   color: #FFFFFF;
-  padding-left: 14px;
   width: 100%;
   margin-left: 8px;
   outline: none;
   border: none;
-  padding: 20px;
+  padding: 20px 20px 20px 14px;
 }
 
 #btn-div {
@@ -651,24 +611,11 @@ img {
   gap: 10px;
 }
 
-.file-report-wrap {
-  display: flex;
-}
-
-.file-link {
-  margin-right: 10px;
-}
-
-.file-link button {
-  color: #999;
-  transition: color .2s ease-in;
-}
-
-.file-link button:hover {
-  color: #fff;
-}
-
 .kade-wrap {
   display: flex;
+}
+
+.kade-wrap > div:first-child {
+  margin-right: 10px;
 }
 </style>

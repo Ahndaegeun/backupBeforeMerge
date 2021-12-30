@@ -9,7 +9,7 @@ import java.util.Map;
 
 public interface BoardFileService {
 
-    BoardFileDTO insertFiles(BoardFileDTO dto, MultipartFile file, int category, long memIdx, String checkInsertOrUpdate);
+    BoardFileDTO insertFiles(BoardFileDTO dto, MultipartFile file, int category, long memIdx, String checkInsertOrUpdate, long projectIdx);
 
     String getFolder(long boardIdx, long memIdx);
 

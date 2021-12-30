@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BoardReportRepository extends JpaRepository<BoardReport, Long> {
+    int deleteByMember_MemIdxAndAndBoard_BoardIdx(long memeIdx, long boardIdx);
 }

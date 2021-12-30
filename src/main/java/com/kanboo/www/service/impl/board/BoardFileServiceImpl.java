@@ -32,7 +32,7 @@ public class BoardFileServiceImpl implements BoardFileService {
 
     @Transactional
     @Override
-    public BoardFileDTO insertFiles(BoardFileDTO dto, MultipartFile file, int category, long memIdx, String checkInsertOrUpdate){
+    public BoardFileDTO insertFiles(BoardFileDTO dto, MultipartFile file, int category, long memIdx, String checkInsertOrUpdate, long projectIdx){
 
 
         String uploadPath = "";
@@ -47,6 +47,8 @@ public class BoardFileServiceImpl implements BoardFileService {
             uploadPath = "/src/main/resources/storage/board/free";
         } else if(category == 8){
             uploadPath = "/src/main/resources/storage/board/qna";
+        } else if(category == 9){
+            uploadPath = "/src/main/resources/storage/board/project/" + projectIdx;
         }
 
         rootPath = absolutePath + uploadPath;
@@ -56,7 +58,6 @@ public class BoardFileServiceImpl implements BoardFileService {
         }
         originalFileName = originalFileName.substring(originalFileName.lastIndexOf("\\") + 1);
         saveFile = new File(uploadFile, originalFileName);
-
         if(checkInsertOrUpdate.equals("update")){
             BoardFile presentFile = boardFileRepository.getPresentFile(dto.getBoard().getBoardIdx());
             if(presentFile != null){
@@ -70,8 +71,6 @@ public class BoardFileServiceImpl implements BoardFileService {
                 }
             }
         }
-
-
         try {
             if(!file.isEmpty()){
                 file.transferTo(saveFile);
@@ -116,6 +115,8 @@ public class BoardFileServiceImpl implements BoardFileService {
             downloadPath ="/src/main/resources/storage/board/free";
         }else if(codeDetail.equals("8")){
             downloadPath ="/src/main/resources/storage/board/qna";
+        } else if(codeDetail.equals("9")){
+            downloadPath ="/src/main/resources/storage/board/project/" + map.get("projectIdx");
         }
         String finalPath
                 = absolutePath + downloadPath + "/" + (String)map.get("memIdx") + "/" + (String)map.get("boardIdx");

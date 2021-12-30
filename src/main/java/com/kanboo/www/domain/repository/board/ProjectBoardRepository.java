@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProjectBoardRepository extends JpaRepository<ProjectBoard, Long> {
+    int deleteByBoard_BoardIdxAndProject_PrjctIdx(long boardIdx, long projectIdx);
 }

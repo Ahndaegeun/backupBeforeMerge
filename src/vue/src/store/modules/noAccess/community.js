@@ -1,9 +1,3 @@
-/*
-    검색버튼 관력 초기화(조건 잡아주세용~~)
-    select box 변경시 키워드가 입력되있으면 바로 검색
-    키워드가 공백(trim잡아주셔야 됩니다)이면 데이터 초기화 후 조건 없이 글 가져오기
-*/
-//import { createStore } from 'vuex'
 import axios from 'axios'
 
 const community = {
@@ -20,9 +14,15 @@ const community = {
         codeDetail : 7,
         axiosState : false,
         isOpen : false,
+        signMember: {},
+        updateCheckingForReal : false,
     },
 
     mutations: {
+        changeUpdateCheckingForReal(state){
+            state.updateCheckingForReal = !state.updateCheckingForReal
+        },
+
         changeWriteIsOpen(state){
             state.isOpen = !state.isOpen
         },
@@ -62,13 +62,15 @@ const community = {
 
         deleteBoards(state){
             state.articlesOnView--
-            console.log('못옴??')
-            console.log(state.articlesOnView)
             state.numberOfArticle--
         },
 
         increaseNumOfArticleAfterInsert(state){
-            state.numberOfArticl++
+            state.numberOfArticle++
+        },
+
+        decreaseNumOfArticleAfterInsert(state){
+            state.numberOfArticle--
         },
 
         setNumberOfArticle(state, payload) {
@@ -85,10 +87,8 @@ const community = {
 
         pushToComment(state, item) {
             if (item._board.commentList.length !== 0 || item._board.totalComments === 0) {
-                console.log('걸리니')
                 return
             }
-            console.log('지나가니')
             item._board.commentList.push(...item._comment)
             item._board.commentsOnView = item._comment.length;
         },
@@ -105,35 +105,29 @@ const community = {
 
         // 해당 게시물 댓글 리스트에 댓글 추가
         addingToCommentList(state, payload) {
-            state
             payload.board.commentList.push(...payload.commentList)
         },
 
         //----------------댓글 관련!!!-------------------
         changeCommentsIsOpen(state, payload) {
             payload.isOpen = !payload.isOpen
-            state
         },
 
         changeCommentsIsUpdate(state, payload) {
             payload.isUpdate = !payload.isUpdate
-            state
         },
 
         changeIsFinish(state, payload) {
             payload.isFinish = !payload.isFinish
-            state
         },
 
         changeIsModify(state, payload) {
             payload.isModify = !payload.isModify
-            state
         },
 
         //-------------------------------------------
         changeBoardIsModify(state, payload) {
             payload.isModify = !payload.isModify
-            state
         },
         changeUpdateCheck(state) {
             state.updateCheck = !state.updateCheck
@@ -157,33 +151,54 @@ const community = {
         setAxiosState(state, stat) {
             state.axiosState = stat
         },
+
+        setSignMember(state, item) {
+            state.signMember = item
+        },
+
+        resetBoardList(state) {
+            state.boardList = []
+        }
     },
 
     actions: {
         getBoardList(context, position) {
             let detail
-            // const _token = sessionStorage.getItem("token")
             if(position === 'qna') {
                 detail = 8
             } else if(position === 'free') {
                 detail = 7
+            } else if(position === 'board'){
+                detail = 9
             } else {
                 detail = context.state.codeDetail
             }
+            let token = 'none'
+            let projectIdx = 0
+
+            if(sessionStorage.getItem("token") !== null){
+                token = sessionStorage.getItem("token")
+            }
+            if(sessionStorage.getItem("project") !== null){
+                projectIdx = sessionStorage.getItem("project")
+            }
+
             axios.get('/boardTest', {
                     params: {
                         selected: context.state.selected,
                         key: context.state.key,
                         articleOnvView: context.state.articlesOnView,
                         codeDetail: detail,
-                        token : "#1921"
+                        token : token,
+                        projectIdx : projectIdx
                     }
                 }
             )
                 .then(e => {
-                    console.log("뀨??????????????????")
-                    console.log(e.data)
-                    if(e.data.length === 0) {
+                    const member = e.data.member
+                    const boardList = e.data.boardList
+
+                    if(boardList.length === 0) {
                         const obj = {
                             isNull: true,
                             content: '해당하는 게시물이 없습니다.'
@@ -191,10 +206,11 @@ const community = {
                         context.commit('boardListNullPush', obj)
                         return
                     }
-                    for (let item of e.data) {
+                    for (let item of boardList) {
                         context.commit('pushToBoardList', item)
                     }
-                    context.commit('setArticlesOnView', e.data.length)
+                    context.commit('setArticlesOnView', boardList.length)
+                    context.commit("setSignMember", member)
                 })
         },
 
@@ -204,21 +220,25 @@ const community = {
                 detail = 8
             } else if(position === 'free') {
                 detail = 7
+            } else if(position === 'board'){
+                detail = 9
             } else {
                 detail = context.state.codeDetail
+            }
+            let projectIdx = 0;
+            if(sessionStorage.getItem("project") !== null){
+                projectIdx = sessionStorage.getItem("project")
             }
             axios.get('/getArticleNum', {
                     params : {
                         key : context.state.key,
                         selected : context.state.selected,
-                        codeDetails : detail
+                        codeDetails : detail,
+                        projectIdx : projectIdx,
                     }
                 }
             )
                 .then(e => {
-                    console.log('---게시글 총 글 수---')
-                    console.log(e.data)
-                    console.log('------')
                     context.commit('setNumberOfArticle', e.data)
                 })
         },
@@ -229,10 +249,15 @@ const community = {
                 detail = 8
             } else if(position === 'free') {
                 detail = 7
+            } else if(position === 'board'){
+                detail = 9
             } else {
                 detail = context.state.codeDetail
             }
-
+            let projectIdx = 0
+            if(sessionStorage.getItem("project") !== null){
+                projectIdx = sessionStorage.getItem("project");
+            }
             if(context.state.axiosState) {
                 return
             }
@@ -244,29 +269,26 @@ const community = {
                         key: context.state.key,
                         articleOnvView: context.state.articlesOnView,
                         codeDetail: detail,
-                        token : "#1921",
+                        token : sessionStorage.getItem("token"),
+                        projectIdx : projectIdx
                     }
                 })
                 .then(e => {
-                    for (let item of e.data) {
+                    for (let item of e.data.boardList) {
                         context.commit('pushToBoardList', item)
                     }
-                    context.commit('setArticlesOnView', e.data.length)
+                    context.commit('setArticlesOnView', e.data.boardList.length)
                     context.commit('setAxiosState', false)
                 })
         },
 
-        //컨트롤러에서 Comment찾아서 { params : {idx : item.idx, number : this.commentsOnView }}
-        //commentsOnView는 여기서 params로 0을 넘겨줌
-        //context.state.commentsOnView 이렇게 매개변수  넘겨줌
         getComments(context, item) {
-            axios.get('/BoardComment', { params : {
-                    boardIdx : item.boardIdx,
-                    commentsOnView : item.commentsOnView,
-                }})
+            axios.post('/BoardComment', {
+                boardIdx : item.boardIdx,
+                commentsOnView : item.commentsOnView,
+                token : sessionStorage.getItem("token")
+            })
                 .then(e => {
-                    console.log('댓글 가져오니 ?')
-                    console.log(e)
                     context.commit('changeIsOpen', item)
 
                     for (let item of e.data) {
@@ -275,13 +297,8 @@ const community = {
                         item.isFinish = false
                         item.isModify = true
                     }
-                    console.log('======댓글가져오고나서 데이터=====')
-                    console.log(e.data)
-                    console.log('===========')
                     const obj = {
-                        //해당 게시글 object
                         _board: item,
-                        //ex) 댓글 5개 씩 가져옴 ..
                         _comment: e.data
                     }
                     context.commit('pushToComment', obj)
@@ -289,12 +306,11 @@ const community = {
         },
 
         extraComments(context, item) {
-            //엑시오스 호출
-            //이 부분에에서 { params : { idx : item.idx, number : this.commentsOnView}}넘겨줌.. 12개
-            axios.get('/BoardComment', { params : {
-                    boardIdx : item.boardIdx,
-                    commentsOnView : item.commentsOnView,
-                }})
+            axios.post('/BoardComment', {
+                boardIdx : item.boardIdx,
+                commentsOnView : item.commentsOnView,
+                token : sessionStorage.getItem("token")
+            })
                 .then(e => {
                     for (let item of e.data) {
                         item.isOpen = false
@@ -307,7 +323,6 @@ const community = {
                         board: item,
                         commentList: e.data
                     }
-                    //가져온 데이터 뮤테이션으로 바꿔주기
                     context.commit('addingToCommentList', payload)
                 })
         }

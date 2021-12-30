@@ -10,13 +10,5 @@ import java.util.List;
 
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Long>, BoardDSLRepository {
-    long getArticleNum(String keyword, String selected, String codeDetails);
-
-    List<Comment> getComments(long boardIdx, int commentsOnView);
-
     Board findByBoardIdx(long boardIdx);
-
-    long deleteByBoardIdx(long boardIdx);
-
-    List<Board> findByCodeDetail_CodeDetailIdx(String codeDetail);
 }

@@ -1,14 +1,14 @@
 <template>
 <div @scroll="getArticle" class="router-wrapper">
     <div class="router-wrapper2">
-        <div v-for="(item, index) in this.boardList" :key="index">
+        <div v-for="(item, index) in boardList" :key="index">
           <div class="null-content" v-if="item.isNull">{{item.content}}</div>
           <div v-else>
           <div class="board" v-if="item.delAt === 'N'">
             <div class="name-div">
                 <div>
                     <div>{{item.member.memNick}}</div>
-                    <div>{{item.boardDate}}</div>
+                    <div>{{item.boardDate.substring(0, 19).replace("T", " ")}}</div>
                 </div>
                 <!-- 이 부분에다가 v-if로 토큰값 비교해서 작성자일 경우 수정,삭제 버튼.. 아닐경우 신고 버튼-->
                 <div class="icon-container" v-if="item.수정했니 === false">
@@ -20,12 +20,10 @@
                                     @click="exportFinish(item); increasingIsExportUpdate()">Finish
                 </div>
             </div>
-            <div class="content-div no-read-only" v-if="item.isModify == true">
-                {{ item.boardCn }}
-            </div>
+            <div class="content-div no-read-only" v-if="item.isModify == true" v-html="item.boardCn"></div>
 
             <div class="content-div read-only" v-if="item.isModify == false">
-                <editor :originContent="item" :isExport="isExport" @exportContent="getContent" class="content-div"/>
+                <editor :originContent="item" :isExport="isExport" class="content-div"/>
             </div>
             <div id="btn-div">
                 <div>
@@ -33,7 +31,7 @@
                 </div>
             </div>
             <div class="comment-wrapper">
-                <input class="comment-input" type="text" placeholder="댓글을 입력하세요">
+                <input class="comment-input" v-model="item.insertComment" type="text" placeholder="댓글을 입력하세요">
                 <button id="button-id" class="comment-btn" @click="insertComment(item)">등록</button>
             </div>
             <BoardComment :board="item"/>
@@ -68,7 +66,7 @@ export default {
     },
     computed : {
         ...mapState({
-            boardList : state=>state.community.boardList,
+            boardList: state => state.community.boardList,
             updateCheck : state => state.community.updateCheck,
             numberOfArticle : state => state.community.numberOfArticle,
             articlesOnView : state => state.community.articlesOnView,
@@ -77,94 +75,118 @@ export default {
     },
 
     methods: {
-        ...mapActions({
-            getBoardList : 'community/getBoardList',
-            getBoardNum : 'community/getBoardNum',
-            getMoreList : 'community/getMoreList',
-            getComments : 'community/getComments'
-        }),
-        ...mapMutations({
-            changeIsUpdate : 'community/changeIsUpdate',
-            changeBoardIsModify : 'community/changeBoardIsModify',
-            changeUpdateCheck : 'community/changeUpdateCheck',
-            setAxiosState: 'community/setAxiosState',
-            deleteBoards : 'community/deleteBoards'
-        }),
+      ...mapActions({
+          getBoardList : 'community/getBoardList',
+          getBoardNum : 'community/getBoardNum',
+          getMoreList : 'community/getMoreList',
+          getComments : 'community/getComments'
+      }),
+      ...mapMutations({
+          changeIsUpdate : 'community/changeIsUpdate',
+          changeBoardIsModify : 'community/changeBoardIsModify',
+          changeUpdateCheck : 'community/changeUpdateCheck',
+          setAxiosState: 'community/setAxiosState',
+          deleteBoards : 'community/deleteBoards',
+          resetBoardList: 'community/resetBoardList'
+      }),
 
-        downloadFile(item) {
-          const url = '/downloadFile'
-          const boardIdx = item.boardIdx
-          console.log(boardIdx)
-          const memIdx = item.member.memIdx
-          const fileName = item.boardFileDTO.fileName
-          const codeDetail = item.codeDetail.codeDetailIdx
-          console.log(fileName)
-          console.log(memIdx)
+      downloadFile(item) {
+        const url = '/downloadFile'
+        const boardIdx = item.boardIdx
+        const memIdx = item.member.memIdx
+        const fileName = item.boardFileDTO.fileName
+        const codeDetail = item.codeDetail.codeDetailIdx
 
-          this.axios({
-            url: url,
-            method: 'post',
-            responseType: 'blob',
-            data: {
-              boardIdx: boardIdx,
-              memIdx: memIdx,
-              fileName: fileName,
-              codeDetail: codeDetail
-            }
-          }).then(e => {
-            const url = window.URL.createObjectURL(new Blob([e.data]));
-            const link = document.createElement('a')
-            link.href = url
-            link.setAttribute('download', fileName)
-            document.body.appendChild(link)
-            link.click()
-          })
-        },
-
-        exportFinish(item) {
-            this.changeIsUpdate(item); 
-            this.changeBoardIsModify(item);
-        },
-
-        increasingIsExportUpdate(){
-            this.isExport++
-        },
-
-        getArticle(e){
-            if(this.articlesOnView === this.numberOfArticle) {
-                return
-            }
-            const fullScroll = e.target.scrollHeight
-            const nowScroll = e.target.scrollTop
-            const position = this.$route.fullPath.split('/')[2]
-
-          if(this.articlesOnView <= 4) {
-            this.getMoreList(position)
-          } else {
-            if((fullScroll - nowScroll) < (fullScroll / 1.5) && !this.axiosState) {
-              this.getMoreList(position)
-            }
+        this.axios({
+          url: url,
+          method: 'post',
+          responseType: 'blob',
+          data: {
+            boardIdx: boardIdx,
+            memIdx: memIdx,
+            fileName: fileName,
+            codeDetail: codeDetail
           }
+        }).then(e => {
+          const url = window.URL.createObjectURL(new Blob([e.data]));
+          const link = document.createElement('a')
+          link.href = url
+          link.setAttribute('download', fileName)
+          document.body.appendChild(link)
+          link.click()
+        })
         },
 
-        getCommentList(item) {
-            if(item.totalComments <= 0) {
-                return
-            }
-            this.getComments(item)
-        },
-        //댓글 등록
-        insertComment(item){
-            const commentContent = document.querySelector('.comment-input')
-            this.axios.post('url', null, { params :
-                                            { idx : item.idx, commentContent : commentContent.value } })
-              .then(() => {
-                  commentContent.value = ''
-              })
-        },
-        backToFirst(){
-          document.querySelector('.router-wrapper').scroll(0,0)
+      exportFinish(item) {
+          this.changeIsUpdate(item);
+          this.changeBoardIsModify(item);
+      },
+
+      increasingIsExportUpdate(){
+          this.isExport++
+      },
+
+      getArticle(e){
+          if(this.articlesOnView === this.numberOfArticle) {
+              return
+          }
+          const fullScroll = e.target.scrollHeight
+          const nowScroll = e.target.scrollTop
+          const position = this.$route.fullPath.split('/')[2]
+
+        if(this.articlesOnView <= 4) {
+          this.getMoreList(position)
+        } else {
+          if((fullScroll - nowScroll) < (fullScroll / 1.5) && !this.axiosState) {
+            this.getMoreList(position)
+          }
         }
+      },
+
+      getCommentList(item) {
+          if(item.totalComments <= 0) {
+              return
+          }
+          this.getComments(item)
+      },
+        //댓글 등록
+      insertComment(item){
+        this.axios.post('/insertComment',  {
+          answerCn : item.insertComment,
+          answerDate : '',
+          answerDelAt : 'N',
+          boardIdx : item.boardIdx,
+          token : sessionStorage.getItem("token")
+        }).then(e => {
+          if(item.totalComments === 0){
+            this.addAttributeToComments(e.data)
+            item.insertComment = ''
+          }
+          if(item.commentsOnView !== 0){
+            item.totalComments += 1
+            item.commentsOnView +=1
+            this.addAttributeToComments(e.data)
+            item.commentList.unshift(e.data)
+            item.insertComment = ''
+          }
+          if(item.commentsOnView === 0){
+            item.totalComments += 1
+            this.addAttributeToComments(e.data)
+            item.insertComment = ''
+          }
+        })
+      },
+
+      addAttributeToComments(e){
+        e.isOpen = false
+        e.isUpdate = false
+        e.isFinish = false
+        e.isModify = true
+      },
+
+      backToFirst(){
+        document.querySelector('.router-wrapper').scroll(0,0)
+      }
 
     },
 
