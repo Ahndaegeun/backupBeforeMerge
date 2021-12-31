@@ -13,6 +13,7 @@ const userList = {
   },
   mutations: {
     update(state, payload) {
+      moment.locale("en")
       let today = moment().format("YYYY-MM-DD");
       let BanDTO = {};
       let target = state.userListData.find((data) => data.memIdx == payload[0]);

@@ -103,6 +103,7 @@ export default {
       getMaxMemberIndex: "userList/getMaxMemberIndex",
     }),
     isBan(start, end) {
+      moment.locale("en")
       if (start == "") return "정상";
 
       let startDay = moment(start, "YYYY-MM-DD");
@@ -122,6 +123,7 @@ export default {
       }
     },
     getState(end) {
+      moment.locale("en")
       let date = moment(end, "YYYY-MM-DD").fromNow(true).split(" ");
       let result = "";
 
