@@ -2,31 +2,80 @@
   <div class="container">
     <nav>
       <Menu/>
-<!--      <Notice />-->
+      <Notice v-if="$store.state.global.chatOn"/>
       <NoticeList v-if="$store.state.menu.isOpenNotification"/>
       <UserSetting v-if="$store.state.menu.isOpenUserSetting"/>
-     </nav>
+    </nav>
     <router-view></router-view>
-<!--    <Chat v-if="$store.state.global.chatOn"/>-->
+    <Chat v-if="$store.state.global.chatOn"/>
+    <!-- <SocketDetail v-if="$store.state.global.chatOn"/> -->
   </div>
 </template>
 
 <script>
 import '../public/reset.css'
 import Menu from './components/component/global/Menu.vue'
-// import Notice from './components/popup/Notice.vue'
+import Notice from './components/popup/Notice.vue'
 import NoticeList from './components/popup/NoticeList.vue'
 import UserSetting from './components/popup/UserSetting.vue'
-// import Chat from './components/popup/Chat.vue'
+import Chat from './components/popup/Chat.vue'
+import {mapMutations} from "vuex";
+// import SocketDetail from './components/container/access/projectDetail/socketDetail.vue'
 
 export default {
   name: 'App',
   components: {
     Menu,
-    // Notice,
+    Notice,
     NoticeList,
     UserSetting,
-    // Chat
+    Chat,
+    // SocketDetail,
+  },
+  data() {
+    return {
+      isEnterProject: false
+    }
+  },
+  methods: {
+    ...mapMutations({
+      setMemIdx: 'socket/setMemIdx',
+      enterProjectAlarm: 'socket/enterProjectAlarm',
+    })
+  },
+  watch: {
+    'this.$store.state.global.chatOn'() {
+    },
+    '$route' (to) {
+      if(to.path.includes('projects')) {
+        this.axios({
+          url: '/access/getMemNick',
+          data: {
+            token: sessionStorage.getItem("token")
+          },
+          method: 'post'
+        }).then(res => {
+          this.setMemIdx(res.data)
+        })
+      }
+
+      if(to.path.includes('pdtail') &&
+          sessionStorage.getItem("token") !== null &&
+          sessionStorage.getItem("project") !== null) {
+        this.$store.state.global.chatOn = true
+
+        if(!this.isEnterProject) {
+          this.$store.dispatch("socket/connect")
+        }
+        this.isEnterProject = true
+
+      } else {
+        this.$store.state.global.chatOn = false
+        this.$store.commit("socket/disConnect")
+        this.isConnect = false
+        this.isEnterProject = false
+      }
+    }
   }
 }
 </script>

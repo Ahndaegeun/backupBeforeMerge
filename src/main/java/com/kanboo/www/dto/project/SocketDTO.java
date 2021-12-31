@@ -10,9 +10,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class SocketDTO {
-    private String id;
+    private String memNick;
+    private String memIdx;
+    private String prjctIdx;
     private String text;
     private String date;
     private String alarm;
+    private String alarmCategory;
+    private String calCategory;
     private String textAreaText;
 }

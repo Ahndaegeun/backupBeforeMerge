@@ -1,5 +1,6 @@
 package com.kanboo.www.service.impl.project;
 
+import com.kanboo.www.domain.entity.member.Member;
 import com.kanboo.www.domain.entity.project.Chat;
 import com.kanboo.www.domain.entity.project.ChattingContent;
 import com.kanboo.www.domain.repository.member.MemberRepository;
@@ -7,6 +8,7 @@ import com.kanboo.www.domain.repository.project.ChattingContentRepository;
 import com.kanboo.www.domain.repository.project.ChattingRepository;
 import com.kanboo.www.domain.repository.project.ProjectMemberRepository;
 import com.kanboo.www.domain.repository.project.ProjectRepository;
+import com.kanboo.www.dto.member.MemberDTO;
 import com.kanboo.www.dto.project.ChatDTO;
 import com.kanboo.www.dto.project.ChattingContentDTO;
 import com.kanboo.www.service.inter.project.ChattingContentService;
@@ -27,7 +29,10 @@ public class ChattingContentServiceImpl implements ChattingContentService {
 
     @Override
     public ChattingContentDTO insertChatLog(ChattingContentDTO chattingContentDTO) {
-        Chat chat = chattingRepository.findByMember_MemIdx(chattingContentDTO.getChat().getMember().getMemIdx());
+        Long memIdx = chattingContentDTO.getMember().getMemIdx();
+        Long prjctIdx = chattingContentDTO.getChat().getProject().getPrjctIdx();
+        Chat chat = chattingRepository.findByProjectPrjctIdxAndMember_MemIdx(prjctIdx, memIdx);
+
         ChattingContent chattingContent = ChattingContent.builder()
                 .chat(chat)
                 .chatCn(chattingContentDTO.getChatCn())
@@ -37,9 +42,9 @@ public class ChattingContentServiceImpl implements ChattingContentService {
     }
 
     @Override
-    public List<ChattingContentDTO> getAllChat(ChattingContentDTO chattingContentDTO) {
+    public List<ChattingContentDTO> getAllChat(Long prjctIdx) {
         List<ChattingContent> returnList = chattingContentRepository.findAllByPrjctIdxAndMemIdx(
-                chattingContentDTO.getChat().getProject().getPrjctIdx());
+                prjctIdx);
         List<ChattingContentDTO> dtoList = new ArrayList<>();
         for (ChattingContent chattingContent : returnList) {
             dtoList.add( chattingContent.entityToDto() );

@@ -1,6 +1,6 @@
 export default {
   roomId: "0",
-  isMini: false,
+  isMini: true,
   content: [
     {
       id: "kade",

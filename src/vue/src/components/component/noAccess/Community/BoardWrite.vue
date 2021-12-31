@@ -38,7 +38,8 @@ export default {
           changeUpdateCheck : 'community/changeUpdateCheck',
           setArticlesOnView: 'community/setArticlesOnView',
           increaseNumOfArticleAfterInsert : 'community/increaseNumOfArticleAfterInsert',
-          resetBoardList: 'community/resetBoardList'
+          resetBoardList: 'community/resetBoardList',
+          projectBoardAlarm: 'socket/projectBoardAlarm'
         }),
 
         insert(){
@@ -105,7 +106,7 @@ export default {
                 this.changeUpdateCheck()
                 this.changeWriteIsOpen()
                 this.increaseNumOfArticleAfterInsert()
-
+                this.projectBoardAlarm(ele.data)
                 if(e._file !== ''){
                   this.makeFormData(e, formData, boardIdxToInsertFile)
                 }

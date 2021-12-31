@@ -1,4 +1,5 @@
 import moment from 'moment' // eslint-disable-line no-unused-vars
+import axios from 'axios'
 
 const scheduler = {
   namespaced: true,
@@ -13,217 +14,6 @@ const scheduler = {
       changeLang : false,
       isModal : false,
       callAddFunction : false,
-
-      fakedata :[
-        {
-          id : '16',
-          start: '2021-12-09 09:15',
-          end: '2021-12-09 11:15',
-          title: '테스트일정 제목',
-          content: '테스트일정 내용',
-          class: 'common',
-          deletable: true,
-          resizable: true,
-          draggable: true,
-          allDay : false,
-          isgantt : false,
-        },
-        {
-          id : '15',
-          start: '2021-12-09 11:15',
-          end: '2021-12-09 13:15',
-          title: '테스트일정 제목',
-          content: '테스트일정 내용',
-          class: 'individual',
-          deletable: true,
-          resizable: true,
-          draggable: true,
-          allDay : true,
-          isgantt : false,
-        },
-        {
-          id : '14',
-          start: '2021-12-08 08:15',
-          end: '2021-12-08 11:15',
-          title: '테스트일정 제목',
-          content: '테스트일정 내용',
-          class: 'notice',
-          deletable: true,
-          resizable: true,
-          draggable: true,
-          allDay : false,
-          isgantt : false,
-        },
-        {
-          id : '13',
-          start: '2021-12-09 11:15',
-          end: '2021-12-09 15:15',
-          title: '테스트일정 제목',
-          content: '테스트일정 내용',
-          class: 'emergency',
-          deletable: true,
-          resizable: true,
-          draggable: true,
-          allDay : false,
-          isgantt : false,
-        },
-        {
-          id : '12',
-          start: '2021-12-09 11:15',
-          end: '2021-12-09 15:15',
-          title: '테스트일정 제목',
-          content: '테스트일정 내용',
-          class: 'vacation',
-          deletable: true,
-          resizable: true,
-          draggable: true,
-          allDay : false,
-          isgantt : false,
-        },
-        {
-          id : '11',
-          start: '2021-12-09 11:15',
-          end: '2021-12-09 15:15',
-          title: '테스트일정 제목',
-          content: '테스트일정 내용',
-          class: 'note',
-          deletable: true,
-          resizable: true,
-          draggable: true,
-          allDay : false,
-          isgantt : false,
-        },
-        {
-          id : '10',
-          start: '2021-12-09 11:15',
-          end: '2021-12-09 15:15',
-          title: '테스트일정 제목',
-          content: '테스트일정 내용',
-          class: 'emergency',
-          deletable: true,
-          resizable: true,
-          draggable: true,
-          allDay : false,
-          isgantt : false,
-        },
-        {
-          id : '9',
-          start: '2021-12-08 11:15',
-          end: '2021-12-08 15:15',
-          title: '테스트일정 제목',
-          content: '테스트일정 내용',
-          class: 'common',
-          deletable: true,
-          resizable: true,
-          draggable: true,
-          allDay : false,
-          isgantt : false,
-        },
-        {
-          id : '1',
-          start: '2021-12-07 11:15',
-          end: '2021-12-07 15:15',
-          title: '테스트일정 제목',
-          content: '테스트일정 내용',
-          class: 'individual',
-          deletable: true,
-          resizable: true,
-          draggable: true,
-          allDay : false,
-          isgantt : false,
-        },
-        {
-          id : '2',
-          start: '2021-12-10 11:15',
-          end: '2021-12-10 15:15',
-          title: '테스트일정 제목',
-          content: '테스트일정 내용',
-          class: 'emergency',
-          deletable: true,
-          resizable: true,
-          draggable: true,
-          allDay : false,
-          isgantt : false,
-        },
-        {
-          id : '3',
-          start: '2021-12-11 11:15',
-          end: '2021-12-11 15:15',
-          title: '테스트일정 제목',
-          content: '테스트일정 내용',
-          class: 'notice',
-          deletable: true,
-          resizable: true,
-          draggable: true,
-          allDay : false,
-          isgantt : false,
-        },
-        {
-          id : '4',
-          start: '2021-12-12 11:15',
-          end: '2021-12-12 15:15',
-          title: '테스트일정 제목',
-          content: '테스트일정 내용',
-          class: 'note',
-          deletable: true,
-          resizable: true,
-          draggable: true,
-          allDay : false,
-          isgantt : false,
-        },
-        {
-          id : '5',
-          start: '2021-12-13 11:15',
-          end: '2021-12-13 15:15',
-          title: '테스트일정 제목',
-          content: '테스트일정 내용',
-          class: 'notice',
-          deletable: true,
-          resizable: true,
-          draggable: true,
-          allDay : false,
-          isgantt : false,
-        },
-        {
-          id : '6',
-          start: '2021-12-14 11:15',
-          end: '2021-12-14 15:15',
-          title: '테스트일정 제목',
-          content: '테스트일정 내용',
-          class: 'note',
-          deletable: true,
-          resizable: true,
-          draggable: true,
-          allDay : false,
-          isgantt : false,
-        },
-        {
-          id : '7',
-          start: '2021-12-15 11:15',
-          end: '2021-12-15 15:15',
-          title: '테스트일정 제목',
-          content: '테스트일정 내용',
-          class: 'common',
-          deletable: true,
-          resizable: true,
-          draggable: true,
-          allDay : true,
-          isgantt : false,
-        },
-        {
-          id : '8',
-          start: '2021-12-16 11:15',
-          end: '2021-12-16 15:15',
-          title: '테스트일정 제목',
-          content: '테스트일정 내용',
-          class: 'emergency',
-          deletable: true,
-          resizable: true,
-          draggable: true,
-          allDay : false,
-          isgantt : false,
-        },
-      ],
       copiedData : [{}],
       data : [],
       secondData :[],
@@ -238,9 +28,13 @@ const scheduler = {
           class3 : 'gantt-green',
         }
       ],
+      memInfo_scheduler:'',
     }
   },
   mutations: {
+    resetData(state) {
+      state.data = []
+    },
     showData(state){
       console.log(state.addEventData)
     },
@@ -337,8 +131,24 @@ const scheduler = {
       }
       state.data = copy
     },
-
+    setMemInfo_scheduler(state, data){
+      state.memInfo_scheduler = data
+    },
   },
+  actions : {
+    getMemInfo_schduler(context, t){
+      const url = 'gitAndIssue/getInfo'
+      const token = t
+      axios.post(url, null, {
+        params : {
+          token : token
+        }
+      })
+          .then( r => {
+            context.commit('setMemInfo_scheduler', r.data)
+          })
+    },
+  }
 }
 
 export default scheduler

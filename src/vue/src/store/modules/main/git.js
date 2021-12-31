@@ -1,4 +1,5 @@
 import moment from "moment"
+import axios from "axios"
 
 const git = {
     namespaced : true,
@@ -18,6 +19,7 @@ const git = {
             selectedFileSize : '',
             insertedContent : '',
             maxLineNum : '',
+            memInfo : '',
         }
     },
     mutations :{
@@ -50,10 +52,25 @@ const git = {
         setMaxLineNum(state, data){
             state.maxLineNum = data + ' lines  |'
         },
+        setMemInfo(state, data){
+            state.memInfo = data
+        },
     },
 
     actions:{
-
+        getMemInfo(context, t){
+            const url = 'gitAndIssue/getInfo'
+            const token = t
+            axios.post(url, null, {
+                params : {
+                    token : token
+                }
+            })
+                .then( r => {
+                    context.commit('setMemInfo', r.data)
+                    this.commit('socket/setMemInfo_Socket', r.data)
+                })
+        },
     },
 
 }

@@ -19,7 +19,7 @@ const menu = {
     }
   },
   actions: {
-    
+
   }
 }
 

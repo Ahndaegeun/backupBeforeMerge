@@ -42,8 +42,8 @@
             <input class="endDate" type="text" placeholder="End Date..." @click="setEndIndex" v-model="this.endDate" readonly>
           </span>
 
-          <vue-timepicker :minute-range="[0, 6, [10, 30], 42, 50]"  drop-direction="auto"  auto-scroll v-model="this.startTimePicker"></vue-timepicker>
-          <vue-timepicker :minute-range="[0, 6, [10, 30], 42, 50]"  drop-direction="auto"  auto-scroll v-model="this.endTimePicker"></vue-timepicker>
+          <vue-timepicker :minute-range="[0]"  drop-direction="auto"  auto-scroll v-model="this.startTimePicker"></vue-timepicker>
+          <vue-timepicker :minute-range="[0]"  drop-direction="auto"  auto-scroll v-model="this.endTimePicker"></vue-timepicker>
         </div>
 
         <div class="rightInput">
@@ -120,6 +120,7 @@ import '../../../../../node_modules/vue-cal/dist/vuecal.css'
 import '../../../../../node_modules/vue-cal/dist/drag-and-drop.js'
 import '../../../../assets/js/ko.js'
 import '../../../../assets/css/blackTheme.css'
+
 export default {
   name: 'Scheduler',
   components: {
@@ -163,7 +164,7 @@ export default {
         '기타'
       ],
       // modal variables
-
+      prjctIdx : sessionStorage.getItem('project'),
     }
   },
   computed : {
@@ -182,6 +183,7 @@ export default {
       resetValue : 'scheduler/resetValue',
       setModalFalse : 'scheduler/setModalFalse',
       pushData : 'scheduler/pushData',
+      alarm : 'socket/alarm',
     }),
 
     // modal functions start
@@ -241,6 +243,7 @@ export default {
     createEventUseModal(){
       const copy = [...this.$store.state.scheduler.data]
       const url = '/calendar/insertSchedule'
+
       let codeDetailIdx
       let temp
       let v_allDay
@@ -300,9 +303,11 @@ export default {
         reTemp = true
       }
 
-      if(this.startTimePicker === this.endTimePicker || this.startTimePicker > this.endTimePicker){
-        this.resetValue()
-        return
+      if(this.startDate === this.endDate) {
+        if(this.startTimePicker === this.endTimePicker || this.startTimePicker > this.endTimePicker){
+          this.resetValue()
+          return
+        }
       }
 
       const arr ={
@@ -324,11 +329,12 @@ export default {
         this.resetValue()
       }
 
-      this.axios.post( url, null, {
+      const prjctIdx = this.prjctIdx
+      this.axios.post( url, 'application/json', {
         params : {
           calIdx : null,
-          'project.prjctIdx' : 1,
-          'member.memIdx' : 3,
+          'project.prjctIdx' : prjctIdx,
+          'member.memIdx' : this.$store.state.scheduler.memInfo_scheduler.memIdx,
           calStartDate : arr.start,
           calEndDate : arr.end,
           calColor : arr.class,
@@ -346,6 +352,16 @@ export default {
             this.setModalFalse()
             let index = this.$store.state.scheduler.data.length-1
             this.$store.state.scheduler.data[index].id = r.data.calIdx
+
+            // 여기서 소켓 알람 호출
+            const arr = {
+              prjctIdx : sessionStorage.getItem("project"),
+              memberInfo : this.$store.state.scheduler.memInfo_scheduler,
+              color : '#808080',
+              schedulerData : r,
+              alarmCategory : 'calendar'
+            }
+            this.alarm(arr)
           })
     },
     // modal Functions end
@@ -377,7 +393,6 @@ export default {
 .filter{
   color : #eee;
   font-size: 20px;
-  margin-top: 250px;
 }
 
 .filter > ul{

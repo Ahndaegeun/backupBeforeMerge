@@ -32,6 +32,9 @@ public class CalendarServiceImpl implements CalendarService {
 	@Override
 	public List<CalendarDTO> calendarHandler(CalendarDTO calendarDTO) {
 		Map<String, Object> map = new HashMap<>();
+
+		Member member = memberRepository.findByMemTag(calendarDTO.getMember().getMemTag());
+		calendarDTO.getMember().setMemIdx(member.getMemIdx());
 		map.put("member", calendarDTO.getMember().getMemIdx());
 		List<Calendar> calendarList = calendarRepository
 				.findByProjectIdxAndMemberIdx(calendarDTO.getProject().getPrjctIdx()

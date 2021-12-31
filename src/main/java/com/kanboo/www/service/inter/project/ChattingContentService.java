@@ -8,5 +8,5 @@ import java.util.List;
 public interface ChattingContentService {
     ChattingContentDTO insertChatLog(ChattingContentDTO chattingContentDTO);
 
-    List<ChattingContentDTO> getAllChat(ChattingContentDTO chattingContentDTO);
+    List<ChattingContentDTO> getAllChat(Long prjctIdx);
 }

@@ -111,4 +111,5 @@
   .vuecal__event.vacation {background-color: rgba(77, 122, 248, 0.9);border: 1px solid rgb(77, 122, 248);color: #fff;}
   /* 회색 */
   .vuecal__event.note {background-color: rgba(87, 87, 87, 0.9);border: 1px solid rgb(87, 87, 87);color: #fff;}
-  
+/* 삭제됨 */
+.vuecal__event.deleted {background-color: rgba(255, 0, 0, 0.5);border: 1px solid rgb(255, 0, 0);color: #fff;}

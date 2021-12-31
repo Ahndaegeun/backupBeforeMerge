@@ -50,6 +50,16 @@ const gantt = {
           })
           .then((result) => {
             target[target.length - 1].gtIdx = result.data.gtIdx;
+            const alarmArr = {
+              alarmCategory : 'gantt',
+              gtPriority : result.data.gtPriority,
+              gtState : result.data.gtState,
+              gtTitle : result.data.gtTitle,
+              memNick : state.memNick,
+              memIdx : result.data.member.memIdx,
+              prjctIdx : result.data.project.prjctIdx
+            }
+            this.commit('socket/ganttAlarm', alarmArr)
           });
     },
     select(state, payload) {

@@ -1,41 +1,6 @@
 <template>
-
-  <button
-      style="
-      position: absolute;
-      top: 10%;
-      right: 40%;
-      background: #eee;
-      width: 100px;
-      height: 50px;
-    "
-      @click="getAllRoomFindByMemIdx"
-  >
-    방생성 테스트
-  </button>
-
-  <button  style="
-      position: absolute;
-      top: 20%;
-      right: 40%;
-      background: #eee;
-      width: 100px;
-      height: 50px;
-    " @click="this.userId = 'yunyun'"
-  > 아이디 yunyun </button>
-  <button  style="
-      position: absolute;
-      top: 20%;
-      right: 20%;
-      background: #eee;
-      width: 100px;
-      height: 50px;
-    "
-           @click="this.userId = 'zerozero'"
-  > 아이디 zerozero </button>
-
   <div class="chat-container">
-    <div class="chat-box" id="chatRoom">
+    <div class="chat-box chat-mini" id="chatRoom">
       <div class="chat-header">
         <i
             v-if="!chatData.isMini"
@@ -45,13 +10,12 @@
         <i v-else @click="setMax()" class="far fa-square"></i>
       </div>
       <div class="chat-content">
-        <ul>
-          <!-- v-for="(line, index) in chatData.content" -->
+        <ul class="chat-room-wrap">
           <li
               class="chat-line"
               v-for="(line, index) in s_chatData.content"
               :key="index"
-              :class="{ 'chat-myLine': line.id == userId }"
+              :class="{ 'chat-myLine': line.id == this.$store.state.git.memInfo.memNick }"
           >
             <ul v-if="line.line" class="date-line">
               <li class="chat-info">
@@ -60,14 +24,14 @@
             </ul>
             <div class="me-or-other-wrap">
               <!-- 상대방의 채팅에만 사진,닉네임 표시 시작 -->
-              <div v-if="userId != line.id" class="chat-userInfo">
+              <div v-if="this.$store.state.git.memInfo.memNick != line.id" class="chat-userInfo">
                 <img :src="require(`@/assets/${line.img}`)" alt="img" />
                 {{ line.id }}
               </div>
               <!-- 상대방의 채팅에만 사진,닉네임 표시 끝 -->
 
               <!-- 상대방의 채팅은 회색 배경 시작 -->
-              <div class="chat-info" v-if="line.id != userId">
+              <div class="chat-info" v-if="line.id != this.$store.state.git.memInfo.memNick">
               <span class="chat-text chat-friend">
                 {{ line.text }}
               </span>
@@ -93,6 +57,7 @@
             @input="setText"
             @keyup.enter="sendMessage()"
             type="text"
+            autocomplete="off"
         />
         <button @click="sendMessage()">전송</button>
       </div>
@@ -108,9 +73,11 @@ import moment from 'moment'
 export default {
 
   updated() {
-    this.focus(this.lastChatRoom);
+    const wrap = document.querySelector("#chatRoom > .chat-content > ul")
+    wrap.scrollTo(0, 100000000)
   },
   mounted() {
+    this.sendTokenInfo()
     if(this.s_chatData === null || this.s_chatData.content.length === 0)this.callDataOfAllChat()
   },
   computed : {
@@ -122,9 +89,11 @@ export default {
     return {
       chatData: chatData,
       inputText: "",
-      userId: "yunyun",
+      userId: this.$store.state.git.memInfo.memNick,
       img: "con3.jpg",
       lastChatRoom: "",
+      prjctIdx : sessionStorage.getItem('project'),
+      token : sessionStorage.getItem('token'),
     }
   },
   methods: {
@@ -137,18 +106,24 @@ export default {
     ...mapActions({
       callDataOfAllChat : 'socket/callDataOfAllChat',
       getAllRoomFindByMemIdx : 'socket/getAllRoomFindByMemIdx',
+      getMemInfo : 'git/getMemInfo',
     }),
+    sendTokenInfo(){
+      this.getMemInfo(this.token)
+    },
     setText(e) {
       this.inputText = e.target.value;
     },
     sendMessage() {
       let date = moment().format('HH:mm')
+      const prjctIdx = this.prjctIdx
       if (this.inputText !== "") {
         const arr = {
-          id : this.userId,
+          id : this.$store.state.git.memInfo,
           text : this.inputText,
           date : date,
-          img : this.img
+          img : this.img,
+          prjctIdx : prjctIdx,
         }
         this.callMessageSocket(arr)
       }
@@ -156,14 +131,13 @@ export default {
       this.inputText = "";
     },
     focus() {
-      let chatRoom = document.querySelector("#chatRoom>.chat-content>ul");
-      chatRoom.lastElementChild.scrollIntoView(false);
+      const wrap = document.querySelector("#chatRoom > .chat-content > ul")
+      wrap.scrollTo(0, 100000000)
     },
     setMini() {
       let chatRoom = document.querySelector(`#chatRoom`);
       chatRoom.className = "chat-box chat-mini";
       this.chatData.isMini = true;
-      console.log(this.chatData);
     },
     setMax() {
       let chatRoom = document.querySelector(`#chatRoom`);
@@ -180,12 +154,6 @@ export default {
         img: "con1.jpg",
         date: this.$store.state.socket.receivedChat.date,
       });
-      console.log('chatTest =>> ', this.chatData.content)
-    },
-  },
-  watch : {
-    '$store.state.socket.receiveChatCnt'(){
-      this.focus()
     },
   },
 };
@@ -232,7 +200,6 @@ export default {
 .chat-content {
   padding: 15px;
   font-size: 12px;
-  overflow: auto;
   width: 100%;
 }
 
@@ -303,6 +270,7 @@ export default {
 .chat-myLine {
   justify-content: right;
   align-items: flex-end;
+  padding-right: 10px;
 }
 
 .chat-my::before {
@@ -396,6 +364,12 @@ export default {
   font-size: 12px;
   line-height: 1.25;
 }
+
+.chat-room-wrap {
+  height: 90%;
+  overflow-y: scroll;
+}
+
 @media (max-width:768px) {
   span{
     font-size: 10px;

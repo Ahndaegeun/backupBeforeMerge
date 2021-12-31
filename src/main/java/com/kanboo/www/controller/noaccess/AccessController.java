@@ -1,5 +1,7 @@
 package com.kanboo.www.controller.noaccess;
 
+import com.kanboo.www.domain.entity.member.Member;
+import com.kanboo.www.domain.repository.member.MemberRepository;
 import com.kanboo.www.dto.member.MemberDTO;
 import com.kanboo.www.security.JwtSecurityService;
 import com.kanboo.www.service.inter.member.MemberService;
@@ -9,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -19,6 +22,7 @@ public class AccessController {
     private final MemberService memberService;
     private final JwtSecurityService jwtSecurityService;
     private final Logger logger = LoggerFactory.getLogger(AccessController.class);
+    private final MemberRepository memberRepository;
 
 
 
@@ -76,6 +80,17 @@ public class AccessController {
     public Boolean modifyImg(@ModelAttribute MultipartFile file) {
 
         return false;
+    }
+
+    @PostMapping("/getMemNick")
+    public Map<String, Object> getMemInfo(@RequestBody Map<String, String> map) {
+        Map<String, Object> result = new HashMap<>();
+        String token = map.get("token");
+        String memTag = jwtSecurityService.getToken(token);
+        Member member = memberRepository.findByMemTag(memTag);
+        result.put("nick", member.getMemNick());
+        result.put("idx", member.getMemIdx());
+        return result;
     }
 }
 

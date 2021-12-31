@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface ChattingRepository extends JpaRepository<Chat, Long> {
     Chat findByProject_PrjctIdx(Long prjctIdx);
     Chat findByMember_MemIdx(Long memIdx);
+    Chat findByProjectPrjctIdxAndMember_MemIdx(Long prjctIdx, Long memIdx);
 }

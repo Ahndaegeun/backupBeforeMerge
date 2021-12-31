@@ -33,12 +33,6 @@ public class CalendarDslRepositoryImpl implements CalendarDslRepository{
 
 		JPAQueryFactory query = new JPAQueryFactory(em);
 
-		BooleanBuilder booleanBuilder = new BooleanBuilder();
-
-		if(filter.get("member") != null) {
-			booleanBuilder.and(qCalendar.member.memIdx.eq(Long.parseLong(filter.get("member") + "")));
-		}
-
 		 return query.select(qCalendar)
 				.from(qCalendar)
 				.innerJoin(qCalendar.member, qMember)
@@ -49,7 +43,6 @@ public class CalendarDslRepositoryImpl implements CalendarDslRepository{
 				.fetchJoin()
 				.where(
 						qCalendar.project.prjctIdx.eq(projectIdx)
-								.and(booleanBuilder)
 				)
 				.fetch();
 	}

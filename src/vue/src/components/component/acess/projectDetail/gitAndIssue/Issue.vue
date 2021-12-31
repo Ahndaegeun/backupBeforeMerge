@@ -28,9 +28,13 @@
 import { mapMutations } from 'vuex'
 import moment from "moment"
 
+const prjctIdx = sessionStorage.getItem('project')
+
+
 export default {
   data() {
     return {
+      memInfo : '안녕하세요',
     }
   },
   mounted() {
@@ -40,6 +44,8 @@ export default {
       addIssueData : 'git/addIssueData',
       setInsertedContent : 'git/setInsertedContent',
       getFileList : 'git/getFileList',
+      returnMemInfo : 'git/returnMemInfo',
+      issueAlarm: 'socket/issueAlarm'
     }),
     updateIssueState(e){
       let selectedIndex = e.target.options.selectedIndex
@@ -62,9 +68,6 @@ export default {
           selectedIndex : selectedIndex,
         }
       })
-          .then( (r)=>{
-            console.log(r)
-          })
     },
     useAxiosGetData(){
       let issueText = document.querySelector('.issueText').value;
@@ -78,8 +81,8 @@ export default {
       this.axios.post( url, null, {
         params: {
           issueIdx: null,
-          "project.prjctIdx": 1,
-          "member.memIdx" : 1,
+          "project.prjctIdx": prjctIdx,
+          "member.memIdx" : this.$store.state.git.memInfo.memIdx,
           issueCn: issueText,
           issueDate: moment().format('YYYY-MM-DD HH:mm:ss'),
           issueState: '버그',
@@ -88,11 +91,13 @@ export default {
       })
           .then( (r)=>{
                 r.data.issueDate = r.data.issueDate.replace('T', ' ')
+                r.data.issueDate = moment(r.data.issueDate).format('LLL')
                 this.$store.state.git.realIssue.unshift(r.data)
                 document.querySelector('.issueText').value = ''
+                // kade님이 readme.md파일에 이슈를 등록했습니다.
+                this.issueAlarm(r.data)
               }
           )
-          .catch()
     },
   },
 }

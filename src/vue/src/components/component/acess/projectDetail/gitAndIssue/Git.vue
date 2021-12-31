@@ -3,7 +3,7 @@
     <h1>Project Repository</h1>
     <div class="nodeTree">
       <h1>Document List</h1>
-      <div class="repoContent">
+      <div class="repoContent" v-if="this.repoState">
         <Tree
             :search-text="searchText"
             :use-icon="true"
@@ -11,20 +11,27 @@
             :nodes="data"
         />
       </div>
+      <div class="repoContent" v-else>
+        <div class="text-wrap">
+          <input type="text" class="repoInputText" @keyup.enter="setRepoAdd"
+                 placeholder="UserName/Repository를 입력해주세요. " size="30">
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import {mapMutations} from 'vuex'
-import {mapActions} from 'vuex'
+import {mapActions, mapMutations, mapState} from 'vuex'
 import {ref} from 'vue';
 import Tree from 'vue3-tree'
 import "vue3-tree/dist/style.css";
 import moment from "moment" // eslint-disable-line no-unused-vars
+import dotenv from 'dotenv'
 
+dotenv.config()
 
-const key = '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';
+const API_KEY = process.env.VUE_APP_API_KEY
 
 export default {
   components: {
@@ -35,19 +42,34 @@ export default {
       data: ref([]),
       searchText: ref(''),
       encodedData: '',
-      errorFileNames : ['package-lock.json', '.DS_Store'],
+      errorFileNames: ['package-lock.json', '.DS_Store'],
+      repoState: false,
+      tempAdd: '',
+      prjctIdx: sessionStorage.getItem('project'),
+      token: sessionStorage.getItem('token'),
     }
+  },
+  mounted() {
+    this.sendTokenInfo()
+    this.getApiKey()
+    this.getIssueList()
+  },
+  computed: {
+    ...mapState({})
   },
   methods: {
     ...mapMutations({
       setDecodeData: 'git/setDecodeData',
       setSelectedFileName: 'git/setSelectedFileName',
       setIssueDate: 'git/setIssueDate',
-      setSelectedFileSize : 'git/setSelectedFileSize'
+      setSelectedFileSize: 'git/setSelectedFileSize'
     }),
     ...mapActions({
-      getRepoList: 'git/getRepoList',
+      getMemInfo: 'git/getMemInfo',
     }),
+    sendTokenInfo() {
+      this.getMemInfo(this.token)
+    },
 
     onUpdate(e) {
       if (e.type === 'file') {
@@ -57,18 +79,16 @@ export default {
 
       this.axios.get(`${e.url}`, {
         headers: {
-          Authorization: `token ${key}`
+          Authorization: `token ${API_KEY}`
         }
       })
           .then(res => {
             for (let i of res.data) {
 
-              if (i.name === 'package-lock.json') {
-                continue
-              }
-              if (i.name === '.DS_Store') {
-                continue
-              }
+              if (i.name === 'package-lock.json') continue
+              if (i.name === '.DS_Store') continue
+              if (i.name === 'node_modules') continue
+              if (i.name === 'favicon.ico') continue
 
               const a = {
                 idx: i.sha,
@@ -82,27 +102,15 @@ export default {
                 a.nodes = null
                 a.content = i.content
               }
-
               e.nodes.push(a)
             }
           })
     },
 
-    filterErrorFiles(file){
-      //비동기라서 작동이 잘안됨
-      let flag = false;
-      for(let i = 0; i < this.errorFileNames.length; i++){
-        console.log(this.errorFileNames[i])
-        if(this.errorFileNames[i] === file){
-          return flag
-        }
-      }
-    },
-
     sendContent(e) {
       this.axios.get(`${e.url}`, {
         headers: {
-          Authorization: `token ${key}`
+          Authorization: `token ${API_KEY}`
         }
       })
           .then(res => {
@@ -112,18 +120,30 @@ export default {
             this.setSelectedFileSize(res.data.size)
           })
     },
-    getFileList() {
-      this.axios.get('https://api.github.com/repos/Juwon-Yun/kanboo_my_work/contents', {
+    setRepoAdd(e) {
+      if (e.key === 'Enter') {
+        const input = document.querySelector('.repoInputText').value
+        const temp = `https://api.github.com/repos/${input}/contents`
+        this.getFileList(temp, true)
+      }
+    },
+    getFileList(r, flag) {
+      const add = r
+      this.tempAdd = add
+      this.axios.get(`${add}`, {
         headers: {
-          Authorization: `token ${key}`
+          Authorization: `token ${API_KEY}`
         }
       })
           .then(res => {
+            this.repoState = true
             for (let i of res.data) {
 
               // 403 error 방지
-              if(i.name === 'package-lock.json') continue
-              if(i.name === '.DS_Store') continue
+              if (i.name === 'package-lock.json') continue
+              if (i.name === 'node_modules') continue
+              if (i.name === '.DS_Store') continue
+              if (i.name === 'favicon.ico') continue
 
               const array = {
                 idx: i.sha,
@@ -139,32 +159,65 @@ export default {
               }
               this.data.push(array)
             }// for i of
+            if (flag) this.insertRepoAdd()
           })
+          .catch(() => {
+                this.repoState = false
+                const placeholder = document.querySelector('.repoInputText')
+                placeholder.value = ''
+                placeholder.placeholder = 'ex) Juwon-Yun/kanboo '
+              }
+          )
     },
-    getIssueList(){
+    getIssueList() {
       const url = '/gitAndIssue/getAllList'
-
-      this.axios.get( url, {
-        params : {
-          prjctIdx : 1,
+      const prjctIdx = this.prjctIdx
+      this.axios.get(url, {
+        params: {
+          prjctIdx: prjctIdx,
         }
       })
-          .then( (r)=>{
-            for(let i = 0; i < r.data.length; i++){
+          .then((r) => {
+            for (let i = 0; i < r.data.length; i++) {
               r.data[i].issueDate = r.data[i].issueDate.replace('T', ' ')
+              r.data[i].issueDate = moment(r.data[i].issueDate).format('LLL')
             }
             this.setIssueDate(r.data)
           })
     },
-
     decodeData() {
       this.setDecodeData(decodeURIComponent(escape(window.atob(this.encodedData))))
     },
-  },
+    getApiKey() {
+      const url = 'gitAndIssue/getAdd'
+      const prjctIdx = this.prjctIdx
 
-  mounted() {
-    this.getFileList();
-    this.getIssueList();
+      this.axios.post(url, null, {
+        params: {
+          'project.prjctIdx': prjctIdx,
+        }
+      })
+          .then(r => {
+            if (r.data.address !== null || r.data.address !== '') {
+              this.repoState = true;
+              this.getFileList(r.data.address)
+            }
+          })
+          .catch(
+              this.repoState = false
+          )
+    },
+    insertRepoAdd() {
+      const url = 'gitAndIssue/insertRepo'
+      const prjctIdx = this.prjctIdx
+
+      this.axios.post(url, null, {
+        params: {
+          'project.prjctIdx': prjctIdx,
+          gitRepo: this.tempAdd,
+        }
+      })
+    },
   },
 }
 
@@ -197,6 +250,7 @@ export default {
 
 .repoContent {
   color: #eee;
+  height: 100%;
 }
 
 .tree-row-item {
@@ -205,5 +259,25 @@ export default {
 
 .tree-list {
   gap: 5px;
+}
+
+.repoContent > div > * {
+  color: #eee;
+  background-color: #2C2F3B;
+  border: none;
+  outline: none;
+}
+
+.repoContent > div > *:focus {
+  color: #eee;
+  border: none;
+  outline: none;
+}
+
+.text-wrap {
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  align-content: center;
 }
 </style>

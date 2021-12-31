@@ -1,11 +1,11 @@
 <template>
   <div style="height: calc(100vh - 70px)">
-    <div class="gitContainer">
-      <div class="gitleftDiv">
+    <div className="gitContainer">
+      <div className="gitleftDiv">
         <GitRepository class="git"/>
         <Issue class="issue"/>
       </div>
-      <div class="gitrightDiv">
+      <div className="gitrightDiv">
         <GitCode/>
       </div>
     </div>
@@ -18,7 +18,7 @@ import Issue from '@/components/component/acess/projectDetail/gitAndIssue/Issue.
 import GitCode from '@/components/component/acess/projectDetail/gitAndIssue/GitCode.vue'
 
 export default {
-  components:{
+  components: {
     GitRepository,
     Issue,
     GitCode,
@@ -27,21 +27,23 @@ export default {
 </script>
 
 <style scoped>
-.gitContainer{
+.gitContainer {
   padding: 10px 40px;
   display: flex;
   height: calc(100vh - 70px);
   justify-content: space-between;
 }
-.gitleftDiv{
+
+.gitleftDiv {
   width: 45%;
 }
-.gitrightDiv{
+
+.gitrightDiv {
   width: 50%;
   height: 90vh;
 }
 
-h1{
+h1 {
   color: #eee;
 }
 

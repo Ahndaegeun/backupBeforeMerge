@@ -136,7 +136,7 @@ const routes = [
             next: next,
             data: {
               projectIdx: sessionStorage.getItem("project"),
-              token : sessionStorage.getItem("token")
+              token : sessionStorage.getItem("token"),
             }
           }
 

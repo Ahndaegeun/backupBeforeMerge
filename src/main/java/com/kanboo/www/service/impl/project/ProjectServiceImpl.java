@@ -38,6 +38,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final ChattingRepository chattingRepository;
     private final DemandRepository demandRepository;
     private final KanbanRepository kanbanRepository;
+    private final ChattingContentRepository chattingContentRepository;
 
     @PersistenceContext
     private EntityManager em;
@@ -258,7 +259,15 @@ public class ProjectServiceImpl implements ProjectService {
                 .member(member)
                 .project(saveProject)
                 .build();
-        chattingRepository.save(chat);
+        Chat saveChat = chattingRepository.save(chat);
+
+        ChattingContent chattingContent = ChattingContent.builder()
+                .chat(saveChat)
+                .chatCnDate(LocalDateTime.now())
+                .chatCn(project.getPrjctNm() + "채팅방이 개설되었습니다.")
+                .build();
+        chattingContentRepository.save(chattingContent);
+
 
         Demand demand = Demand.builder()
                 .project(saveProject)

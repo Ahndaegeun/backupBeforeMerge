@@ -3,7 +3,7 @@ import router from "@/router";
 const global = {
   namespaced: true,
   state: {
-    chatOn: true,
+    chatOn: false,
     projectIdx: 0,
   },
   mutations: {
@@ -21,7 +21,7 @@ const global = {
     },
   },
   actions: {
-    
+
   }
 }
 

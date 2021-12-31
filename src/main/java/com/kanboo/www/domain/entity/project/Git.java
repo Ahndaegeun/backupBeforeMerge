@@ -17,10 +17,9 @@ import javax.persistence.*;
 @Builder
 public class Git {
 
-    @EmbeddedId
-    private GitId id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long gitIdx;
 
-    @MapsId("project")
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "prjct_idx")
     private Project project;

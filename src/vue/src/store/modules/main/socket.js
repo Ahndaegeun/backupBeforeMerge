@@ -4,7 +4,6 @@ import moment from 'moment'
 import axios from 'axios'
 moment.locale('ko')
 
-//https://ws-pace.tistory.com/105 채팅방
 
 const socket = {
     namespaced : true,
@@ -35,8 +34,15 @@ const socket = {
                 text : 'received',
                 date : 'received',
                 img : '',
+                prjctIdx : '',
             },
             alarmCnt: 0,
+            ganttAlarmCnt: 0,
+            projectBoardAlarmCnt: 0,
+            issueAlarmCnt: 0,
+            enterProjectAlarmCnt: 0,
+            kanbanAlarmCnt: 0,
+
             chatCnt : 0,
             receiveChatCnt : 0,
             textAreaCnt : 0,
@@ -53,11 +59,48 @@ const socket = {
                 ],
             },
             callDateLineCmt : 0 ,
+            memInfo_socket : '',
+            alarmContent : {},
+            receiveAlarmData  : '',
+            receiveGanttAlarmData : '',
+            receiveProjectBoardAlarmData : '',
+            receiveIssueAlarmData: '',
+            receiveEnterProjectAlarmData: '',
+            receiveKanbanAlarmData: '',
+
+            projectArr: {}
         }
     },
     mutations : {
-        setAlarmColor(state, color){
-            state.alarmColor = color
+        setMemIdx(state, item) {
+            const arr = {
+                memIdx: item.idx,
+                memNick: item.nick,
+                alarmCategory: "enterProject",
+                prjctIdx: sessionStorage.getItem("project")
+            }
+            state.projectArr = arr
+        },
+        setReceiveAlarmData(state, arr){
+            state.receiveAlarmData = arr
+        },
+        setReceiveGanttAlarmData(state, arr){
+            state.receiveGanttAlarmData = arr
+        },
+        setReceiveProjectBoardAlarmData(state, arr){
+            state.receiveProjectBoardAlarmData = arr
+        },
+        setReceiveIssueAlarmData(state, arr) {
+            state.receiveIssueAlarmData = arr
+        },
+        setReceiveKanbanAlarmData(state, arr) {
+            console.log(arr)
+            state.receiveKanbanAlarmData = arr
+        },
+        setReceiveEnterProjectAlarmData(state, arr) {
+            console.log(arr)
+            state.receiveEnterProjectAlarmData = arr
+            console.log(state.receiveEnterProjectAlarmData)
         },
         setSendChatting(state, arr){
             const temp = {
@@ -77,18 +120,21 @@ const socket = {
             state.sendChat.img = ''
         },
         setReceivedChatting(state,arr){
-            // console.log('arr => ',arr)
             state.receivedChat.id = arr.id
             state.receivedChat.text = arr.text
             state.receivedChat.date = arr.date
+            state.receivedChat.prjctIdx = arr.prjctIdx
+
+            if(sessionStorage.getItem('project') != arr.prjctIdx ) return
 
             const temp = {
                 // id는 꼭 로그인한 id나 idx로 값을 입력해줘야함
-                id : arr.id,
+                id : arr.memNick,
                 text : arr.text,
                 date : moment().format('YYYY-MM-DD')+'T'+ arr.date,
-                img : 'con1.jpg',
+                img : 'profile.png',
                 originDate : moment().format('YYYY-MM-DD')+' '+ arr.date,
+                prjctIdx : arr.prjctIdx,
             }
             this.commit('socket/pushToS_chatDataContent', temp)
         },
@@ -97,6 +143,12 @@ const socket = {
         },
         increaseAlarmCnt(state){
             state.alarmCnt++
+        },
+        increaseGanttAlarmCnt(state){
+            state.ganttAlarmCnt++
+        },
+        increaseProjectBoardAlarmCnt(state){
+            state.projectBoardAlarmCnt++
         },
         increaseChatCnt(state){
             state.chatCnt++
@@ -110,26 +162,117 @@ const socket = {
         increaseCallDateLineCnt(state){
             state.callDateLineCmt++
         },
+        increaseIssueAlarmCnt(state) {
+            state.issueAlarmCnt++
+        },
+        increaseEnterProjectAlarmCnt(state) {
+            state.enterProjectAlarmCnt++
+        },
+        increaseKanbanAlarmCnt(state) {
+            state.kanbanAlarmCnt++
+        },
         setIdValue(state, value){
             state.sendChat.id = value
         },
         setTextValue(state, value){
             state.text = value
         },
-        alarm(state,color){
-            if(color !== null){
+        setMemInfo_Socket(state, arr){
+            state.memInfo_socket = arr
+        },
+        alarm(state,arr){
+            const {color} = arr
+
+            if(arr !== null){
                 if(this.stompClient && this.stompClient.connected){
                     const msg = {
                         alarm : color,
+                        memNick : arr.memberInfo.memNick,
+                        memIdx : arr.memberInfo.memIdx,
+                        prjctIdx : arr.prjctIdx,
+                        date : arr.schedulerData.data.calStartDate.replace('T', ' '),
+                        alarmCategory : arr.alarmCategory,
+                        calCategory : arr.schedulerData.data.calColor,
                     }
                     this.stompClient.send("/alarm", JSON.stringify(msg), {})
                 }
             }// color if
         },// color function end
-
-        // sendMessage(state, {id,text}) {
+        ganttAlarm(state, arr){
+            if(arr != null){
+                if(this.stompClient && this.stompClient.connected){
+                    const msg = {
+                        memNick : arr.memNick,
+                        memIdx : arr.memIdx,
+                        prjctIdx : arr.prjctIdx,
+                        text : arr.gtTitle,
+                        date : arr.gtPriority,
+                        alarm : arr.gtState,
+                        alarmCategory : arr.alarmCategory,
+                    }
+                    this.stompClient.send("/alarm", JSON.stringify(msg), {})
+                }
+            }
+        },
+        projectBoardAlarm(state, arr){
+            if(arr != null){
+                if(this.stompClient && this.stompClient.connected){
+                    const msg = {
+                        memIdx : arr.member.memIdx,
+                        memNick : arr.member.memNick,
+                        alarmCategory : 'projectBoard',
+                        alarm : 'projectBoard',
+                        prjctIdx : sessionStorage.getItem("project"),
+                        // 작성자
+                    }
+                    this.stompClient.send("/alarm", JSON.stringify(msg), {})
+                }
+            }
+        },
+        issueAlarm(state, arr) {
+            if(arr != null){
+                if(this.stompClient && this.stompClient.connected){
+                    const msg = {
+                        memIdx: arr.member.memIdx,
+                        alarm: 'issue',
+                        alarmCategory: 'issue',
+                        prjctIdx: sessionStorage.getItem("project"),
+                        memNick: arr.member.memNick,
+                        text: arr.issueGitFile
+                    }
+                    this.stompClient.send("/alarm", JSON.stringify(msg), {})
+                }
+            }
+        },
+        kanbanAlarm(state, arr) {
+            console.log(arr)
+            if(arr !== null) {
+                if (this.stompClient && this.stompClient.connected) {
+                    const msg = {
+                        memIdx: arr.memIdx,
+                        alarm: 'kanban',
+                        alarmCategory: 'kanban',
+                        prjctIdx: sessionStorage.getItem("project"),
+                        memNick: arr.memNick,
+                        text : arr.text,
+                    }
+                    this.stompClient.send("/alarm", JSON.stringify(msg), {})
+                }
+            }
+        },
+        enterProjectAlarm(state) {
+            if(this.stompClient && this.stompClient.connected){
+                const msg = {
+                    memIdx: state.projectArr.memIdx,
+                    alarm: 'enterProject',
+                    alarmCategory: 'enterProject',
+                    prjctIdx: sessionStorage.getItem("project"),
+                    memNick: state.projectArr.memNick,
+                }
+                this.stompClient.send("/alarm", JSON.stringify(msg), {})
+            }
+        },
         sendMessage(state, arr) {
-
             // store에 값 저장함
             this.commit('socket/send', arr)
             // 소켓에 데이터 전송 후 store 에 저장된 값을 초기화함
@@ -139,9 +282,10 @@ const socket = {
         send(state, arr) {
             if(this.stompClient && this.stompClient.connected) {
                 const msg = {
-                    id: arr.id,
+                    memNick: arr.id.memNick,
                     text: arr.text,
-                    date : arr.date
+                    date : arr.date,
+                    prjctIdx : arr.prjctIdx
                 }
                 this.stompClient.send("/receive", JSON.stringify(msg), {})
             }
@@ -187,27 +331,58 @@ const socket = {
             }
         },
 
+        disConnect(){
+            if(this.stompClient != null){
+                this.stompClient.disconnect()
+            }
+        },
 
     },
     actions : {
         connect(state){
-            const serverURL = "http://192.168.0.8:8099/"
+            const serverURL = "http://192.168.46.16:8099/"
             let socket = new SockJS(serverURL)
             this.stompClient = Stomp.over(socket)
-            this.stompClient.connect( {}, frame => {
+            // this.stompClient.debug = () => {}
+            this.stompClient.connect( {}, () => {
                     this.stompClient.connected = true
-                    console.log('store에서의 frame ==>>',frame)
-
+                    if(state.state.projectArr !== null) {
+                        this.commit('socket/enterProjectAlarm')
+                    }
+                    // subscribe 한 횟수만큼 소켓을 쏘는 버그를 잡아야함
                     this.stompClient.subscribe("/send", res => {
-                        console.log("소켓에서 수신한 내용 =>>>>", JSON.parse(res.body))
                         let arr = JSON.parse(res.body)
-
-                        const {alarm, textAreaText, userName, message} = arr
+                        const {alarmCategory, alarm, textAreaText, userName, message} = arr
 
                         if(alarm !== null && alarm !== '' && textAreaText === null){
                             state.alarmState = alarm
-                            this.commit('socket/setAlarmColor', alarm)
-                            this.commit('socket/increaseAlarmCnt')
+                            //알람 내용 담기
+                            if(alarmCategory == 'calendar'){
+                                this.commit('socket/setReceiveAlarmData', arr)
+                                this.commit('socket/increaseAlarmCnt')
+                            }
+                            if(alarmCategory == 'gantt'){
+                                this.commit('socket/setReceiveGanttAlarmData', arr)
+                                this.commit('socket/increaseGanttAlarmCnt')
+                            }
+                            if(alarmCategory == 'projectBoard'){
+                                this.commit('socket/setReceiveProjectBoardAlarmData', arr)
+                                this.commit('socket/increaseProjectBoardAlarmCnt')
+                            }
+                            if(alarmCategory == 'issue') {
+                                this.commit('socket/setReceiveIssueAlarmData', arr)
+                                this.commit('socket/increaseIssueAlarmCnt')
+                            }
+                            if(alarmCategory == 'enterProject') {
+                                this.commit('socket/setReceiveEnterProjectAlarmData', arr)
+                                this.commit('socket/increaseEnterProjectAlarmCnt')
+                            }
+                            if(alarmCategory == 'kanban') {
+                                this.commit('socket/setReceiveKanbanAlarmData', arr)
+                                this.commit('socket/increaseKanbanAlarmCnt')
+                            }
+
+                            // watch들 호출하기
                         }else if(userName !== null && userName !== '' && message !== null && message !== '' && textAreaText === null){
                             this.commit('socket/setReceivedChatting',arr)
                             this.commit('socket/increaseReceiveChatCnt')
@@ -216,9 +391,9 @@ const socket = {
                             this.commit('socket/increaseTextAreaCnt')
                         }
                     })
+                    this.stompClient.unsubscribe("/send")
                 },
-                error => {
-                    console.log(error)
+                () => {
                     this.stompClient.connected = false
                 })
         }, // connect function end
@@ -228,48 +403,43 @@ const socket = {
             const header = null
 
             //토큰에서 받아오는 memIdx이어야함
-            let memIdx
-            if(arr.id === 'yunyun'){
-                memIdx = 36
-            }else if(arr.id ==='zerozero'){
-                memIdx = 3
-            }
+            const memIdx = arr.id.memIdx
 
             axios.post( url, header, {
                 params : {
                     chatContentIdx : null,
-                    // zerochae의 idx가 3임
                     'member.memIdx' : memIdx,
-                    'chat.project.prjctIdx' : 1,
+                    'chat.project.prjctIdx' : sessionStorage.getItem("project"),
                     'chat.member.memIdx' : memIdx,
                     chatCn : arr.text,
                     chatCnDate : moment().format('YYYY-MM-DD')+' '+ arr.date,
                 }
             })
-                .then( result => {
-                    console.log(result)
-                })
         },
 
         callDataOfAllChat(){
+
             const url = '/socket/selectAllChatLog'
             axios.get( url, {
                 params : {
-                    'member.memIdx' : 3,
-                    'chat.project.prjctIdx' : 1,
-                    'chat.member.memIdx' : 3,
+                    token : sessionStorage.getItem("token"),
+                    prjctIdx : sessionStorage.getItem("project"),
                 }
             }).then( e => {
-
                 const {data} = e
-
-                for(let i = 0; i < data.length; i++){
+                let tempImg = ''
+                for(let i = 0; i < data.chat.length; i++){
+                    if(data.chat[i].chat.member.memImg === '' || data.chat[i].chat.member.memImg === null){
+                        tempImg ='profile.png'
+                    }else{
+                        tempImg = data.chat[i].chat.member.memImg
+                    }
                     const arr = {
-                        id : data[i].chat.member.memId,
-                        text : data[i].chatCn,
-                        img : 'con1.jpg',
-                        date : data[i].chatCnDate,
-                        originDate : data[i].chatCnDate.replace('T', ' '),
+                        id : data.chat[i].chat.member.memNick,
+                        text : data.chat[i].chatCn,
+                        img : tempImg,
+                        date : data.chat[i].chatCnDate,
+                        originDate : data.chat[i].chatCnDate.replace('T', ' '),
                     }
                     this.commit('socket/pushToS_chatDataContent', arr)
                 }
@@ -277,17 +447,6 @@ const socket = {
             })
         },
 
-        getAllRoomFindByMemIdx(){
-            const url = '/socket/getAllRoom'
-            axios.post( url, null, {
-                params : {
-                    memIdx : 3,
-                }
-            }).then( e => {
-                console.log(e)
-                console.log(e.data.length)
-            })
-        },
     },
 
 }

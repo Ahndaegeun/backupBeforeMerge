@@ -1,5 +1,8 @@
 package com.kanboo.www.domain.repository.project.dslsupport;
 
+import com.kanboo.www.domain.entity.global.QCodeDetail;
+import com.kanboo.www.domain.entity.member.QBan;
+import com.kanboo.www.domain.entity.member.QMember;
 import com.kanboo.www.domain.entity.project.Issue;
 import com.kanboo.www.domain.entity.project.QIssue;
 import com.kanboo.www.domain.entity.project.QProject;
@@ -18,8 +21,19 @@ public class IssueDslRepositoryImpl implements IssueDslRepository {
 	@Override
 	public List<Issue> findAllByProjectIdxDesc(Long projectIdx) {
 		QIssue qIssue = QIssue.issue;
-		JPAQuery<Issue> query = new JPAQuery<>(em);
-		return query.from(qIssue)
+		QProject qProject = QProject.project;
+		QMember qMember = QMember.member;
+		QBan qBan = QBan.ban;
+
+		JPAQueryFactory query = new JPAQueryFactory(em);
+
+		return query.selectFrom(qIssue)
+				.rightJoin(qIssue.project, qProject)
+				.fetchJoin()
+				.rightJoin(qIssue.member, qMember)
+				.fetchJoin()
+				.leftJoin(qMember.ban, qBan)
+				.fetchJoin()
 				.where(qIssue.project.prjctIdx.eq(projectIdx))
 				.orderBy(qIssue.issueDate.desc())
 				.fetch();

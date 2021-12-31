@@ -171,7 +171,8 @@ export default {
       closeAdd: "kanban/closeAdd",
       showCalendar: "kanban/showCalendar",
       switchCard: "kanban/switchCard",
-      setInputDate: "kanban/setInputDate"
+      setInputDate: "kanban/setInputDate",
+      kanbanAlarm: 'socket/kanbanAlarm'
     }),
     ...mapActions({
       getAllKanbanItems: "kanban/getAllKanbanItems",
@@ -208,19 +209,43 @@ export default {
     },
     onCardDrop(columnId, dropResult) {
       this.dropSensor++;
+      let column;
+      let index;
       if (dropResult.removedIndex !== null || dropResult.addedIndex !== null) {
+
         const kanban = Object.assign({}, this.kanban);
-        const column = kanban.columns.filter((p) => p.id === columnId)[0];
+        column = kanban.columns.filter((p) => p.id === columnId)[0];
+        if(dropResult.addedIndex !== null ) index = column.id;
         const itemIndex = kanban.columns.indexOf(column);
         const newColumn = Object.assign({}, column);
         newColumn.cards = applyDrag(newColumn.cards, dropResult);
         kanban.columns.splice(itemIndex, 1, newColumn);
         this.kanban = kanban;
+
       }
-        if(this.dropSensor === 5){
-          this.switchCard();
-          this.dropSensor = 0;
+      if(this.dropSensor === 5){
+        this.switchCard();
+        this.dropSensor = 0;
+      }
+
+      if(column !== undefined && (index === 1 || index === 4)) {
+        const temp = column.name.split(' ')
+        let tempText = `${temp[0]} ${temp[1]}이 완료되었습니다.`
+        console.log(tempText)
+        const arr  = {
+          memIdx : this.$store.state.kanban.memIdx,
+          memNick : this.$store.state.kanban.memNick,
+          prjctIdx : sessionStorage.getItem("project"),
+          alarmCategory : 'kanban',
+          alarm : 'kanban',
+          text : `${tempText} : ${
+              this.$store.state.kanban.inputContent.length > 20 ?
+                  this.$store.state.kanban.inputContent.substring(0, 20) + "..." :
+                  this.$store.state.kanban.inputContent
+          }`
         }
+        this.kanbanAlarm(arr)
+      }
     },
     getCardPayload(columnId) {
       return (index) => {
@@ -299,6 +324,7 @@ export default {
         this.inputBadge = "";
         this.inputDate = "";
         this.inputContent = "";
+
       }
     },
   },
