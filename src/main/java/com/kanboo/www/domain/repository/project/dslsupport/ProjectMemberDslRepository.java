@@ -1,6 +1,7 @@
 package com.kanboo.www.domain.repository.project.dslsupport;
 
 import com.kanboo.www.domain.entity.member.ProjectMember;
+import com.kanboo.www.dto.member.ProjectMemberDTO;
 import com.querydsl.core.Tuple;
 import org.springframework.stereotype.Repository;
 
@@ -9,7 +10,7 @@ import java.util.List;
 @Repository
 public interface ProjectMemberDslRepository {
 
-    List<ProjectMember> getAllList(String memTag);
+    List<ProjectMemberDTO> getAllList(String memTag);
 
     List<ProjectMember> findAllByMemIdx(Long MemIdx);
 

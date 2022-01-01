@@ -428,11 +428,21 @@ export default {
             memPass: this.inputData[2],
           },
         })
-        .then((data) => {
-          if (data.data !== "") {
+        .then((res) => {
+          if(res.data.isStop) {
+            this.addLine(`(login console) > `, `Login access Fail`, `com`);
+            this.addLine(`(base console) > `, `${this.welcomeHelp[0]}`, `com`);
+            return
+          }
+          if (res.data.role !== "") {
             this.addLine(`(login console) > `, `success`, `com`);
-            sessionStorage.setItem("token", data.data);
-            this.$router.push("/projects")
+            sessionStorage.setItem("token", res.data.token);
+            this.$store.state.global.isLogin = true
+            if(res.data.role === "admin") {
+              this.$router.push("/admin")
+            } else {
+              this.$router.push("/projects")
+            }
           } else {
             this.addLine(`(login console) > `, `Login access Fail`, `com`);
             this.addLine(`(base console) > `, `${this.welcomeHelp[0]}`, `com`);

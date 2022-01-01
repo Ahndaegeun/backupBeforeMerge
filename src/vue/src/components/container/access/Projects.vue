@@ -199,17 +199,18 @@ export default {
 .list-right-container {
   display: flex;
   flex-direction: column;
-  width: 90%;
   height: calc(100vh - 70px);
+  width: 100%;
 }
 
 #addproject-div {
   height: 60%;
+  width: 98%;
 }
 
 #changes-div {
   font-size: 30px;
-  width: 100%;
+  width: 97%;
   padding-left: 40px;
 }
 </style>

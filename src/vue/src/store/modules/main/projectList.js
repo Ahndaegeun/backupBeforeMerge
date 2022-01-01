@@ -21,7 +21,6 @@ const projectList = {
       }
     },
     pushToProjectList(state, item) {
-      console.log(item)
       if(item.projectMemberDtoList.length < 1) {
         return
       }
@@ -43,6 +42,8 @@ const projectList = {
     },
     listRest(state) {
       state.projectList = []
+      state.progressLength = 0
+      state.completeLength = 0
     }
   },
 

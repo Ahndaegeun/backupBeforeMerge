@@ -1,49 +1,51 @@
 <template>
   <div class="container">
     <h2>Git Commit</h2>
-    <ul class="git-list">
-      <li v-for="item in gitList" :key="item">
+    <ul class="git-list" v-if="isConnectRepo">
+      <li v-for="item in commitList" :key="item">
         <a :href="item.link">- {{item.title}}</a>
       </li>
+    </ul>
+    <ul class="git-list" v-else>
+      <li><a href="/pdtail/gitIssue">Git Repository 주소를 입력해 주세요</a></li>
     </ul>
   </div>  
 </template>
 
 <script>
+import dotenv from 'dotenv'
+
+dotenv.config()
+
+const API_KEY = process.env.VUE_APP_API_KEY
+
 export default {
   name: "Commit",
   data() {
     return {
-      gitList: [
-        {
-          link: "https://www.github.com",
-          title: "git-last-commit"
-        },
-        {
-          link: "https://www.github.com",
-          title: "git-last-commit"
-        },
-        {
-          link: "https://www.github.com",
-          title: "git-last-commit"
-        },
-        {
-          link: "https://www.github.com",
-          title: "git-last-commit"
-        },
-        {
-          link: "https://www.github.com",
-          title: "git-last-commit"
-        },
-        {
-          link: "https://www.github.com",
-          title: "git-last-commit"
-        },
-        {
-          link: "https://www.github.com",
-          title: "git-last-commit"
-        },
-      ]
+      isConnectRepo: false,
+      commitList: []
+    }
+  },
+  methods: {
+    getFileList() {
+      console.log(this.$store.state.dashBoard.gitCommit)
+      this.axios.get(`${this.$store.state.dashBoard.gitCommit}`, {
+        headers: {
+          Authorization: `token ${API_KEY}`
+        }
+      })
+          .then(res => {
+            console.log(res)
+          })
+    },
+  },
+  mounted() {
+    const repo = this.$store.state.dashBoard.gitCommit
+    console.log(repo)
+    if(repo !== "") {
+      this.isConnectRepo = true
+      this.getFileList()
     }
   }
 }

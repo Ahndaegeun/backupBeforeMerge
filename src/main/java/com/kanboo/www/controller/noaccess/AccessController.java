@@ -1,6 +1,8 @@
 package com.kanboo.www.controller.noaccess;
 
+import com.kanboo.www.domain.entity.member.Ban;
 import com.kanboo.www.domain.entity.member.Member;
+import com.kanboo.www.domain.repository.member.BanRepository;
 import com.kanboo.www.domain.repository.member.MemberRepository;
 import com.kanboo.www.dto.member.MemberDTO;
 import com.kanboo.www.security.JwtSecurityService;
@@ -11,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,16 +27,33 @@ public class AccessController {
     private final JwtSecurityService jwtSecurityService;
     private final Logger logger = LoggerFactory.getLogger(AccessController.class);
     private final MemberRepository memberRepository;
+    private final BanRepository banRepository;
 
 
 
     @PostMapping("/login")
-    public String loginHandler(MemberDTO memberDTO) {
+    public Map<String, Object> loginHandler(MemberDTO memberDTO) {
         MemberDTO member = memberService.loginHandler(memberDTO);
+        Map<String, Object> result = new HashMap<>();
         if(member == null) {
             return null;
         }
-        return jwtSecurityService.createToken(member.getMemTag(), (60L * 60 * 100000));
+        String token = jwtSecurityService.createToken(member.getMemTag(), (60L * 60 * 100000));
+        if(member.getRole().getRoleIdx() == 1) {
+            result.put("role", "admin");
+        } else {
+            result.put("role", "member");
+        }
+
+        Ban ban = banRepository.findByMember_MemIdx(member.getMemIdx());
+
+        if(ban == null || ban.getBanEndDate().isBefore(LocalDate.now())) {
+            result.put("isStop", false);
+        } else {
+            result.put("isStop", true);
+        }
+        result.put("token", token);
+        return result;
     }
 
 
@@ -69,7 +90,6 @@ public class AccessController {
 
     @PostMapping("/userModify")
     public Boolean modifyUser(@RequestBody MemberDTO memberDTO) {
-        System.out.println(memberDTO);
         if(memberDTO == null) {
             return false;
         }
@@ -92,6 +112,7 @@ public class AccessController {
         result.put("idx", member.getMemIdx());
         return result;
     }
+
 }
 
 

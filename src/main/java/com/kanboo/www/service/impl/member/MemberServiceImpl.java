@@ -35,9 +35,10 @@ public class MemberServiceImpl implements MemberService {
                     memberDTO.getMemId(),
                     CryptoUtil.encryptSha512(memberDTO.getMemPass())
             );
-            return member.entityToDto();
+            MemberDTO dto = member.entityToDto();
+            dto.setRole(member.getRole().entityToDto());
+            return dto;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return null;
         }
     }

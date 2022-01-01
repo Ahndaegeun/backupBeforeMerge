@@ -6,7 +6,7 @@
     <div id="contain">
       <div id="change-list" @mousewheel="wheel">
         <div v-for="item in this.$store.state.projectList.projectList" :key="item">
-          <div class="list-detail" v-if="item.issueList !== null || item.calendarList !== null">
+          <div class="list-detail" v-if="item.issueList.length > 0 || item.calendarList.length > 0">
             <div class="list-wrapper">
               <a id="prjct-name" @click="moveToDashBoard(item)">
                 {{ item.prjctNm }}
@@ -16,7 +16,7 @@
                   <a @click="moveToIssue(item)">
                     Issue
                   </a>
-                  <a class="balloon-wrap" @click="moveToIssue(issue)" v-for="issue in item.issueList" :key="issue">
+                  <a class="balloon-wrap" @click="moveToIssue(item)" v-for="issue in item.issueList" :key="issue">
                     <div class="title-wrap" v-if="issue.issueCn.length >= 10">{{
                         `${issue.issueCn.substring(0, 10)}...`
                       }}
@@ -140,7 +140,6 @@ a {
 }
 
 .change-container {
-  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -152,7 +151,7 @@ a {
 #change-list {
   width: 100%;
   display: flex;
-  gap: 60px;
+  column-gap: 20px;
   overflow: scroll;
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
@@ -164,12 +163,11 @@ a {
 
 .list-detail {
   border-radius: 10px;
-  width: 240px;
+  width: 300px;
   font-size: 20px;
   background-color: #2C2F3B;
   padding: 10px;
   transition: ease-in-out 0.3s;
-
 }
 
 .list-wrapper > div:first-child {
@@ -197,12 +195,6 @@ a {
   width: 50%;
 }
 
-#prjct-name {
-  border-bottom: 1px solid #717790;
-  padding-bottom: 10px;
-}
-
-
 .content-children > a {
   font-size: 15px;
   padding-left: 10px;
@@ -226,11 +218,6 @@ a {
 
 .list-detail:hover #prjct-name {
   border-bottom: 1px solid darkorchid;
-}
-
-#contain {
-  padding-right: 40px;
-  padding-bottom: 10px;
 }
 
 .balloon-wrap {

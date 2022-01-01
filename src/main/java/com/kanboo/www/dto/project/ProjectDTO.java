@@ -58,6 +58,7 @@ public class ProjectDTO {
                 .prjctDelAt(prjctDelAt)
                 .prjctComplAt(prjctComplAt)
                 .prjctReadMe(prjctReadMe)
+                .prjctManager(prjctManager)
                 .build();
     }
 }

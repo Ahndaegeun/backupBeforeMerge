@@ -85,7 +85,6 @@ const gantt = {
 
       state.detail =
           state.chart.tasks[state.year][state.month][state.openIndex];
-      console.log(ganttDTO)
 
       axios.post("/gantt/updateGantt", null, {
         params: ganttDTO,
@@ -133,6 +132,7 @@ const gantt = {
       state.selectedTasks = state.chart.tasks[2021][12];
     },
     renderDate(state) {
+
       state.dateList = [];
       let today = moment().format("YYYY-MM-DD").split("-");
       if (state.year === "") {
@@ -190,19 +190,19 @@ const gantt = {
       });
     },
     setPrevMonth(state) {
-      if(state.month === 1) {
+      if(state.month === '01') {
         state.month = 12
         state.year--
       } else {
-        state.month--
+        state.month = typeof state.month === 'string' ? '0' + --state.month : --state.month
       }
     },
     setNextMonth(state) {
       if(state.month === 12) {
-        state.month = 1
+        state.month = "01"
         state.year++
       } else {
-        state.month++
+        state.month = typeof state.month === 'string' ? '0' + ++state.month : ++state.month
       }
     }
   },
@@ -218,12 +218,17 @@ const gantt = {
             let temp = {};
             if(result.data.length > 0) {
               result.data.map((item) => {
+                const thisYear = moment().format("YYYY-MM-DD").split("-")
                 const date = item.gtStartDate.split("T")[0].split("-");
                 const year = date[0];
                 const month = date[1];
 
                 if (temp[year] == null) temp[year] = {};
                 if (temp[year][month] == null) temp[year][month] = [];
+                if (thisYear[0] !== year && temp[thisYear] == null) {
+                  temp[thisYear[0]] = {}
+                  temp[thisYear[0]][moment().format("MM")] = []
+                }
 
                 const obj = {
                   gtIdx: item.gtIdx,

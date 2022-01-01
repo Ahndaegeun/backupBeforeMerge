@@ -49,7 +49,6 @@ public class AdminController {
 
     @PostMapping("/deleteBanUser")
     public boolean deleteBanUser(BanDTO banDTO){
-        System.out.println("AdminController : " + banDTO);
         return banService.deleteBanUser(banDTO);
     }
 

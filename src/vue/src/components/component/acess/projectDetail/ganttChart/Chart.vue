@@ -121,23 +121,21 @@ export default {
     },
     prevMonth() {
       for (let key of Object.keys(this.$store.state.gantt.chart.tasks[this.$store.state.gantt.year])) {
-        if (this.$store.state.gantt.month - 1 == key) {
-          this.setPrevMonth()
-          this.setShowList(this.$store.state.gantt.chart.tasks)
-          this.renderDate();
-          break;
-        }
+        key
+        this.setPrevMonth()
+        this.setShowList(this.$store.state.gantt.chart.tasks)
+        this.renderDate();
+        break;
       }
       this.renderTodayLine();
     },
     nextMonth() {
       for (let key of Object.keys(this.$store.state.gantt.chart.tasks[this.$store.state.gantt.year])) {
-        if (this.$store.state.gantt.month + 1 == key) {
-          this.setNextMonth()
-          this.setShowList(this.$store.state.gantt.chart.tasks)
-          this.renderDate();
-          break;
-        }
+        key
+        this.setNextMonth()
+        this.setShowList(this.$store.state.gantt.chart.tasks)
+        this.renderDate();
+        break;
       }
       this.renderTodayLine();
     },
@@ -157,23 +155,23 @@ export default {
     },
     monthName() {
       switch (this.$store.state.gantt.month) {
-        case "1": case 1:
+        case "01": case 1:
           return "January";
-        case "2": case 2:
+        case "02": case 2:
           return "February";
-        case "3": case 3:
+        case "03": case 3:
           return "March";
-        case "4": case 4:
+        case "04": case 4:
           return "April";
-        case "5": case 5:
+        case "05": case 5:
           return "May";
-        case "6": case 6:
+        case "06": case 6:
           return "June";
-        case "7": case 7:
+        case "07": case 7:
           return "July";
-        case "8": case 8:
+        case "08": case 8:
           return "August";
-        case "9": case 9:
+        case "09": case 9:
           return "September";
         case "10": case 10:
           return "October";

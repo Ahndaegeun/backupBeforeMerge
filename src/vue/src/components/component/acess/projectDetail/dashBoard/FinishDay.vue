@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    Finish D-{{dDay}}
+    Finish D-{{ this.$store.state.dashBoard.finishDay }}
   </div>
 </template>
 
@@ -9,7 +9,6 @@ export default {
   name: "finishDay",
   data() {
     return {
-      dDay: 10
     }
   }
 }

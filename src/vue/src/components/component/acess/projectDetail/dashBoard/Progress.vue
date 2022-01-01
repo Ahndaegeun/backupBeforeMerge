@@ -2,14 +2,14 @@
   <div class="container">
     <h2>Progress</h2>
     <div class="circle-box">
-      <circle-progress :percent="now / total * 100"
+      <circle-progress :percent="this.$store.state.dashBoard.progressNow / this.$store.state.dashBoard.progressTotal * 100"
                         :size="140"
                         fill-color="#3F80A9"
                         empty-color="#2C2F3B"/>
       <div class="count">
-        <span class="now">{{now}}</span>
+        <span class="now">{{this.$store.state.dashBoard.progressNow}}</span>
         <span class="seperator"> / </span>
-        <span class="total">{{total}}</span>
+        <span class="total">{{this.$store.state.dashBoard.progressTotal}}</span>
       </div>
     </div>
   </div>
@@ -23,8 +23,6 @@ export default {
   name: "Progress",
   data() {
     return {
-      now: 14,
-      total: 40,
     }
   },
   components: {

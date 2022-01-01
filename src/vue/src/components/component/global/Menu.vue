@@ -6,38 +6,36 @@
         <img src="../../../assets/kanboo_logo.png" alt="logo">
       </router-link>
       <router-link :to="menuList.left.path" v-if="menuList.left.type === 'text'">
-        {{menuList.left.name}}
+        {{ menuList.left.name }}
       </router-link>
     </li>
     <li>
       <ul class="left-menu">
         <li v-for="item in menuList.right" :key="item">
-          <router-link v-if="item.path === nowTab" 
-                      class="route-menu check" 
-                      :to="item.path">{{item.name}}</router-link>
-          <button type="button" v-else-if="item.name === 'notification'"
-                  class="alarm-icon"
-                  @click="notificationClick">
-                  <i class="fa fa-bell-o"></i>
-          </button>
+          <router-link v-if="item.path === nowTab"
+                       class="route-menu check"
+                       :to="item.path">{{ item.name }}
+          </router-link>
           <button type="button" v-else-if="item.name === 'userSetting'"
                   class="user-icon"
                   @click="userSettingClick">
-                  <i class="fa fa-user-o"></i>
+            <i class="fa fa-user-o"></i>
           </button>
-          <router-link v-else-if="item.path !== nowTab" 
-                      class="route-menu" 
-                      :to="item.path">{{item.name}}</router-link>
+          <router-link v-else-if="item.path !== nowTab"
+                       class="route-menu"
+                       :to="item.path">{{ item.name }}
+          </router-link>
         </li>
       </ul>
     </li>
-  </ul>  
+  </ul>
 
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import {mapMutations} from 'vuex'
 import MenuContent from '../../../assets/MenuList.json'
+
 export default {
   name: 'menu',
   data() {
@@ -57,24 +55,31 @@ export default {
     })
   },
   watch: {
-    '$route' (to) {
+    '$route'(to) {
       const path = to.path
       this.nowTab = path
       const obj = {
         "left": {},
         "right": []
       }
-      
+
       // console.log(this.$store.state.global.isLogin)
 
-      if(path.includes('pdtail')) {
+      if (path.includes('pdtail')) {
         obj.left = this.list.projectDetail.left
         obj.right = this.list.projectDetail.right
       } else {
         obj.left = this.list.noAccess.left
       }
 
-      switch(path) {
+      let pushSettingBtn = true
+      this.list.access.right.forEach(item => {
+        if (item.name === "userSetting") {
+          pushSettingBtn = false
+        }
+      })
+
+      switch (path) {
         case '/':
           obj.right = this.list.noAccess.home
           break
@@ -89,23 +94,26 @@ export default {
           obj.right = this.list.noAccess.home
           break
         case '/projects':
-          this.list.access.right.push({
-            "name": "userSetting",
-            "path": "#",
-            "type": "img"
-          })
+          if (pushSettingBtn) {
+            this.list.access.right.push({
+              "name": "userSetting",
+              "path": "#",
+              "type": "img"
+            })
+
+          }
           obj.right = this.list.access.right
           break
       }
 
-      if(this.$store.state.global.isLogin) {
+      if (this.$store.state.global.isLogin) {
         obj.right = this.list.access.right
       }
 
       this.menuList = obj
     }
   },
-  
+
 }
 </script>
 

@@ -16,6 +16,7 @@ import com.kanboo.www.service.inter.project.ProjectService;
 import com.kanboo.www.util.FileSystemUtil;
 import com.kanboo.www.util.SaveCompileFile;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ISourceContext;
 import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -195,13 +196,9 @@ public class ProjectServiceImpl implements ProjectService {
         if(!exeToken.isEmpty()) {
             Map<String, Object> resultMap = new HashMap<>();
 
-            List<ProjectMember> allList = projectMemberRepository.getAllList(exeToken);
-            List<ProjectMemberDTO> list = new ArrayList<>();
-            allList.forEach(item -> {
-                list.add(item.entityToDto());
-            });
+            List<ProjectMemberDTO> allList = projectMemberRepository.getAllList(exeToken);
 
-            resultMap.put("projectMemberDtoList", list);
+            resultMap.put("projectMemberDtoList", allList);
 
             return resultMap;
         }

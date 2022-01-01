@@ -7,6 +7,9 @@ import com.kanboo.www.domain.entity.member.QBan;
 import com.kanboo.www.domain.entity.member.QMember;
 import com.kanboo.www.domain.entity.member.QProjectMember;
 import com.kanboo.www.domain.entity.project.*;
+import com.kanboo.www.dto.member.ProjectMemberDTO;
+import com.kanboo.www.dto.project.CalendarDTO;
+import com.kanboo.www.dto.project.IssueDTO;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.JPAExpressions;
@@ -24,7 +27,7 @@ public class ProjectMemberDslRepositoryImpl implements ProjectMemberDslRepositor
     private final EntityManager em;
 
     @Override
-    public List<ProjectMember> getAllList(String memTag) {
+    public List<ProjectMemberDTO> getAllList(String memTag) {
         QMember member = QMember.member;
         QProject project = QProject.project;
         QProjectMember projectMember = QProjectMember.projectMember;
@@ -34,7 +37,8 @@ public class ProjectMemberDslRepositoryImpl implements ProjectMemberDslRepositor
         JPAQueryFactory query = new JPAQueryFactory(em);
 
 
-        return query
+        List<ProjectMemberDTO> resultList = new ArrayList<>();
+        List<ProjectMember> projectMembers = query
                 .select(projectMember).distinct()
                 .from(projectMember)
                 .innerJoin(projectMember.member, member)
@@ -43,8 +47,41 @@ public class ProjectMemberDslRepositoryImpl implements ProjectMemberDslRepositor
                 .leftJoin(project.calendarList, calendar)
                 .where(
                         projectMember.member.memTag.eq(memTag)
+                                .and(project.prjctDelAt.eq("n"))
                 )
                 .fetch();
+
+        projectMembers.forEach(item -> {
+            ProjectMemberDTO projectMemberDTO = item.entityToDto();
+            List<Issue> issueList = item.getProject().getIssueList();
+            List<IssueDTO> issueDTOS = new ArrayList<>();
+            int issueCnt = 0;
+            for(Issue iss : issueList) {
+                if(issueCnt > 3) {
+                    break;
+                }
+                issueDTOS.add(iss.entityToDto());
+                issueCnt++;
+            }
+
+            List<Calendar> calendarList = item.getProject().getCalendarList();
+            List<CalendarDTO> calendarDTOS = new ArrayList<>();
+            int calendarCnt = 0;
+            for(Calendar cal : calendarList) {
+                if(calendarCnt > 2) {
+                    break;
+                }
+                calendarDTOS.add(cal.entityToDto());
+                calendarCnt++;
+            }
+
+            projectMemberDTO.getProject().setIssueList(issueDTOS);
+            projectMemberDTO.getProject().setCalendarList(calendarDTOS);
+
+            resultList.add(projectMemberDTO);
+        });
+
+        return resultList;
     }
 
     @Override

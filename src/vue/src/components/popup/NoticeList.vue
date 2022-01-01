@@ -1,12 +1,5 @@
 <template>
-  <ul class="notice-container">
-    <li class="del-btn">
-      <button @click="del" type="button">delete all</button>
-    </li>
-    <li v-for="item in noticeList" 
-        :key="item"
-        class="notice-detail">{{item.content}}</li>
-  </ul>
+  <div></div>
 </template>
 
 <script>

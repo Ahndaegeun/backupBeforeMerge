@@ -94,13 +94,10 @@ const socket = {
             state.receiveIssueAlarmData = arr
         },
         setReceiveKanbanAlarmData(state, arr) {
-            console.log(arr)
             state.receiveKanbanAlarmData = arr
         },
         setReceiveEnterProjectAlarmData(state, arr) {
-            console.log(arr)
             state.receiveEnterProjectAlarmData = arr
-            console.log(state.receiveEnterProjectAlarmData)
         },
         setSendChatting(state, arr){
             const temp = {
@@ -245,7 +242,6 @@ const socket = {
             }
         },
         kanbanAlarm(state, arr) {
-            console.log(arr)
             if(arr !== null) {
                 if (this.stompClient && this.stompClient.connected) {
                     const msg = {
@@ -340,10 +336,10 @@ const socket = {
     },
     actions : {
         connect(state){
-            const serverURL = "http://192.168.46.16:8099/"
+            const serverURL = "http://192.168.46.14:8099/"
             let socket = new SockJS(serverURL)
             this.stompClient = Stomp.over(socket)
-            // this.stompClient.debug = () => {}
+            this.stompClient.debug = () => {}
             this.stompClient.connect( {}, () => {
                     this.stompClient.connected = true
                     if(state.state.projectArr !== null) {

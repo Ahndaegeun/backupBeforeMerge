@@ -6,13 +6,13 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import java.io.Serializable;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
 public class ChatId implements Serializable {
-
-    private Member member;
-    private Project project;
+    private Long member;
+    private Long project;
 }

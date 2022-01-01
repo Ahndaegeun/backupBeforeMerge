@@ -107,19 +107,19 @@ const routes = [
   {
     path: '/admin',
     component : Admin,
-    // beforeEnter: (to, from, next) => {
-    //   const repData = {
-    //     url : '/token/admin',
-    //     method : 'post',
-    //     falsePath: '/signin',
-    //     next: next,
-    //     data: {
-    //       token : sessionStorage.getItem("token")
-    //     }
-    //   }
-    //
-    //   roleCheck(repData)
-    // }
+    beforeEnter: (to, from, next) => {
+      const repData = {
+        url : '/token/admin',
+        method : 'post',
+        falsePath: '/signin',
+        next: next,
+        data: {
+          token : sessionStorage.getItem("token")
+        }
+      }
+
+      roleCheck(repData)
+    }
   },
   {
     path: "/pdtail",
@@ -247,6 +247,7 @@ const routes = [
         path: "gitissue",
         component: GitAndIssue,
         beforeEnter: (to, from, next) => {
+          console.log(sessionStorage.getItem("project"))
           const repData = {
             url : '/token/projectCheck',
             method : 'post',

@@ -5,6 +5,7 @@ const global = {
   state: {
     chatOn: false,
     projectIdx: 0,
+    isLogin: false
   },
   mutations: {
     moveToDashBoard(state, project) {
@@ -12,12 +13,12 @@ const global = {
       router.push('/pdtail/dashboard')
     },
     moveToIssue(state, issue) {
-      sessionStorage.setItem("project", issue.project.prjctIdx)
-      router.push('/pdtail/issue')
+      sessionStorage.setItem("project", issue.prjctIdx)
+      router.push('/pdtail/gitissue')
     },
     moveToCalendar(state, calendar) {
       sessionStorage.setItem("project", calendar.project.prjctIdx)
-      router.push('/pdtail/calendar')
+      router.push('/pdtail/scheduler')
     },
   },
   actions: {

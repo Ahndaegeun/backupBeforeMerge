@@ -2,9 +2,13 @@
   <div class="container">
     <h2>Issue</h2>
     <ul class="issue-list">
-      <li v-for="(item, index) in issueList" 
+      <li v-for="(item, index) in this.$store.state.dashBoard.issueList"
           :key="index">
-      <a :href="item.idx">{{item.title}}</a>
+      <a :href="item.issueIdx">{{
+          item.issueCn.length > 15 ?
+              item.issueCn.substring(0, 15) + "..." :
+              item.issueCn
+        }}</a>
       </li>
     </ul>
   </div>
@@ -14,34 +18,7 @@
 export default {
   name: "Issue",
   data() {
-    return {
-      issueList: [
-        {
-          idx: 1,
-          title: "HomeController 버그",
-        },
-        {
-          idx: 2,
-          title: "Entity 설계 수정",
-        },
-        {
-          idx: 3,
-          title: "집 가고 싶다",
-        },
-        {
-          idx: 4,
-          title: "Hello world!!",
-        },
-        {
-          idx: 5,
-          title: "Hello java, jpa, springBoot"
-        },
-        {
-          idx: 6,
-          title: "Hello java, jpa, springBoot"
-        },
-      ]
-    }
+    return {}
   },
 
 }

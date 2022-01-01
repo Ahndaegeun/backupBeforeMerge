@@ -25,7 +25,7 @@ VueMarkdownEditor.use(vuepressTheme, {
 import '@kangc/v-md-editor/lib/theme/style/vuepress.css';
 
 
-axios.defaults.baseURL = "http://192.168.46.16:8099"
+axios.defaults.baseURL = "http://192.168.46.14:8099"
 
 const app = createApp(App)
 app.config.globalProperties.axios = axios

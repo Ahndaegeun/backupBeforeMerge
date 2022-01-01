@@ -74,7 +74,6 @@ export default {
       let issueTitle = document.querySelector('.issueTitle').value;
 
       if( issueText === '' || issueText === null) return
-      if( issueTitle === '' || issueTitle === null) return
 
       const url = '/gitAndIssue/insert'
 

@@ -46,5 +46,6 @@ public class ChattingContentDslRepositoryImpl implements ChattingContentDslRepos
 				.fetchJoin()
 				.where(qChattingContent.chat.project.prjctIdx.eq(prjctIdx))
 				.fetch();
+
 	}
 }
