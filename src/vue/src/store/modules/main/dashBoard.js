@@ -87,7 +87,7 @@ const dashBoard = {
                         }
                     })
                     context.commit("setReadMeContent", res.data.project.prjctReadMe)
-                    // context.commit("setBoardList", res.data.boardList)
+                    context.commit("setBoardList", res.data.boardList)
                     context.commit("setIssueList", res.data.issueList)
                     context.commit("setScheduleList", res.data.calendarList)
                     context.commit("setProgress", res.data.ganttList)

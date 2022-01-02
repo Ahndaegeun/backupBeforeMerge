@@ -8,6 +8,7 @@
 
 <script>
 import axios from 'axios';
+
 export default {
   methods :{
 
@@ -15,11 +16,9 @@ export default {
         axios.post('/setting/modifyProjectMember',{
           params : this.$store.state.setting.projectMemberList
 
-        }).then(res =>{
-          console.log(res.data);
+        }).then(() =>{
           alert("정상적으로 수정되었습니다.");
-        }).catch(err =>{
-          console.log(err.data);
+        }).catch(() =>{
           alert("수정에 실패했습니다.");
         });
     },
@@ -30,11 +29,10 @@ export default {
           axios.post('/setting/modifyProject', {
             params : this.$store.state.setting.projectData
 
-          }).then(res =>{
-            console.log(res.data);
+          }).then(() =>{
             alert("정상적으로 삭제되었습니다..");
-          }).catch(err =>{
-            console.log(err.data);
+            this.$router.push("/projects")
+          }).catch(() =>{
             alert("삭제에 실패했습니다.");
           });
       }else{
@@ -45,16 +43,13 @@ export default {
 
       if(confirm("프로젝트를 종료하시겠습니까?")){
           this.$store.state.setting.projectData.prjctComplAt = "y";
-          console.log(this.$store.state.setting.projectData);
 
           axios.post('/setting/modifyProject', {
             params : this.$store.state.setting.projectData
 
-          }).then(res =>{
-            console.log(res.data);
+          }).then(() =>{
             alert("정상적으로 종료되었습니다..");
-          }).catch(err =>{
-            console.log(err.data);
+          }).catch(() =>{
             alert("종료에 실패했습니다.");
           });
       }else{

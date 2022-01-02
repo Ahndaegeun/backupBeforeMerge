@@ -5,9 +5,13 @@ const global = {
   state: {
     chatOn: false,
     projectIdx: 0,
-    isLogin: false
+    isLogin: false,
+    isPm: false
   },
   mutations: {
+    setIsPm(state, item) {
+      state.isPm = item
+    },
     moveToDashBoard(state, project) {
       sessionStorage.setItem("project", project.prjctIdx)
       router.push('/pdtail/dashboard')

@@ -135,11 +135,6 @@
         "type": "text"
       },
       {
-        "name": "notification",
-        "path": "#",
-        "type": "img"
-      },
-      {
         "name": "userSetting",
         "path": "#",
         "type": "img"

@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -21,27 +22,35 @@ public class TokenController {
     private final MemberRepository memberRepository;
 
     @PostMapping("/check")
-    public Boolean tokenCheck(@RequestBody Map<String, Object> map) {
+    public Map<String, Object> tokenCheck(@RequestBody Map<String, Object> map) {
+        Map<String, Object> resultMap = new HashMap<>();
         String exeToken = jwtSecurityService.getToken(map.get("token") + "");
+        resultMap.put("isPm", null);
         if(exeToken != null) {
-            return true;
+            resultMap.put("isRole", true);
+        } else {
+            resultMap.put("isRole", false);
         }
-        return false;
+        return resultMap;
     }
 
     @PostMapping("/admin")
-    public boolean isAdmin(@RequestBody Map<String, String> map) {
+    public Map<String, Object> isAdmin(@RequestBody Map<String, String> map) {
+        Map<String, Object> resultMap = new HashMap<>();
         String token = map.get("token");
         String memTag = jwtSecurityService.getToken(token);
         Member member = memberRepository.findByMemTag(memTag);
+        resultMap.put("isPm", null);
         if(member.getRole().getRoleIdx() == 1) {
-            return true;
+            resultMap.put("isRole", true);
+        } else {
+            resultMap.put("isRole", false);
         }
-        return false;
+        return resultMap;
     }
 
     @PostMapping("/projectCheck")
-    public Boolean projectTokenCheck(@RequestBody Map<String, Object> map) {
+    public Map<String, Object> projectTokenCheck(@RequestBody Map<String, Object> map) {
         String token = map.get("token") + "";
         Long projectIdx = map.get("projectIdx") != null ? Long.parseLong(map.get("projectIdx") + "") : null;
         return pageRoleCheckService.checkProject(token, projectIdx);

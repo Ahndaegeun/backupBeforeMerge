@@ -2,9 +2,9 @@
   <div class="container">
     <h2>Board</h2>
     <ul class="board-list">
-      <li v-for="(item, index) in boardList" 
+      <li v-for="(item, index) in this.$store.state.dashBoard.boardList"
           :key="index">
-      <a :href="item.idx">{{item.content}}</a>
+      <a :href="item.idx">{{item.boardDate.split("T")[0]}} - {{item.member.memId}}</a>
       </li>
     </ul>
   </div>  

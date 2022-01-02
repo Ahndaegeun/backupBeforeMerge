@@ -42,7 +42,6 @@ export default {
   },
   mounted() {
     const repo = this.$store.state.dashBoard.gitCommit
-    console.log(repo)
     if(repo !== "") {
       this.isConnectRepo = true
       this.getFileList()

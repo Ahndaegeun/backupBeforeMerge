@@ -1,9 +1,14 @@
 package com.kanboo.www.service.impl.project;
 
+import com.kanboo.www.domain.entity.board.Board;
+import com.kanboo.www.domain.entity.board.ProjectBoard;
 import com.kanboo.www.domain.entity.member.ProjectMember;
 import com.kanboo.www.domain.entity.project.*;
 import com.kanboo.www.domain.repository.board.BoardRepository;
+import com.kanboo.www.domain.repository.board.ProjectBoardRepository;
 import com.kanboo.www.domain.repository.project.*;
+import com.kanboo.www.dto.board.BoardDTO;
+import com.kanboo.www.dto.board.ProjectBoardDTO;
 import com.kanboo.www.dto.member.MemberDTO;
 import com.kanboo.www.dto.member.ProjectMemberDTO;
 import com.kanboo.www.dto.project.*;
@@ -28,6 +33,7 @@ public class DashBoardServiceImpl implements DashBoardService {
     private final ProjectRepository projectRepository;
     private final IssueRepository issueRepository;
     private final ProjectMemberRepository projectMemberRepository;
+    private final ProjectBoardRepository projectBoardRepository;
     private final BoardRepository boardRepository;
     private final CalendarRepository calendarRepository;
     private final GitRepository gitRepository;
@@ -127,5 +133,13 @@ public class DashBoardServiceImpl implements DashBoardService {
         result.put("projectMemberList", projectMemberList);
         result.put("git", git);
         result.put("ganttList", ganttList);
+
+        List<ProjectBoard> projectBoardList = projectBoardRepository.getDashBoardArticle(prjctIdx);
+        List<BoardDTO> boardList = new ArrayList<>();
+        projectBoardList.forEach(item -> {
+            Board board = item.getBoard();
+            boardList.add(board.entityToDto());
+        });
+        result.put("boardList", boardList);
     }
 }

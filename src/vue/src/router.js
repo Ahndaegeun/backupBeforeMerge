@@ -1,5 +1,6 @@
 import { createWebHistory, createRouter } from "vue-router"
 import axios from 'axios'
+import store from './store/index'
 
 import Home from './components/container/noAccess/Home.vue'
 import Demo from './components/container/noAccess/Demo.vue'
@@ -38,7 +39,11 @@ const roleCheck = (repData) => {
     method: repData.method,
     data: repData.data
   }).then(res => {
-    if(res.data) {
+    if(res.data.isPm !== null) {
+      store.commit("global/setIsPm", res.data.isPm)
+    }
+
+    if(res.data.isRole) {
       repData.next()
     } else {
       repData.next(repData.falsePath)

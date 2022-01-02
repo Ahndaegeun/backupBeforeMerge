@@ -4,5 +4,5 @@ import java.util.Map;
 
 public interface PageRoleCheckService {
 
-    boolean checkProject(String token, Long projectIdx);
+    Map<String, Object> checkProject(String token, Long projectIdx);
 }

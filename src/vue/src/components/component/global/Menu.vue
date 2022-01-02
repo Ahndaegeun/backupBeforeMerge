@@ -67,7 +67,11 @@ export default {
 
       if (path.includes('pdtail')) {
         obj.left = this.list.projectDetail.left
-        obj.right = this.list.projectDetail.right
+        let right = this.list.projectDetail.right
+        if(!this.$store.state.global.isPm) {
+          right.splice(9, 1)
+        }
+        obj.right = right
       } else {
         obj.left = this.list.noAccess.left
       }
@@ -100,7 +104,6 @@ export default {
               "path": "#",
               "type": "img"
             })
-
           }
           obj.right = this.list.access.right
           break
