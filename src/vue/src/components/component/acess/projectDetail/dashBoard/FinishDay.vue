@@ -1,7 +1,5 @@
 <template>
-  <div class="container">
-    Finish D-{{ this.$store.state.dashBoard.finishDay }}
-  </div>
+  <div class="container" v-text="`Finish D-${this.$store.state.dashBoard.finishDay}`"></div>
 </template>
 
 <script>

@@ -333,6 +333,7 @@ const routes = [
     path: '/logout',
     beforeEnter: (to, from, next) => {
       sessionStorage.removeItem('token')
+      sessionStorage.removeItem("project")
       next('/')
     }
   },

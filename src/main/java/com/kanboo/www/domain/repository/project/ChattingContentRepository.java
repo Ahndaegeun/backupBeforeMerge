@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface ChattingContentRepository extends JpaRepository<ChattingContent, Long>, ChattingContentDslRepository {
-    List<ChattingContent> findAllByChat_Project_PrjctIdxAndChat_Member_MemIdx(Long prjctIdx, Long memIdx);
+    List<ChattingContent> findByChat_ProjectPrjctIdx(Long prjctIdx);
 }

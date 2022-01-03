@@ -184,6 +184,9 @@ export default {
       setModalFalse : 'scheduler/setModalFalse',
       pushData : 'scheduler/pushData',
       alarm : 'socket/alarm',
+      checkBoxClick : 'scheduler/checkBoxClick',
+      setDataToSecondData : 'scheduler/setDataToSecondData',
+      pushSecondData : 'scheduler/pushSecondData',
     }),
 
     // modal functions start
@@ -324,7 +327,7 @@ export default {
 
       }
       this.pushData(arr)
-
+      this.pushSecondData(arr)
       if(copy.length !== this.$store.state.scheduler.data.length){
         this.resetValue()
       }
@@ -352,6 +355,13 @@ export default {
             this.setModalFalse()
             let index = this.$store.state.scheduler.data.length-1
             this.$store.state.scheduler.data[index].id = r.data.calIdx
+            const filter = {
+              filterName: "all",
+              isClick: true,
+              koName: "전체"
+            }
+            this.setDataToSecondData()
+            this.checkBoxClick(filter)
 
             // 여기서 소켓 알람 호출
             const arr = {

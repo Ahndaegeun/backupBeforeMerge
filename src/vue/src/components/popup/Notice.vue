@@ -7,7 +7,7 @@
         :key="index"
     >
       <p class="notice-text">
-        {{ message.user }} {{ message.content }}
+        <span class="text-wrap">{{ message.user }} {{ message.content }}</span>
         <button @click="closeNotice(index)" class="notice-close-btn">
           <i class="fas fa-times"> </i>
         </button>
@@ -201,9 +201,9 @@ export default {
 
 <style>
 .notice-container {
-  position: absolute;
+  position: fixed;
   right: 0;
-  top:0;
+  top: 70px;
   display: flex;
   flex-direction: column;
   z-index: 10;
@@ -254,6 +254,20 @@ export default {
   height: 100%;
   animation: progress 5s linear;
   box-shadow: 2px 2px 3px rgba(255, 255, 255, 0.3) inset;
+}
+
+.text-wrap {
+  width: 90%;
+  display: block;
+  top: 10px;
+  left: 10px;
+  position: absolute;
+}
+
+.notice-close-btn {
+  top: 10px;
+  position: absolute;
+  right: 10px;
 }
 
 @keyframes progress {

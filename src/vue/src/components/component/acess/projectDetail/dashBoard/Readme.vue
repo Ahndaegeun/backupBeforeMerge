@@ -14,6 +14,7 @@ export default {
   name: "readme",
   data() {
     return {
+      isMount: false
     }
   },
   methods: {
@@ -21,9 +22,17 @@ export default {
       saveReadMe: 'dashBoard/saveReadMe'
     }),
     updateReadMe(origin) {
-      this.saveReadMe(origin)
+      if(this.isMount && this.$store.state.dashBoard.isUpdate) {
+        this.saveReadMe(origin)
+      }
     }
   },
+  mounted() {
+    this.isMount = true
+  },
+  unmounted() {
+    this.isMount = false
+  }
 }
 </script>
 

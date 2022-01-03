@@ -336,8 +336,8 @@ const socket = {
     },
     actions : {
         connect(state){
-            // const serverURL = "http://192.168.46.14:8099/"
-            const serverURL = "http://localhost:8099/"
+            const serverURL = "http://192.168.46.11:8099/"
+            // const serverURL = "http://localhost:8099/"
             let socket = new SockJS(serverURL)
             this.stompClient = Stomp.over(socket)
             this.stompClient.debug = () => {}

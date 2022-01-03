@@ -3,6 +3,7 @@ package com.kanboo.www.service.inter.member;
 import com.kanboo.www.dto.member.MemberDTO;
 
 import java.util.List;
+import java.util.Map;
 
 public interface MemberService {
 
@@ -27,4 +28,6 @@ public interface MemberService {
     List<MemberDTO> getAllMember(String selected, String keyword, int articleOnView);
 
     Long getMaxIndexOfMember(String selected, String key);
+
+    void updateMemberImg(Map<String, Object> map);
 }

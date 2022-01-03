@@ -8,9 +8,9 @@
           {{ enterText[i - 1] }}</span
         >
         <span
-          class="copy"
-          v-if="printToken && j === tokenPrintIndex"
-          @click="copyToken"
+            class="copy"
+            v-if="printToken && j === tokenPrintIndex"
+            @click="copyToken"
         >
           [copy]</span
         >
@@ -19,11 +19,11 @@
         {{ rootText }}
         <span style="color: white" v-if="inputData.length == 6"> +82) </span>
         <input
-          :type="inputType"
-          @keyup.enter="enter"
-          id="inputBox"
-          v-model="inputText"
-          :class="{
+            :type="inputType"
+            @keyup.enter="enter"
+            id="inputBox"
+            v-model="inputText"
+            :class="{
             'text-color-red': signReg,
             'text-color-orange': reservedWord,
           }"
@@ -52,9 +52,6 @@ export default {
     this.isLang("en");
   },
   updated() {
-    if (this.printToken) {
-      this.tokenPrintIndex = this.consoleText.length - 1;
-    }
     this.focus();
   },
   data() {
@@ -83,6 +80,7 @@ export default {
   methods: {
     ...mapMutations({
       isLang: "sign/isLang",
+      setIsPrintToken: "sign/setIsPrintToken"
     }),
     selectLang(payload) {
       this.isLang(payload);
@@ -91,25 +89,25 @@ export default {
       let header = null;
 
       if (
-        this.inputData.length === 1 &&
-        this.inputText.length > 5 &&
-        this.inputData[0] === "sign"
+          this.inputData.length === 1 &&
+          this.inputText.length > 5 &&
+          this.inputData[0] === "sign"
       ) {
         this.axios
-          .post(`/access/idCheck`, header, {
-            params: {
-              memId: `${this.inputText}`,
-            },
-          })
-          .then((data) => {
-            if (data.data) {
-              this.idCheck = true;
-              this.signReg = true;
-            } else {
-              this.idCheck = false;
-              this.signReg = false;
-            }
-          });
+            .post(`/access/idCheck`, header, {
+              params: {
+                memId: `${this.inputText}`,
+              },
+            })
+            .then((data) => {
+              if (data.data) {
+                this.idCheck = true;
+                this.signReg = true;
+              } else {
+                this.idCheck = false;
+                this.signReg = false;
+              }
+            });
       }
     },
     enter() {
@@ -274,9 +272,9 @@ export default {
           this.form(data, "nickName");
           this.inputData.push(data);
           this.addLine(
-            `(sign console) > `,
-            `${this.signHelp[4]}`,
-            `text-color-red`
+              `(sign console) > `,
+              `${this.signHelp[4]}`,
+              `text-color-red`
           );
           this.inputType = "text";
           return;
@@ -285,9 +283,9 @@ export default {
           this.form(data, "phoneChk");
           if ("Y" !== data && "y" !== data) {
             this.addLine(
-              `(sign console) > `,
-              `${this.signHelp[4]}`,
-              `text-color-red`
+                `(sign console) > `,
+                `${this.signHelp[4]}`,
+                `text-color-red`
             );
             return;
           }
@@ -328,9 +326,9 @@ export default {
         case "PW":
         case "PWCheck":
           this.addLine(
-            `(${this.inputData[0]} console) > `,
-            this.printPW(data),
-            ""
+              `(${this.inputData[0]} console) > `,
+              this.printPW(data),
+              ""
           );
           break;
         case "phone":
@@ -359,16 +357,16 @@ export default {
             switch (this.inputData.length) {
               case 1:
                 this.addLine(
-                  `(${this.inputData[0]} console) > `,
-                  `${this.loginHelp[0]}`,
-                  `com`
+                    `(${this.inputData[0]} console) > `,
+                    `${this.loginHelp[0]}`,
+                    `com`
                 );
                 return;
               case 2:
                 this.addLine(
-                  `(${this.inputData[0]} console) > `,
-                  `${this.loginHelp[1]}`,
-                  `com`
+                    `(${this.inputData[0]} console) > `,
+                    `${this.loginHelp[1]}`,
+                    `com`
                 );
                 return;
             }
@@ -422,32 +420,32 @@ export default {
 
       // 자바 로그인 로직 작성 후 주석 해제
       this.axios
-        .post("/access/login", null, {
-          params: {
-            memId: this.inputData[1],
-            memPass: this.inputData[2],
-          },
-        })
-        .then((res) => {
-          if(res.data.isStop) {
-            this.addLine(`(login console) > `, `Login access Fail`, `com`);
-            this.addLine(`(base console) > `, `${this.welcomeHelp[0]}`, `com`);
-            return
-          }
-          if (res.data.role !== "") {
-            this.addLine(`(login console) > `, `success`, `com`);
-            sessionStorage.setItem("token", res.data.token);
-            this.$store.state.global.isLogin = true
-            if(res.data.role === "admin") {
-              this.$router.push("/admin")
-            } else {
-              this.$router.push("/projects")
+          .post("/access/login", null, {
+            params: {
+              memId: this.inputData[1],
+              memPass: this.inputData[2],
+            },
+          })
+          .then((res) => {
+            if(res.data.isStop) {
+              this.addLine(`(login console) > `, `Login access Fail`, `com`);
+              this.addLine(`(base console) > `, `${this.welcomeHelp[0]}`, `com`);
+              return
             }
-          } else {
-            this.addLine(`(login console) > `, `Login access Fail`, `com`);
-            this.addLine(`(base console) > `, `${this.welcomeHelp[0]}`, `com`);
-          }
-        })
+            if (res.data.role !== "") {
+              this.addLine(`(login console) > `, `success`, `com`);
+              sessionStorage.setItem("token", res.data.token);
+              this.$store.state.global.isLogin = true
+              if(res.data.role === "admin") {
+                this.$router.push("/admin")
+              } else {
+                this.$router.push("/projects")
+              }
+            } else {
+              this.addLine(`(login console) > `, `Login access Fail`, `com`);
+              this.addLine(`(base console) > `, `${this.welcomeHelp[0]}`, `com`);
+            }
+          })
       this.baseMode();
     },
 
@@ -467,24 +465,24 @@ export default {
       let header = null;
 
       this.axios
-        .post("/access/sign", header, {
-          params: {
-            memId: signInfo.data.memId,
-            memPass: signInfo.data.memPass,
-            memNick: signInfo.data.memNick,
-            memCelNum: signInfo.data.memCelNum,
-          },
-        })
-        .then((token) => {
-          this.printToken = true;
-          this.addLine(
-            `(sign console) > `,
-            `Your Token : ${token.data}`,
-            `com token`
-          );
-          this.tokenText = token.data;
-          this.sign(signInfo);
-        })
+          .post("/access/sign", header, {
+            params: {
+              memId: signInfo.data.memId,
+              memPass: signInfo.data.memPass,
+              memNick: signInfo.data.memNick,
+              memCelNum: signInfo.data.memCelNum,
+            },
+          })
+          .then((token) => {
+            this.printToken = true;
+            this.tokenPrintIndex = this.consoleText.length
+            this.addLine(
+                `(sign console) > `,
+                `Your Token : ${token.data}`,
+                `com token`
+            );
+            this.tokenText = token.data;
+          })
       this.baseMode();
     },
 
@@ -505,25 +503,25 @@ export default {
       }
 
       this.axios
-        .post(`/access/${url}`, header, { params })
-        .then((data) => {
-          switch (mode) {
-            case "id":
-              this.addLine(
-                `(find console) > `,
-                `Your ID : ${data.data} `,
-                "com"
-              );
-              break;
-            case "pw":
-              if (data.data == true) {
-                this.addLine(`(find console) > `, `${this.etcHelp[1]}`, "com");
-              } else {
-                this.addLine(`(find console) > `, `${this.etcHelp[0]}`, "com");
-              }
-              break;
-          }
-        })
+          .post(`/access/${url}`, header, { params })
+          .then((data) => {
+            switch (mode) {
+              case "id":
+                this.addLine(
+                    `(find console) > `,
+                    `Your ID : ${data.data} `,
+                    "com"
+                );
+                break;
+              case "pw":
+                if (data.data == true) {
+                  this.addLine(`(find console) > `, `${this.etcHelp[1]}`, "com");
+                } else {
+                  this.addLine(`(find console) > `, `${this.etcHelp[0]}`, "com");
+                }
+                break;
+            }
+          })
       this.baseMode();
     },
 
@@ -539,7 +537,7 @@ export default {
       if (this.printToken) {
         navigator.clipboard.writeText(this.tokenText);
       }
-      this.printToken = false;
+      // this.printToken = false;
     },
     focus() {
       document.getElementById("inputBox").focus();
@@ -588,8 +586,8 @@ export default {
         } else {
           this.reservedWord = false;
           if (
-            (this.inputData.length === 2 || this.inputData.length === 3) &&
-            this.inputData[0] !== "find"
+              (this.inputData.length === 2 || this.inputData.length === 3) &&
+              this.inputData[0] !== "find"
           ) {
             this.inputType = "password";
           }
@@ -604,7 +602,7 @@ export default {
 @font-face {
   font-family: "NeoDunggeunmo";
   src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.3/NeoDunggeunmo.woff")
-    format("woff");
+  format("woff");
   font-weight: normal;
   font-style: normal;
 }

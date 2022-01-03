@@ -1,6 +1,5 @@
 <template>
-  <div class="chart-container"
-       :style="{'max-height': maxHeight}">
+  <div class="chart-container" :style="{ 'max-height': maxHeight }">
     <div class="date-container">
       <div class="chart-header">
         <ChevronLeftIcon class="icons" @click="prevMonth" />
@@ -15,12 +14,12 @@
     </div>
     <ul class="chart-bars">
       <li
-        v-for="(task, index) in this.$store.state.gantt.showData"
-        :key="index"
-        @click="showInfo(index)"
+          v-for="(task, index) in this.$store.state.gantt.showData"
+          :key="index"
+          @click="showInfo(index)"
       >
         <span
-          :style="{
+            :style="{
             background: setColor(task.priority),
             width: `${task.progress}%`,
           }"
@@ -31,11 +30,11 @@
       </li>
     </ul>
     <div
-      class="todayLine"
-      :style="{
+        class="todayLine"
+        :style="{
         left: `${todayLineOffsetLeft}px`,
       }"
-      v-if="isToday"
+        v-if="isToday"
     ></div>
   </div>
 </template>
@@ -49,7 +48,6 @@ export default {
   name: "chart",
   data() {
     return {
-      year: "",
       month: "",
       isToday: "true",
       first: true,
@@ -58,7 +56,7 @@ export default {
     };
   },
   props: {
-    maxHeight: String
+    maxHeight: String,
   },
   components: {
     ChevronLeftIcon,
@@ -69,7 +67,7 @@ export default {
     this.renderDate();
     this.getUserInfo();
     this.getGanttData();
-    window.addEventListener('resize', this.render )
+    window.addEventListener("resize", this.render);
   },
   mounted() {
     if (this.first) {
@@ -81,7 +79,7 @@ export default {
     !this.first ? this.renderChart() : (this.first = false);
   },
   unmounted() {
-    window.removeEventListener("resize", this.render)
+    window.removeEventListener("resize", this.render);
   },
   methods: {
     ...mapMutations({
@@ -90,20 +88,23 @@ export default {
       renderChart: "gantt/renderChart",
       setPrevMonth: "gantt/setPrevMonth",
       setShowList: "gantt/setShowList",
-      setNextMonth: "gantt/setNextMonth"
+      setNextMonth: "gantt/setNextMonth",
     }),
     ...mapActions({
       getGanttData: "gantt/getGanttData",
-      getUserInfo: "gantt/getUserInfo"
+      getUserInfo: "gantt/getUserInfo",
     }),
-    render(){
+    render() {
       this.renderTodayLine();
       this.renderChart();
     },
     renderTodayLine() {
       let today = moment().format("YYYY-MM-DD").split("-");
 
-      if (today[1] == this.$store.state.gantt.month) {
+      if (
+          today[1] == this.$store.state.gantt.month &&
+          today[0] == this.$store.state.gantt.year
+      ) {
         this.isToday = true;
       } else {
         this.isToday = false;
@@ -120,23 +121,37 @@ export default {
       this.select(index);
     },
     prevMonth() {
-      for (let key of Object.keys(this.$store.state.gantt.chart.tasks[this.$store.state.gantt.year])) {
-        key
-        this.setPrevMonth()
-        this.setShowList(this.$store.state.gantt.chart.tasks)
-        this.renderDate();
-        break;
+      if (
+          this.$store.state.gantt.chart.tasks[this.$store.state.gantt.year] !=
+          null
+      ) {
+        for (let key of Object.keys(
+            this.$store.state.gantt.chart.tasks[this.$store.state.gantt.year]
+        )) {
+          key;
+          this.setShowList(this.$store.state.gantt.chart.tasks);
+          break;
+        }
       }
+      this.setPrevMonth();
+      this.renderDate();
       this.renderTodayLine();
     },
     nextMonth() {
-      for (let key of Object.keys(this.$store.state.gantt.chart.tasks[this.$store.state.gantt.year])) {
-        key
-        this.setNextMonth()
-        this.setShowList(this.$store.state.gantt.chart.tasks)
-        this.renderDate();
-        break;
+      if (
+          this.$store.state.gantt.chart.tasks[this.$store.state.gantt.year] !=
+          null
+      ) {
+        for (let key of Object.keys(
+            this.$store.state.gantt.chart.tasks[this.$store.state.gantt.year]
+        )) {
+          key;
+          this.setShowList(this.$store.state.gantt.chart.tasks);
+          break;
+        }
       }
+      this.setNextMonth();
+      this.renderDate();
       this.renderTodayLine();
     },
     setColor(str) {
@@ -155,29 +170,41 @@ export default {
     },
     monthName() {
       switch (this.$store.state.gantt.month) {
-        case "01": case 1:
+        case "01":
+        case 1:
           return "January";
-        case "02": case 2:
+        case "02":
+        case 2:
           return "February";
-        case "03": case 3:
+        case "03":
+        case 3:
           return "March";
-        case "04": case 4:
+        case "04":
+        case 4:
           return "April";
-        case "05": case 5:
+        case "05":
+        case 5:
           return "May";
-        case "06": case 6:
+        case "06":
+        case 6:
           return "June";
-        case "07": case 7:
+        case "07":
+        case 7:
           return "July";
-        case "08": case 8:
+        case "08":
+        case 8:
           return "August";
-        case "09": case 9:
+        case "09":
+        case 9:
           return "September";
-        case "10": case 10:
+        case "10":
+        case 10:
           return "October";
-        case "11": case 11:
+        case "11":
+        case 11:
           return "November";
-        case "12": case 12:
+        case "12":
+        case 12:
           return "December";
       }
     },

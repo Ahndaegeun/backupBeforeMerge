@@ -204,6 +204,7 @@ const community = {
                             content: '해당하는 게시물이 없습니다.'
                         }
                         context.commit('boardListNullPush', obj)
+                        context.commit("setSignMember", member)
                         return
                     }
                     for (let item of boardList) {

@@ -1,9 +1,13 @@
 <template>
   <div class="container">
     <h2>Git Commit</h2>
-    <ul class="git-list" v-if="isConnectRepo">
-      <li v-for="item in commitList" :key="item">
-        <a :href="item.link">- {{item.title}}</a>
+    <ul class="git-list" v-if="this.$store.state.dashBoard.gitRepo !== ''">
+      <li v-for="item in this.$store.state.dashBoard.commitList" :key="item">
+        <a :href="item.url">{{item.name}} - {{
+            item.message.length > 10 ?
+                item.message.substring(0, 10) + "..." :
+                item.message
+          }}</a>
       </li>
     </ul>
     <ul class="git-list" v-else>
@@ -13,40 +17,14 @@
 </template>
 
 <script>
-import dotenv from 'dotenv'
-
-dotenv.config()
-
-const API_KEY = process.env.VUE_APP_API_KEY
 
 export default {
   name: "Commit",
   data() {
     return {
-      isConnectRepo: false,
-      commitList: []
     }
   },
-  methods: {
-    getFileList() {
-      console.log(this.$store.state.dashBoard.gitCommit)
-      this.axios.get(`${this.$store.state.dashBoard.gitCommit}`, {
-        headers: {
-          Authorization: `token ${API_KEY}`
-        }
-      })
-          .then(res => {
-            console.log(res)
-          })
-    },
-  },
-  mounted() {
-    const repo = this.$store.state.dashBoard.gitCommit
-    if(repo !== "") {
-      this.isConnectRepo = true
-      this.getFileList()
-    }
-  }
+
 }
 </script>
 

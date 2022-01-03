@@ -97,9 +97,8 @@ public class AccessController {
     }
 
     @PostMapping("/userImg")
-    public Boolean modifyImg(@ModelAttribute MultipartFile file) {
-
-        return false;
+    public void modifyImg(@RequestBody Map<String, Object> map) {
+        memberService.updateMemberImg(map);
     }
 
     @PostMapping("/getMemNick")

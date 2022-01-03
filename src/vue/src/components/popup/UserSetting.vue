@@ -22,8 +22,8 @@
     </li>
     <li class="profile-img">
       <span class="img-wrap">
-        <img v-if="userDetail.memImg === ''" src="@/assets/profile.png" alt="userProfile">
-        <img v-else :src="`@/assets/${userDetail.userImg}`" alt="userProfile">
+        <img v-if="userDetail.memImg === '' || userDetail.memImg === null" :src="changeImg" alt="userProfile">
+        <img v-else :src="userDetail.memImg" alt="userProfile">
       </span>
       <input @change="modifyImg" type="file" class="content" accept="image/*">
     </li>
@@ -37,7 +37,7 @@ export default {
   data() {
     return {
       userDetail: {},
-      changeImg: ""
+      changeImg: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAVCAYAAABG1c6oAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADRSURBVHgBrZQLDYMwEIb/LhMADnAwCasUJOAAHMzCLEwBm4M5AAfg4HYXWNYM+qRfck3T9L70cS3ggIg0R88x0YL0a6TAiS3ZaWNlNfnRMcI+QNjv5SqLkOBnVkqV/4Mn22T4KfYGbcI3/LwQylouPmrEwAmdQ9YhBVrK57lKprWvXTnKI5SD1/hdwCjBtzsicmXfJ2etwaAz5EkVhRW1Ka5csoHiGTbSAzJTWpjCOx3nJi5Fy3IH5KGUp9cgH40IL8jHVbY8wfJzJDCfuXkgIx+zEByVvJWBBgAAAABJRU5ErkJggg=="
     }
   },
   mounted() {
@@ -50,6 +50,7 @@ export default {
     }).then(res => {
       res.data.memPass = "****"
       this.userDetail = res.data
+      console.log(res.data)
     }).catch(err => {
       console.log(err)
     })
@@ -82,11 +83,22 @@ export default {
       form.append("file", file)
       form.append("fileSize", fileSize)
 
-      this.axios.post("/access/userImg", form,
-          {headers: {'Content-Type': 'multipart.form-data'}})
-          .then(res => {
-            console.log(res)
-          })
+      let baseImg = ""
+      const reader = new FileReader()
+      reader.onload = readerEvt => {
+        const binaryString = readerEvt.target.result
+        baseImg = btoa(binaryString)
+        const img = "data:image/png;base64," + baseImg
+        this.changeImg = img
+
+        this.axios.post("/access/userImg", {
+          img: img,
+          token: sessionStorage.getItem("token")
+        })
+
+      }
+      reader.readAsBinaryString(file)
+
     }
   }
 }

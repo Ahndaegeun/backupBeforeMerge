@@ -4,6 +4,7 @@ import com.kanboo.www.domain.entity.member.Member;
 import com.kanboo.www.domain.repository.member.MemberRepository;
 import com.kanboo.www.dto.global.RoleDto;
 import com.kanboo.www.dto.member.MemberDTO;
+import com.kanboo.www.security.JwtSecurityService;
 import com.kanboo.www.service.inter.member.MemberService;
 import com.kanboo.www.util.CreateKTag;
 import com.kanboo.www.util.CreateTempPw;
@@ -14,16 +15,14 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
+    private final JwtSecurityService jwtSecurityService;
 
     @Override
     public MemberDTO loginHandler(MemberDTO memberDTO) {
@@ -167,5 +166,17 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public Long getMaxIndexOfMember(String selected, String key) {
         return memberRepository.getMaxIndexOfMember(selected,key);
+    }
+
+    @Override
+    @Transactional
+    public void updateMemberImg(Map<String, Object> map) {
+        String token = map.get("token") + "";
+        String memTag = jwtSecurityService.getToken(token);
+        Member member = memberRepository.findByMemTag(memTag);
+        if(member != null) {
+            String img = map.get("img") + "";
+            member.changeMemImg(img);
+        }
     }
 }

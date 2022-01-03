@@ -3,7 +3,7 @@
     <div class="write-header">
       <span class="write-title">일감 등록</span>
       <span
-        ><button @click="addTask()" class="write-btn btn">작성</button></span
+      ><button @click="addTask()" class="write-btn btn">작성</button></span
       >
     </div>
     <hr class="write-line" />
@@ -46,11 +46,11 @@
         <th>제목</th>
         <td>
           <input
-            type="text"
-            v-model="inputTitle"
-            id="title_w"
-            placeholder="일감 제목을 입력해주세요"
-            style="width: fit-content"
+              type="text"
+              v-model="inputTitle"
+              id="title_w"
+              placeholder="일감 제목을 입력해주세요"
+              style="width: fit-content"
           />
         </td>
         <th id="startTitle_w">시작일</th>
@@ -70,38 +70,38 @@
         <td>
           <span>
             <input
-              style="width: 230px"
-              type="text"
-              v-model="inputContent"
-              placeholder="일감에 대한 설명을 입력해주세요."
-              id="content_w"
+                style="width: 230px"
+                type="text"
+                v-model="inputContent"
+                placeholder="일감에 대한 설명을 입력해주세요."
+                id="content_w"
             />
           </span>
         </td>
         <th id="endTitle_w">종료일</th>
         <td>
           <input
-            type="text"
-            v-model="inputEnd"
-            @click="isPick(`end`)"
-            id="end_w"
-            placeholder="날짜를 선택하세요"
-            readonly
+              type="text"
+              v-model="inputEnd"
+              @click="isPick(`end`)"
+              id="end_w"
+              placeholder="날짜를 선택하세요"
+              readonly
           />
         </td>
       </tr>
     </table>
     <vue-cal
-      locale="ko"
-      class="vuecal--date-picker"
-      xsmall
-      hide-view-selector
-      :time="false"
-      :transitions="true"
-      active-view="month"
-      :disable-views="['years', 'year', 'week', 'day']"
-      @cell-click="pickDate($event)"
-      v-if="showCalWrite"
+        locale="ko"
+        class="vuecal--date-picker"
+        xsmall
+        hide-view-selector
+        :time="false"
+        :transitions="true"
+        active-view="month"
+        :disable-views="['years', 'year', 'week', 'day']"
+        @cell-click="pickDate($event)"
+        v-if="showCalWrite"
     >
     </vue-cal>
   </div>
@@ -160,16 +160,16 @@ export default {
           break;
       }
       document
-        .querySelector(`#${this.startOrEndInWrite}_w`)
-        .classList.remove("selectDate");
+          .querySelector(`#${this.startOrEndInWrite}_w`)
+          .classList.remove("selectDate");
     },
     isPick(position) {
       this.calWriteOpen();
 
       if (this.startOrEndInWrite != "") {
         document
-          .querySelector(`#${this.startOrEndInWrite}_w`)
-          .classList.remove("selectDate");
+            .querySelector(`#${this.startOrEndInWrite}_w`)
+            .classList.remove("selectDate");
       }
       document.querySelector(`#${position}_w`).classList.add("selectDate");
 
@@ -328,6 +328,8 @@ export default {
   border: none;
   width: 100%;
   text-align: left;
+  height: 80%;
+  margin: 2px;
 }
 
 .write-table th,

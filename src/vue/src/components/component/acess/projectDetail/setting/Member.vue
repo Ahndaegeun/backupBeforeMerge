@@ -20,7 +20,8 @@
             :id="`memberList-${index}`">
           <div class="member-info-div">
             <div class="member-li-img-div">
-              <img :src="item.member.memImg" class="member-img" alt="">
+              <img v-if="item.member.memImg === '' || item.member.memImg === null" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAVCAYAAABG1c6oAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADRSURBVHgBrZQLDYMwEIb/LhMADnAwCasUJOAAHMzCLEwBm4M5AAfg4HYXWNYM+qRfck3T9L70cS3ggIg0R88x0YL0a6TAiS3ZaWNlNfnRMcI+QNjv5SqLkOBnVkqV/4Mn22T4KfYGbcI3/LwQylouPmrEwAmdQ9YhBVrK57lKprWvXTnKI5SD1/hdwCjBtzsicmXfJ2etwaAz5EkVhRW1Ka5csoHiGTbSAzJTWpjCOx3nJi5Fy3IH5KGUp9cgH40IL8jHVbY8wfJzJDCfuXkgIx+zEByVvJWBBgAAAABJRU5ErkJggg==" class="member-img" alt="">
+              <img v-else :src="item.member.memImg" class="member-img" alt="">
             </div>
 
             <div class="member-li-name-div">{{ item.member.memNick }}</div>
@@ -172,7 +173,6 @@ export default {
 }
 
 .member-li-img-div {
-  border-radius: 70%;
   overflow: hidden;
   margin-left: 20px;
 }
@@ -189,6 +189,7 @@ export default {
   width: 40px;
   height: 40px;
   margin-right: 20px;
+  border-radius: 50%;
 }
 
 .member-ul {

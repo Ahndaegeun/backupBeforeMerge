@@ -63,12 +63,15 @@ export default {
         "right": []
       }
 
-      // console.log(this.$store.state.global.isLogin)
+      if (this.$store.state.global.isLogin) {
+        obj.right = this.list.access.right
+      }
 
+      // console.log(this.$store.state.global.isLogin)
       if (path.includes('pdtail')) {
         obj.left = this.list.projectDetail.left
         let right = this.list.projectDetail.right
-        if(!this.$store.state.global.isPm) {
+        if(!this.$store.state.global.isPm && right.length > 11) {
           right.splice(9, 1)
         }
         obj.right = right
@@ -83,6 +86,7 @@ export default {
         }
       })
 
+      console.log(path)
       switch (path) {
         case '/':
           obj.right = this.list.noAccess.home
@@ -108,11 +112,6 @@ export default {
           obj.right = this.list.access.right
           break
       }
-
-      if (this.$store.state.global.isLogin) {
-        obj.right = this.list.access.right
-      }
-
       this.menuList = obj
     }
   },

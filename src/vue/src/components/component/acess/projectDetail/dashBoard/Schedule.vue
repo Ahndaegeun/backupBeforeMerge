@@ -4,14 +4,13 @@
         small
         locale='ko'
         hide-view-selector
-
         :time-from="0 * 60"
         :time-to="24 * 60"
         :transitions="false"
         active-view="week"
         :disable-views="['years', 'year', 'month', 'day']"
         resize-x
-        :events=$store.state.scheduler.dasdfasda
+        :events=this.$store.state.dashBoard.scheduleList
         class="vuecal--dark-theme vuecal--full-height-delete"
         :drag-to-create-event="false"
         ref="vuecal"

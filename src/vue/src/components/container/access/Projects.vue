@@ -6,7 +6,7 @@
     <div class="project-state">
       <div id="project-top">
         <div id="img-div">
-          <img v-if="member.memImg === null" id="profile-img" src="@/assets/profile.png" alt="profile">
+          <img v-if="member.memImg === null || member.memImg === ''" id="profile-img" src="@/assets/profile.png" alt="profile">
           <img v-else id="profile-img" :src="member.memImg">
         </div>
         <div id="nick-div">
@@ -134,7 +134,8 @@ export default {
 
 #profile-img {
   width: 50px;
-  height: 50px
+  height: 50px;
+  border-radius: 50%;
 }
 
 #nick-div {

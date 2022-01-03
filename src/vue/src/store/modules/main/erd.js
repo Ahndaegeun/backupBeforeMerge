@@ -123,8 +123,7 @@ const erd = {
         url: '/erd/createTable',
         method: 'post',
         data: obj
-      }).then(res => {
-        console.log(res)
+      }).then(() => {
         state.sideBarData.topData.push(table)
         state.writeData.tableData = {
           idx: 0,
@@ -140,6 +139,7 @@ const erd = {
           ],
           isModify: false
         }
+        this.commit("erd/addErdData")
       })
 
       state.writeData.isOpen = false
@@ -173,8 +173,6 @@ const erd = {
     // 테이블 수정 완료
     modifyTable(state, item) {
       // axios로 백단으로 쏴서 저장
-      console.log(item)
-
       const obj = {
         project: {
           prjctIdx: sessionStorage.getItem("project")
@@ -222,7 +220,6 @@ const erd = {
           }
 
           table.columns.forEach(column => {
-            console.log(column)
             const col = {
               idx: column.erdColumnIdx,
               name : column.erdColumnName,

@@ -19,7 +19,7 @@ import Notice from './components/popup/Notice.vue'
 import NoticeList from './components/popup/NoticeList.vue'
 import UserSetting from './components/popup/UserSetting.vue'
 import Chat from './components/popup/Chat.vue'
-import {mapMutations} from "vuex";
+import {mapActions, mapMutations} from "vuex";
 // import SocketDetail from './components/container/access/projectDetail/socketDetail.vue'
 
 export default {
@@ -41,6 +41,9 @@ export default {
     ...mapMutations({
       setMemIdx: 'socket/setMemIdx',
       enterProjectAlarm: 'socket/enterProjectAlarm',
+    }),
+    ...mapActions({
+      callDataOfAllChat: "socket/callDataOfAllChat"
     })
   },
   watch: {
@@ -63,6 +66,8 @@ export default {
           sessionStorage.getItem("token") !== null &&
           sessionStorage.getItem("project") !== null) {
         this.$store.state.global.chatOn = true
+        this.$store.state.socket.s_chatData.content = []
+        this.callDataOfAllChat()
 
         if(!this.isEnterProject) {
           this.$store.dispatch("socket/connect")
@@ -75,7 +80,7 @@ export default {
         this.isConnect = false
         this.isEnterProject = false
       }
-    }
+    },
   }
 }
 </script>

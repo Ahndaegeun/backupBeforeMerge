@@ -21,8 +21,7 @@ const adminQnA = {
       target.push(data);
 
       let CommentDTO = {
-        "member.memTag": "#eEG8l",
-        // "member.memTag": sessionStorage.getItem('memTag'),
+        "member.memTag": sessionStorage.getItem('token'),
         "board.boardIdx": data.boardIdx,
         answerCn: data.content,
         answerDate: today,

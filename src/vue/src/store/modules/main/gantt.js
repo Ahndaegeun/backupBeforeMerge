@@ -169,6 +169,8 @@ const gantt = {
           width = 0,
           f_arr = [];
 
+      if(tasks.length > 0) return;
+
       tasks.forEach((el, index) => {
         if(state.showData[index].start.split(" ")[0].split("-")[1] == state.month) {
           let start = state.showData[index].start.split(" ")[0].split("-")[2];
@@ -194,16 +196,18 @@ const gantt = {
         state.month = 12
         state.year--
       } else {
-        state.month = typeof state.month === 'string' ? '0' + --state.month : --state.month
+        state.month = --state.month < 10 ? `0${state.month}` : state.month
       }
+      console.log(state.year+ " " + state.month)
     },
     setNextMonth(state) {
       if(state.month === 12) {
         state.month = "01"
         state.year++
       } else {
-        state.month = typeof state.month === 'string' ? '0' + ++state.month : ++state.month
+        state.month = ++state.month < 10 ? `0${state.month}` : state.month
       }
+      console.log(state.year+ " " + state.month)
     }
   },
   actions: {

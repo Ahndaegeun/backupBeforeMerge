@@ -43,8 +43,7 @@ public class ChattingContentServiceImpl implements ChattingContentService {
 
     @Override
     public List<ChattingContentDTO> getAllChat(Long prjctIdx) {
-        List<ChattingContent> returnList = chattingContentRepository.findAllByPrjctIdxAndMemIdx(
-                prjctIdx);
+        List<ChattingContent> returnList = chattingContentRepository.findByChat_ProjectPrjctIdx(prjctIdx);
         List<ChattingContentDTO> dtoList = new ArrayList<>();
         for (ChattingContent chattingContent : returnList) {
             dtoList.add( chattingContent.entityToDto() );

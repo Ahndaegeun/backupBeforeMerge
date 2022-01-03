@@ -6,8 +6,10 @@ import com.kanboo.www.domain.entity.global.CodeDetail;
 import com.kanboo.www.domain.entity.member.Member;
 import com.kanboo.www.domain.repository.board.BoardRepository;
 import com.kanboo.www.domain.repository.board.CommentRepository;
+import com.kanboo.www.domain.repository.member.MemberRepository;
 import com.kanboo.www.dto.board.BoardDTO;
 import com.kanboo.www.dto.board.CommentDTO;
+import com.kanboo.www.security.JwtSecurityService;
 import com.kanboo.www.service.inter.board.BoardService;
 import com.kanboo.www.service.inter.board.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -24,20 +26,22 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final BoardService boardService;
+    private final MemberRepository memberRepository;
+    private final BoardRepository boardRepository;
+    private final JwtSecurityService jwtSecurityService;
 
     @Override
     public CommentDTO insertComment(CommentDTO commentDTO) {
-        Member member = Member.builder()
-                .memIdx(commentDTO.getMember().getMemIdx())
-                .memNick(commentDTO.getMember().getMemNick())
-                .build();
-        Board board = Board.builder()
-                .boardIdx(commentDTO.getBoard().getBoardIdx())
-                .likesList(new HashSet<>())
-                .reportsList(new HashSet<>())
-                .member(new Member())
-                .codeDetail(new CodeDetail())
-                .build();
+        Member member = null;
+
+        if(commentDTO.getMember().getMemIdx() != null) {
+            member = memberRepository.findByMemIdx(commentDTO.getMember().getMemIdx());
+        } else {
+            String memTag = jwtSecurityService.getToken(commentDTO.getMember().getMemTag());
+            member = memberRepository.findByMemTag(memTag);
+        }
+
+        Board board = boardRepository.findByBoardIdx(commentDTO.getBoard().getBoardIdx());
 
         Comment comment = Comment.builder()
                 .answerCn(commentDTO.getAnswerCn())
