@@ -25,9 +25,16 @@ const gantt = {
     dateList: [],
     memNick: "",
     memIdx: 0,
+    memImg: ''
   },
   mutations: {
     insert(state, payload) {
+      const img = state.memImg === '' ?
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAVCAYAAABG1c6oAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADRSURBVHgBrZQLDYMwEIb/LhMADnAwCasUJOAAHMzCLEwBm4M5AAfg4HYXWNYM+qRfck3T9L70cS3ggIg0R88x0YL0a6TAiS3ZaWNlNfnRMcI+QNjv5SqLkOBnVkqV/4Mn22T4KfYGbcI3/LwQylouPmrEwAmdQ9YhBVrK57lKprWvXTnKI5SD1/hdwCjBtzsicmXfJ2etwaAz5EkVhRW1Ka5csoHiGTbSAzJTWpjCOx3nJi5Fy3IH5KGUp9cgH40IL8jHVbY8wfJzJDCfuXkgIx+zEByVvJWBBgAAAABJRU5ErkJggg==' :
+          state.memImg
+
+      payload[1].img = img
+
       let target = state.chart.tasks[payload[2].start.year][payload[0]];
       target.push(payload[1]);
 
@@ -57,7 +64,7 @@ const gantt = {
               gtTitle : result.data.gtTitle,
               memNick : state.memNick,
               memIdx : result.data.member.memIdx,
-              prjctIdx : result.data.project.prjctIdx
+              prjctIdx : result.data.project.prjctIdx,
             }
             this.commit('socket/ganttAlarm', alarmArr)
           });
@@ -169,7 +176,6 @@ const gantt = {
           width = 0,
           f_arr = [];
 
-      if(tasks.length > 0) return;
 
       tasks.forEach((el, index) => {
         if(state.showData[index].start.split(" ")[0].split("-")[1] == state.month) {
@@ -198,7 +204,6 @@ const gantt = {
       } else {
         state.month = --state.month < 10 ? `0${state.month}` : state.month
       }
-      console.log(state.year+ " " + state.month)
     },
     setNextMonth(state) {
       if(state.month === 12) {
@@ -207,7 +212,11 @@ const gantt = {
       } else {
         state.month = ++state.month < 10 ? `0${state.month}` : state.month
       }
-      console.log(state.year+ " " + state.month)
+    },
+    setMemberInfo(state, payload) {
+      state.memNick = payload.memNick
+      state.memIdx = payload.memIdx
+      state.memImg = payload.memImg
     }
   },
   actions: {
@@ -234,8 +243,10 @@ const gantt = {
                   temp[thisYear[0]][moment().format("MM")] = []
                 }
 
+
                 const obj = {
                   gtIdx: item.gtIdx,
+                  img: item.member.memImg,
                   memNick: item.member.memNick,
                   title: item.gtTitle,
                   content: item.gtExplanation,
@@ -266,8 +277,12 @@ const gantt = {
             token: sessionStorage.getItem("token"),
           })
           .then((result) => {
-            context.state.memNick = result.data.memNick;
-            context.state.memIdx = result.data.memIdx;
+            let payload = {
+              memIdx: result.data.memIdx,
+              memImg: result.data.memImg,
+              memNick: result.data.memNick
+            }
+            context.commit("setMemberInfo", payload)
           });
     },
   },

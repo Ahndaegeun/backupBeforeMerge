@@ -1,6 +1,6 @@
 import axios from 'axios';
 import jsPDF from "jspdf";
-import moment from 'moment'
+// import moment from 'moment'
 import autoTable from "jspdf-autotable";
 import malgun from "@/assets/malgunBase64.js"
 const demand = {
@@ -76,15 +76,6 @@ const demand = {
                 demandCnRm : "",
 
             })
-            const arr = [];
-            for(let item of state.rows) {
-                arr.push({...item});
-            }
-            axios.post('/demand/postRows', {
-                params : arr
-            }).then(() => {
-                state.modifiedDate = moment().format("YYYY-MM-DD HH:mm:SS")
-            })
         },
 
         save(state){
@@ -107,9 +98,7 @@ const demand = {
                 for (const resKey in res.data) {
                     state.rows.push(res.data[resKey])
                 }
-            }).catch(() =>{
-                alert("요구사항 정의서 상세정보를 불러오는데 실패했습니다.");
-            });
+            })
         },
         uploadFile(state){
             let sessionIdx = sessionStorage.getItem("project")
@@ -125,15 +114,13 @@ const demand = {
                     }
                 }).then(() =>{
                     axios.post('/demand/load', {
-                        idx : sessionIdx // 나중에 여기에 스토어에서 프로젝트 데이터 빼오자
+                        idx : sessionIdx
                     }).then(res => {
                         state.rows = [];
                         for (const resKey in res.data) {
                             state.rows.push(res.data[resKey])
                         }
-                    }).catch(() =>{
-                        alert("요구사항 정의서 상세정보를 불러오는데 실패했습니다.");
-                    });
+                    })
                 })
             } else{
                 alert("취소되었습니다.")
@@ -147,7 +134,7 @@ const demand = {
                     method: 'POST',
                     responseType: 'blob',
                     data: {
-                        "idx" : state.rows[0].demand.demandIdx,
+                        "idx" : sessionStorage.getItem("project"),
                         "prjctNm" : state.rows[0].demand.project.prjctNm
                     }
                 }).then((response) => {
@@ -269,6 +256,11 @@ const demand = {
                         let headCheckBox = document.querySelector('.headCheckBox');
                         state.checkedArr = []
                         headCheckBox.checked = false
+                        let allCheckBox = document.querySelectorAll('.demand-table-chk');
+                        allCheckBox.forEach(ele => {
+                            ele.checked = false;
+                        })
+
                     })
                 })
             }else{

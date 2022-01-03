@@ -7,9 +7,7 @@ const setting = {
     userInfo : "",
     clickState  : false,
     projectName : '',
-    roleList : [// 여기에 ajax로 요청한 데이터 들어와야함.
-      'PM','PL','DA','TA','AA','UA','BA','EA','SA'
-    ],
+    roleList : ['PM','PL','DA','TA','AA','UA','BA','EA','SA'],
     projectDate : {},
     projectData : {},
     userInputDate : {
@@ -134,10 +132,12 @@ const setting = {
           params: arr
         }).then(res => {
           res.data.forEach(item => {
-            this.commit('setting/makeRoleList', item)
-            state.projectMemberList.push(item)
+            this.commit('setting/makeRoleList', item);
+            // state.projectMemberList.push(item)
           })
-          state.selectMemberList = []
+          state.projectMemberList = [];
+          this.commit('setting/loadData');
+          state.selectMemberList = [];
         })
       }
     },
@@ -154,42 +154,42 @@ const setting = {
     },
 
     makeRoleList(state, item) {
-        const tempRoleData = {
-          PM : false,
-          PL : false,
-          DA : false,
-          TA : false,
-          AA : false,
-          UA : false,
-          BA : false,
-          EA : false,
-          SA : false
-        }
-        const loadRole = item.prjctMemRole.split(',');
+      const tempRoleData = {
+        PM : false,
+        PL : false,
+        DA : false,
+        TA : false,
+        AA : false,
+        UA : false,
+        BA : false,
+        EA : false,
+        SA : false
+      }
+      const loadRole = item.prjctMemRole.split(',');
 
-        for (let j = 0; j < loadRole.length; j++) {
-          if(loadRole[j] === 'PM'){
-            tempRoleData.PM = true;
-          } else if(loadRole[j] === 'PL'){
-            tempRoleData.PL = true;
-          }else if(loadRole[j] === 'DA'){
-            tempRoleData.DA = true;
-          }else if(loadRole[j] === 'TA'){
-            tempRoleData.TA = true;
-          }else if(loadRole[j] === 'AA'){
-            tempRoleData.AA = true;
-          }else if(loadRole[j] === 'UA'){
-            tempRoleData.UA = true;
-          }else if(loadRole[j] === 'BA'){
-            tempRoleData.BA = true;
-          }else if(loadRole[j] === 'EA'){
-            tempRoleData.EA = true;
-          } else{
-            tempRoleData.SA = true;
-          }
+      for (let j = 0; j < loadRole.length; j++) {
+        if(loadRole[j] === 'PM'){
+          tempRoleData.PM = true;
+        } else if(loadRole[j] === 'PL'){
+          tempRoleData.PL = true;
+        }else if(loadRole[j] === 'DA'){
+          tempRoleData.DA = true;
+        }else if(loadRole[j] === 'TA'){
+          tempRoleData.TA = true;
+        }else if(loadRole[j] === 'AA'){
+          tempRoleData.AA = true;
+        }else if(loadRole[j] === 'UA'){
+          tempRoleData.UA = true;
+        }else if(loadRole[j] === 'BA'){
+          tempRoleData.BA = true;
+        }else if(loadRole[j] === 'EA'){
+          tempRoleData.EA = true;
+        } else{
+          tempRoleData.SA = true;
         }
-        item["roleList"] = loadRole
-        item["tempRoleData"] = tempRoleData
+      }
+      item["roleList"] = loadRole
+      item["tempRoleData"] = tempRoleData
     },
   },
   actions: {

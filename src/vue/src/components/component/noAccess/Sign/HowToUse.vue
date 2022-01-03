@@ -1,19 +1,19 @@
 <template>
-  <div>
+  <div class="container-wrap">
     <div class="how-to-use-container">
       <div class="how-title-box">How To Use</div>
       <div class="how-stack">
         <div
-          class="how-cards"
-          v-for="card in cards"
-          :key="card"
-          :id="`card${card.id}`"
+            class="how-cards"
+            v-for="card in cards"
+            :key="card"
+            :id="`card${card.id}`"
         >
           <div class="how-card">
             <img
-              class="how-card-img"
-              :src="require(`@/assets/${card.img}`)"
-              alt="img"
+                class="how-card-img"
+                :src="require(`@/assets/${card.img}`)"
+                alt="img"
             />
             <div class="how-card-content">
               <div class="how-card-text">
@@ -40,86 +40,73 @@ export default {
     return {
       cards: [
         {
-          id: "7",
-          title: "Voice Chat",
-          content: `This is the space where you can compile within the website. 
-You can simply check the code tests and test results, share them with your team members, and discuss them. 
-How many people can interpret this in English? There doesn't seem to be!`,
-          img: "con3.jpg",
-        },
-        {
-          id: "6",
-          title: "VIEW",
-          content: `This is the space where you can compile within the website. 
-You can simply check the code tests and test results, share them with your team members, and discuss them. 
-How many people can interpret this in English? There doesn't seem to be!`,
-          img: "con1.jpg",
-        },
-        {
           id: "5",
           title: "ERD",
-          content: `This is the space where you can compile within the website. 
-You can simply check the code tests and test results, share them with your team members, and discuss them. 
-How many people can interpret this in English? There doesn't seem to be!`,
-          img: "con3.jpg",
+          content: `It is a tool that can draw erd.
+          Tables can be added, deleted, and relationships can be established.
+          When you're done, you can export it to SQL.`,
+          img: "how-to-use-edr.jpg",
         },
         {
           id: "4",
           title: "demand",
-          content: `This is the space where you can compile within the website. 
-You can simply check the code tests and test results, share them with your team members, and discuss them. 
-How many people can interpret this in English? There doesn't seem to be!`,
-          img: "con1.jpg",
+          content: `It is a tool that can create a demand.
+          Team members can write at the same time and check in real time.
+          Exportable to Excel and PDF.`,
+          img: "how-to-use-demand.jpg",
         },
         {
           id: "3",
           title: "kanban",
-          content: `This is the space where you can compile within the website. 
-You can simply check the code tests and test results, share them with your team members, and discuss them. 
-How many people can interpret this in English? There doesn't seem to be!`,
-          img: "con3.jpg",
+          content: `It is a tool to create a Kanban board.
+          Cards created by team members can be viewed,
+          and your cards can be viewed by other team members.
+          When you're done, move it to the Done column so your team can check it out.`,
+          img: "how-to-use-kanban.jpg",
         },
         {
           id: "2",
           title: "gantt",
-          content: `This is the space where you can compile within the website. 
-You can simply check the code tests and test results, share them with your team members, and discuss them. 
-How many people can interpret this in English? There doesn't seem to be!`,
-          img: "con1.jpg",
+          content: `It is a tool that can draw a Gantt chart.
+          You can check and register your work and the work of your team members.
+          Charts enable efficient task management.
+          Efficient project schedule management through Gantt chart.`,
+          img: "how-to-use-gantt.jpg",
         },
         {
           id: "1",
           title: "compiler",
-          content: `This is the space where you can compile within the website. 
-You can simply check the code tests and test results, share them with your team members, and discuss them. 
-How many people can interpret this in English? There doesn't seem to be!`,
-          img: "con3.jpg",
+          content: `It is a tool that can compile Java and HTML.
+          You can check the result of simple code in real time.
+          Files and folders can be added and can be imported into the main class.
+          Write code with the kanboo compiler and share it with your team`,
+          img: "how-to-use-compiler.jpg",
         },
         {
           id: "0",
           title: "create project",
-          content: `This is the space where you can compile within the website. 
-You can simply check the code tests and test results, share them with your team members, and discuss them. 
-How many people can interpret this in English? There doesn't seem to be!`,
-          img: "con1.jpg",
+          content: `Creating a project is the first step to using kanboo.
+          Experiment with various features of kanboo by creating a project.
+          Compiler, Gantt chart, Kanban board, project board, Git, scheduler, etc. are prepared.`,
+          img: "how-to-use-CP.jpg",
         },
       ],
     };
   },
   methods: {
     swap(i) {
-      for (let j = 0; j < 8; j++) {
+      for (let j = 0; j < this.cards.length; j++) {
         let target = document.getElementById(`card${j}`);
         target.style.animation = "";
       }
 
       let card = this.cards.pop();
       let thisCard = document.getElementById(`card${i}`);
-      thisCard.classList+=(' how-swap')
-      console.log(thisCard)
-      setTimeout( ()=>{
-        thisCard.className = 'how-cards';
-      },2000)
+      thisCard.classList += " how-swap";
+      console.log(thisCard);
+      setTimeout(() => {
+        thisCard.className = "how-cards";
+      }, 2000);
       this.cards.unshift(card);
     },
   },
@@ -127,16 +114,21 @@ How many people can interpret this in English? There doesn't seem to be!`,
 </script>
 
 <style scoped>
+.container-wrap {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .how-to-use-container {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   color: #fff;
-  --y: calc(100vh - 70px);
-  height: var(--y);
   overflow: hidden;
-  margin-top: 70px;
+  width: 100%;
 }
 
 .how-to-use-container,
@@ -147,12 +139,9 @@ How many people can interpret this in English? There doesn't seem to be!`,
 
 .how-stack {
   margin-top: 50px;
-  max-width: 1200px;
-  max-height: 600px;
-  width: 80vw;
+  width: 60vw;
   height: 70vh;
   position: relative;
-  
 }
 
 .how-title-box {
@@ -166,10 +155,10 @@ How many people can interpret this in English? There doesn't seem to be!`,
   padding: 15px;
   background: rgb(44, 47, 59);
   background: linear-gradient(
-    60deg,
-    rgba(44, 47, 59, 1) 8%,
-    rgba(69, 72, 87, 0.9640231092436975) 42%,
-    rgba(116, 120, 138, 1) 81%
+      60deg,
+      rgba(44, 47, 59, 1) 8%,
+      rgba(69, 72, 87, 0.9640231092436975) 42%,
+      rgba(116, 120, 138, 1) 81%
   );
 
   width: 80%;
@@ -183,10 +172,9 @@ How many people can interpret this in English? There doesn't seem to be!`,
   align-items: center;
   border-radius: 2rem;
   box-shadow: 0 5px 25px 0 rgba(236, 237, 247, 0.2),
-    0 15px 25px 0 rgba(12, 124, 209, 0.1);
+  0 15px 25px 0 rgba(12, 124, 209, 0.1);
   transition: transform 2000ms;
   z-index: 3;
-  
 }
 
 .how-cards:nth-last-child(n + 6) {
@@ -224,11 +212,12 @@ How many people can interpret this in English? There doesn't seem to be!`,
   padding: 10px;
   margin: 15px;
   position: relative;
+  display: flex;
 }
 
 .how-card-img {
-  width: 320px;
-  height: 440px;
+  width: 240px;
+  height: 240px;
   float: left;
   margin-right: 50px;
   border-radius: 25px;
@@ -244,7 +233,7 @@ How many people can interpret this in English? There doesn't seem to be!`,
   display: flex;
   flex-direction: column;
   text-align: left;
-  padding: 50px;
+  width: 90%;
   font-size: 22px;
 }
 
@@ -262,7 +251,7 @@ How many people can interpret this in English? There doesn't seem to be!`,
   color: white;
 }
 
-.how-swap{
+.how-swap {
   animation: swap 1200ms forwards;
 }
 

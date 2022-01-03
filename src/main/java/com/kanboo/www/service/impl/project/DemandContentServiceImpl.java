@@ -83,10 +83,12 @@ public class DemandContentServiceImpl implements DemandContentService {
 
     @Override
     public Resource downloadExcel(Long idx) {
+        Demand demand = demandRepository.findByProjectPrjctIdx(idx);
+        Long demandIdx = demand.getDemandIdx();
         XSSFWorkbook workBook = new XSSFWorkbook();
         XSSFSheet sheet = workBook.createSheet("demand");
         List<DemandContentDTO> demandContentDTOList = new ArrayList<>();
-        List<DemandContent> demandContentList = demandContentRepository.findByDemandIdx(idx);
+        List<DemandContent> demandContentList = demandContentRepository.findByDemandIdx(demandIdx);
         for(DemandContent demandContent : demandContentList){
             demandContentDTOList.add(demandContent.entityToDto());
         }
@@ -98,7 +100,8 @@ public class DemandContentServiceImpl implements DemandContentService {
         font.setBold(true);
         titleCellStyle.setAlignment(CellStyle.ALIGN_CENTER);
         titleCellStyle.setFont(font);
-        cell.setCellValue(demandContentDTOList.get(0).getDemand().getProject().getPrjctNm() + " - " + "demand");
+        cell.setCellValue(demand.getProject().getPrjctNm() + " - " + "demand");
+//        cell.setCellValue(demandContentDTOList.get(0).getDemand().getProject().getPrjctNm() + " - " + "demand");
         sheet.addMergedRegion(new CellRangeAddress(0,0,0,6));
         cell.setCellStyle(titleCellStyle);
         row = sheet.createRow(1);
@@ -144,9 +147,14 @@ public class DemandContentServiceImpl implements DemandContentService {
         File f = new File("");
         String basePath = f.getAbsolutePath();
         try {
+//            FileOutputStream fileOutputStream = new FileOutputStream(basePath + "/src/main/resources/storage/demand/excel/save/"+
+//                    demandContentDTOList.get(0).getDemand().getProject().getPrjctNm() + "-" +
+//                    demandContentDTOList.get(0).getDemand().getProject().getPrjctIdx() +  ".xlsx");
+//            workBook.write(fileOutputStream);
+
             FileOutputStream fileOutputStream = new FileOutputStream(basePath + "/src/main/resources/storage/demand/excel/save/"+
-                    demandContentDTOList.get(0).getDemand().getProject().getPrjctNm() + "-" +
-                    demandContentDTOList.get(0).getDemand().getProject().getPrjctIdx() +  ".xlsx");
+                    demand.getProject().getPrjctNm() + "-" +
+                    demand.getProject().getPrjctIdx() + ".xlsx");
             workBook.write(fileOutputStream);
 
         } catch (IOException e) {
@@ -155,8 +163,8 @@ public class DemandContentServiceImpl implements DemandContentService {
 
 
         return new FileSystemResource(basePath + "/src/main/resources/storage/demand/excel/save/"+
-                demandContentDTOList.get(0).getDemand().getProject().getPrjctNm() + "-" +
-                demandContentDTOList.get(0).getDemand().getProject().getPrjctIdx() +  ".xlsx");
+                demand.getProject().getPrjctNm() + "-" +
+                demand.getProject().getPrjctIdx() + ".xlsx");
     }
 
     @Transactional

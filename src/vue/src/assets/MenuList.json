@@ -73,7 +73,7 @@
   "projectDetail": {
     "left": 
       {
-        "name": "projectName",
+        "name": "Project",
         "path": "/pdtail/dashboard",
         "type": "text"
       }

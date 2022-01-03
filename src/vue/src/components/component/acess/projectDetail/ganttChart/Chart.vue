@@ -25,7 +25,8 @@
           }"
         >
         </span>
-        <img src="@/assets/con1.jpg" />
+        <img v-if="task.img === '' || task.img === null" :src="defaultImg" />
+        <img v-else :src="task.img"/>
         <p>{{ task.title }}</p>
       </li>
     </ul>
@@ -48,6 +49,7 @@ export default {
   name: "chart",
   data() {
     return {
+      defaultImg: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAVCAYAAABG1c6oAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADRSURBVHgBrZQLDYMwEIb/LhMADnAwCasUJOAAHMzCLEwBm4M5AAfg4HYXWNYM+qRfck3T9L70cS3ggIg0R88x0YL0a6TAiS3ZaWNlNfnRMcI+QNjv5SqLkOBnVkqV/4Mn22T4KfYGbcI3/LwQylouPmrEwAmdQ9YhBVrK57lKprWvXTnKI5SD1/hdwCjBtzsicmXfJ2etwaAz5EkVhRW1Ka5csoHiGTbSAzJTWpjCOx3nJi5Fy3IH5KGUp9cgH40IL8jHVbY8wfJzJDCfuXkgIx+zEByVvJWBBgAAAABJRU5ErkJggg==",
       month: "",
       isToday: "true",
       first: true,
@@ -121,36 +123,14 @@ export default {
       this.select(index);
     },
     prevMonth() {
-      if (
-          this.$store.state.gantt.chart.tasks[this.$store.state.gantt.year] !=
-          null
-      ) {
-        for (let key of Object.keys(
-            this.$store.state.gantt.chart.tasks[this.$store.state.gantt.year]
-        )) {
-          key;
-          this.setShowList(this.$store.state.gantt.chart.tasks);
-          break;
-        }
-      }
       this.setPrevMonth();
+      this.setShowList(this.$store.state.gantt.chart.tasks);
       this.renderDate();
       this.renderTodayLine();
     },
     nextMonth() {
-      if (
-          this.$store.state.gantt.chart.tasks[this.$store.state.gantt.year] !=
-          null
-      ) {
-        for (let key of Object.keys(
-            this.$store.state.gantt.chart.tasks[this.$store.state.gantt.year]
-        )) {
-          key;
-          this.setShowList(this.$store.state.gantt.chart.tasks);
-          break;
-        }
-      }
       this.setNextMonth();
+      this.setShowList(this.$store.state.gantt.chart.tasks);
       this.renderDate();
       this.renderTodayLine();
     },
