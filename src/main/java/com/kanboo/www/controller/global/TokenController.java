@@ -1,7 +1,9 @@
 package com.kanboo.www.controller.global;
 
 import com.kanboo.www.domain.entity.member.Member;
+import com.kanboo.www.domain.entity.project.Project;
 import com.kanboo.www.domain.repository.member.MemberRepository;
+import com.kanboo.www.domain.repository.project.ProjectRepository;
 import com.kanboo.www.security.JwtSecurityService;
 import com.kanboo.www.service.inter.member.PageRoleCheckService;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ public class TokenController {
     private final JwtSecurityService jwtSecurityService;
     private final PageRoleCheckService pageRoleCheckService;
     private final MemberRepository memberRepository;
+    private final ProjectRepository projectRepository;
 
     @PostMapping("/check")
     public Map<String, Object> tokenCheck(@RequestBody Map<String, Object> map) {
@@ -54,5 +57,28 @@ public class TokenController {
         String token = map.get("token") + "";
         Long projectIdx = map.get("projectIdx") != null ? Long.parseLong(map.get("projectIdx") + "") : null;
         return pageRoleCheckService.checkProject(token, projectIdx);
+    }
+
+    @PostMapping("/pmCheck")
+    public Map<String, Object> pmCheck(@RequestBody Map<String, Object> map) {
+        Map<String, Object> resultMap = new HashMap<>();
+        String token = map.get("token") + "";
+        Long projectIdx = map.get("projectIdx") != null ? Long.parseLong(map.get("projectIdx") + "") : null;
+
+        resultMap.put("isRole", false);
+        resultMap.put("isPm", false);
+
+        String memTag = jwtSecurityService.getToken(token);
+        if(memTag != null) {
+            Member member = memberRepository.findByMemTag(memTag);
+            if(member.getMemIdx() != null) {
+                resultMap.put("isRole", true);
+                Project project = projectRepository.findByPrjctIdx(projectIdx);
+                if(project.getPrjctManager().equals(member.getMemId())) {
+                    resultMap.put("isPm", true);
+                }
+            }
+        }
+        return resultMap;
     }
 }

@@ -11,6 +11,7 @@
             type="text"
             placeholder="Name"
             id="name"
+            :style="inputNameStyle"
           />
           <input
             class="create-input"
@@ -72,6 +73,7 @@ export default {
       inputEndDay: "",
       thisDay: "",
       showCalendar: false,
+      inputNameStyle: {}
     };
   },
   components: {
@@ -128,6 +130,17 @@ export default {
         return;
       }
 
+      const reg = /[ㄱ-ㅎㅏ-ㅣ가-힣]/g
+      if(reg.test(this.inputName) || (this.inputName.search(/\s/) !== -1)) {
+        this.inputNameStyle.boxShadow = "0px 0px 40px 40px #dd323e"
+        this.inputNameStyle.transition = "all 0.7s ease-in-out"
+        setTimeout(() => {
+          this.inputNameStyle.boxShadow = "none"
+        }, 1000);
+        clearTimeout();
+        return
+      }
+
       let start = moment(this.inputStartDay, "YYYY-MM-DD");
       let end = moment(this.inputEndDay, "YYYY-MM-DD");
 
@@ -150,7 +163,6 @@ export default {
         return;
       }
 
-
       const params = new URLSearchParams()
       params.append("prjctNm", this.inputName)
       params.append("prjctStartDate", this.inputStartDay)
@@ -160,13 +172,9 @@ export default {
       this.axios
         .post("/pdtail/createProject", params)
         .then((result) => {
-          console.log(result);
           this.changeIsModalOpen()
           this.addCreatedProject(result.data)
         })
-        .catch((err) => {
-          console.error(err);
-        });
 
 
     },

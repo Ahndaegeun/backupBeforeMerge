@@ -23,6 +23,7 @@
     <li class="profile-img">
       <span class="img-wrap">
         <img v-if="userDetail.memImg === '' || userDetail.memImg === null" :src="changeImg" alt="userProfile">
+        <img v-else-if="isChange" :src="changeImg">
         <img v-else :src="userDetail.memImg" alt="userProfile">
       </span>
       <input @change="modifyImg" type="file" class="content" accept="image/*">
@@ -37,7 +38,8 @@ export default {
   data() {
     return {
       userDetail: {},
-      changeImg: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAVCAYAAABG1c6oAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADRSURBVHgBrZQLDYMwEIb/LhMADnAwCasUJOAAHMzCLEwBm4M5AAfg4HYXWNYM+qRfck3T9L70cS3ggIg0R88x0YL0a6TAiS3ZaWNlNfnRMcI+QNjv5SqLkOBnVkqV/4Mn22T4KfYGbcI3/LwQylouPmrEwAmdQ9YhBVrK57lKprWvXTnKI5SD1/hdwCjBtzsicmXfJ2etwaAz5EkVhRW1Ka5csoHiGTbSAzJTWpjCOx3nJi5Fy3IH5KGUp9cgH40IL8jHVbY8wfJzJDCfuXkgIx+zEByVvJWBBgAAAABJRU5ErkJggg=="
+      changeImg: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAVCAYAAABG1c6oAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADRSURBVHgBrZQLDYMwEIb/LhMADnAwCasUJOAAHMzCLEwBm4M5AAfg4HYXWNYM+qRfck3T9L70cS3ggIg0R88x0YL0a6TAiS3ZaWNlNfnRMcI+QNjv5SqLkOBnVkqV/4Mn22T4KfYGbcI3/LwQylouPmrEwAmdQ9YhBVrK57lKprWvXTnKI5SD1/hdwCjBtzsicmXfJ2etwaAz5EkVhRW1Ka5csoHiGTbSAzJTWpjCOx3nJi5Fy3IH5KGUp9cgH40IL8jHVbY8wfJzJDCfuXkgIx+zEByVvJWBBgAAAABJRU5ErkJggg==",
+      isChange: false
     }
   },
   mounted() {
@@ -50,26 +52,19 @@ export default {
     }).then(res => {
       res.data.memPass = "****"
       this.userDetail = res.data
-      console.log(res.data)
-    }).catch(err => {
-      console.log(err)
     })
   },
   methods: {
     modify() {
       const reqData = {...this.userDetail}
-      console.log(reqData)
       this.axios({
         url: '/access/userModify',
         method: 'post',
         data: reqData
-      }).then(res => {
-        console.log(res)
-      }).catch(err => {
-        console.log(err)
       })
     },
     modifyImg(e) {
+      this.isChange = false
       const files = e.target.files
       const file = files[0]
       const maxSize = 5 * 1024 * 1024
@@ -90,10 +85,13 @@ export default {
         baseImg = btoa(binaryString)
         const img = "data:image/png;base64," + baseImg
         this.changeImg = img
-
         this.axios.post("/access/userImg", {
           img: img,
           token: sessionStorage.getItem("token")
+        }).then(() => {
+          this.isChange = true
+        }).catch(() => {
+          this.isChange = false
         })
 
       }

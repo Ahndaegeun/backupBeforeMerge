@@ -120,7 +120,7 @@
         "type": "text"
       },
       {
-        "name": "ERD & View",
+        "name": "ERD",
         "path": "/pdtail/erdview/erd",
         "type": "text"
       },

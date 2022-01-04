@@ -2,7 +2,7 @@
   <div>
     <div class="home-video-box">
       <div class="home-bg-video">
-        <video src="@/assets/videoBanner.webm" autoplay muted></video>
+        <video src="@/assets/videoBanner.webm" autoplay loop muted></video>
         <router-link class="start" to="/demo">Start Now</router-link>
       </div>
     </div>
@@ -16,16 +16,17 @@ export default {};
 <style scoped>
 .home-video-box video {
   display: block;
-  width: 1900px;
   height: calc(100vh - 70px);
   margin: auto;
   -webkit-user-drag: none;
   -khtml-user-drag: none;
   -moz-user-drag: none;
   -o-user-drag: none;
+  transform: scale(1.3);
 }
 
 .home-bg-video{
+  overflow: hidden;
   position: relative;
   display: flex;
   justify-content: center;

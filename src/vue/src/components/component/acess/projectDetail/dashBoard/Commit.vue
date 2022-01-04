@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <h2>Git Commit</h2>
-    <ul class="git-list" v-if="this.$store.state.dashBoard.gitRepo !== ''">
+    <ul class="git-list" v-if="this.$store.state.dashBoard.gitCommit !== '' && this.$store.state.dashBoard.gitCommit !== null">
       <li v-for="item in this.$store.state.dashBoard.commitList" :key="item">
         <a :href="item.url">{{item.name}} - {{
             item.message.length > 10 ?
@@ -11,7 +11,7 @@
       </li>
     </ul>
     <ul class="git-list" v-else>
-      <li><a href="/pdtail/gitIssue">Git Repository 주소를 입력해 주세요</a></li>
+      <li><a href="/pdtail/gitIssue">Enter the Git Repository Address</a></li>
     </ul>
   </div>  
 </template>

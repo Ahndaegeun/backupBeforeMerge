@@ -38,6 +38,8 @@ const projectList = {
       })
     },
     addCreatedProject(state, item) {
+      item.calendarList = []
+      item.issueList = []
       state.projectList.push(item)
     },
     listRest(state) {

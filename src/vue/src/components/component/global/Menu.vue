@@ -63,27 +63,27 @@ export default {
         "right": []
       }
 
-      if (this.$store.state.global.isLogin) {
+      if (sessionStorage.getItem("isLogin")) {
         obj.right = this.list.access.right
       }
       // console.log(this.$store.state.global.isLogin)
       if (path.includes('pdtail')) {
         obj.left = this.list.projectDetail.left
-        let right = this.list.projectDetail.right
-        if(!this.$store.state.global.isPm && right.length > 11) {
-          right.splice(9, 1)
-        }
+        const right = this.list.projectDetail.right
+        // if(!this.$store.state.global.isPm && right.length > 11) {
+        //   right.splice(9, 1)
+        // }
         obj.right = right
       } else {
         obj.left = this.list.noAccess.left
       }
 
-      let pushSettingBtn = true
-      this.list.access.right.forEach(item => {
-        if (item.name === "userSetting") {
-          pushSettingBtn = false
-        }
-      })
+      // let pushSettingBtn = true
+      // this.list.access.right.forEach(item => {
+      //   if (item.name === "userSetting") {
+      //     pushSettingBtn = false
+      //   }
+      // })
 
       switch (path) {
         case '/':
@@ -91,7 +91,7 @@ export default {
           break
         case '/community/free':
         case '/community/qna':
-          if(!this.$store.state.global.isLogin) {
+          if(sessionStorage.getItem("isLogin") !== 'true') {
             obj.right = this.list.noAccess.community
           }
           break
@@ -102,13 +102,13 @@ export default {
           obj.right = this.list.noAccess.home
           break
         case '/projects':
-          if (pushSettingBtn) {
-            this.list.access.right.push({
-              "name": "userSetting",
-              "path": "#",
-              "type": "img"
-            })
-          }
+          // if (pushSettingBtn) {
+          //   this.list.access.right.push({
+          //     "name": "userSetting",
+          //     "path": "#",
+          //     "type": "img"
+          //   })
+          // }
           obj.right = this.list.access.right
           break
       }

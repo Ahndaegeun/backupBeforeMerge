@@ -39,8 +39,11 @@ const roleCheck = (repData) => {
     method: repData.method,
     data: repData.data
   }).then(res => {
-    if(res.data.isPm !== null) {
+    if(res.data.isPm !== null && repData.url.includes("pmCheck")) {
       store.commit("global/setIsPm", res.data.isPm)
+    } else if(repData.url.includes("pmCheck")) {
+      alert("PM만 접근 가능합니다.")
+      repData.next(repData.falsePath)
     }
 
     if(res.data.isRole) {
@@ -312,20 +315,20 @@ const routes = [
       {
         path: "setting",
         component: Setting,
-        // beforeEnter: (to, from, next) => {
-        //   const repData = {
-        //     url : '/token/pmCheck',
-        //     method : 'post',
-        //     falsePath: '/projects',
-        //     next: next,
-        //     data: {
-        //       projectIdx: sessionStorage.getItem("project"),
-        //       token : sessionStorage.getItem("token")
-        //     }
-        //   }
-        //
-        //   roleCheck(repData)
-        // }
+        beforeEnter: (to, from, next) => {
+          const repData = {
+            url : '/token/pmCheck',
+            method : 'post',
+            falsePath: '/pdtail/dashboard',
+            next: next,
+            data: {
+              projectIdx: sessionStorage.getItem("project"),
+              token : sessionStorage.getItem("token")
+            }
+          }
+
+          roleCheck(repData)
+        }
       },
     ]
   },
@@ -334,6 +337,7 @@ const routes = [
     beforeEnter: (to, from, next) => {
       sessionStorage.removeItem('token')
       sessionStorage.removeItem("project")
+      sessionStorage.removeItem("isLogin")
       next('/')
     }
   },

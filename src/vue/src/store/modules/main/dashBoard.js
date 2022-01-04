@@ -82,21 +82,14 @@ const dashBoard = {
         }
     },
     actions: {
-        saveReadMe(context, contents) {
-            context.state.isUpdate = false
+        saveReadMe(context) {
             const url = "/pdtail/saveReadMe"
             axios.post(url, null, {
                 params: {
                     prjctIdx: sessionStorage.getItem("project"),
-                    prjctReadMe: contents
+                    prjctReadMe: context.state.readMeContent
                 }
             })
-                .then(res => {
-                    if (res) {
-                        context.commit("setReadMeContent", contents)
-                        context.state.isUpdate = true
-                    }
-                })
         },
         mountGetData(context) {
             moment.locale("en")
@@ -110,7 +103,6 @@ const dashBoard = {
                     context.commit("setMemberList", res.data.projectMemberList)
                     const end = moment(res.data.project.prjctEndDate, "YYYY-MM-DD")
                     const now = moment()
-
                     context.commit("setFinishDay", Math.floor(moment.duration(end.diff(now)).asDays()))
                     context.commit("setReadMeContent", res.data.project.prjctReadMe)
                     context.commit("setBoardList", res.data.boardList)
@@ -120,7 +112,7 @@ const dashBoard = {
                     context.commit("setGitRepo", res.data.git.gitRepo)
 
                     let result = ''
-                    if(res.data.git.gitRepo !== null && res.data.git.gitRepo !== '') {
+                    if(res.data.git.gitRepo !== null && res.data.git.gitRepo !== '' && res.data.git.gitRepo !== undefined) {
                         result = res.data.git.gitRepo.substring(0, res.data.git.gitRepo.lastIndexOf("/")) + "/commits"
                         axios.get(result, {
                             headers: {

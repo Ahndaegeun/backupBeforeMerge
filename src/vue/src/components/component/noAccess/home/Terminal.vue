@@ -436,7 +436,7 @@ export default {
               if (res.data.role !== "") {
                 this.addLine(`(login console) > `, `success`, `com`);
                 sessionStorage.setItem("token", res.data.token);
-                this.$store.state.global.isLogin = true
+                sessionStorage.setItem("isLogin", true)
 
                 if(res.data.role === "admin") {
                   this.$router.push("/admin")

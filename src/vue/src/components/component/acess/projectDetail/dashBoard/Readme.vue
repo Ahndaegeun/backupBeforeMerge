@@ -1,6 +1,9 @@
 <template>
   <div class="container">
-    <h2>README.md</h2>
+    <div class="read-me-top-wrap">
+      <h2>README.md</h2>
+      <button class="save-readme-btn" @click="saveReadMe">save</button>
+    </div>
     <v-md-editor v-model="this.$store.state.dashBoard.readMeContent"
                  @change="updateReadMe"
                   height="480px"/>
@@ -8,7 +11,7 @@
 </template>
 
 <script>
-import {mapActions} from "vuex";
+import {mapActions, mapMutations} from "vuex";
 
 export default {
   name: "readme",
@@ -19,10 +22,15 @@ export default {
   },
   methods: {
     ...mapActions({
-      saveReadMe: 'dashBoard/saveReadMe'
+      saveReadMe: 'dashBoard/saveReadMe',
+    }),
+    ...mapMutations({
+      setReadMeContent: 'dashBoard/setReadMeContent'
     }),
     updateReadMe(origin) {
-      this.saveReadMe(origin)
+      if(this.isMount) {
+        this.setReadMeContent(origin)
+      }
     }
   },
   mounted() {
@@ -44,11 +52,24 @@ export default {
 
 h2 {
   font-size: 32px;
-  margin-bottom: 10px;
 }
 
 h2 span {
   font-size: 24px;
 }
 
+.read-me-top-wrap {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.save-readme-btn {
+  color: #999;
+  transition: color .2s ease-in;
+}
+
+.save-readme-btn:hover {
+  color: #fff;
+}
 </style>
