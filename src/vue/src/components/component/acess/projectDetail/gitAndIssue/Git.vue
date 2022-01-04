@@ -12,7 +12,7 @@
         />
       </div>
       <div class="repoContent" v-else>
-        <div class="text-wrap">
+        <div class="git-text-wrap">
           <input type="text" class="repoInputText" @keyup.enter="setRepoAdd"
                  placeholder="UserName/Repository를 입력해주세요. " size="30">
         </div>
@@ -209,11 +209,10 @@ export default {
     },
     insertRepoAdd() {
       const url = 'gitAndIssue/insertRepo'
-      const prjctIdx = this.prjctIdx
 
       this.axios.post(url, null, {
         params: {
-          'project.prjctIdx': prjctIdx,
+          'project.prjctIdx': sessionStorage.getItem("project"),
           gitRepo: this.tempAdd,
         }
       })
@@ -274,10 +273,11 @@ export default {
   outline: none;
 }
 
-.text-wrap {
+.git-text-wrap {
   display: flex;
   height: 100%;
   justify-content: center;
   align-content: center;
+  position: initial;
 }
 </style>

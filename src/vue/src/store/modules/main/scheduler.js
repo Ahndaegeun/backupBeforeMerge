@@ -29,6 +29,43 @@ const scheduler = {
         }
       ],
       memInfo_scheduler:'',
+      filters : [
+        {
+          filterName : 'all',
+          koName : '전체',
+          isClick: true
+        },
+        {
+          filterName : 'common',
+          koName : '공통',
+          isClick: false
+        },
+        {
+          filterName : 'individual',
+          koName : '개인',
+          isClick: false
+        },
+        {
+          filterName : 'notice',
+          koName : '공지',
+          isClick: false
+        },
+        {
+          filterName : 'emergency',
+          koName : '긴급',
+          isClick: false
+        },
+        {
+          filterName : 'vacation',
+          koName : '휴가',
+          isClick: false
+        },
+        {
+          filterName : 'note',
+          koName : '기타',
+          isClick: false
+        },
+      ],
     }
   },
   mutations: {
@@ -53,6 +90,24 @@ const scheduler = {
         }
       }
     },
+    checkBoxClick(state, item) {
+      state.data = state.secondData
+      if(item.isClick) {
+        item.isClick = false
+        state.filters.forEach(i => {
+          i.isClick = false
+        })
+        state.filters[0].isClick = true
+        // 전체로 checked 되니 전체 데이터를 뿌려주는 함수 호출해야함
+        this.commit('scheduler/setDataToSecondData')
+        return
+      }
+      state.filters.forEach(i => {
+        i.isClick = false
+      })
+      item.isClick = true
+      this.commit('scheduler/setFilterValue', item.filterName)
+    },
     setCallAddFunction(state){
       state.callAddFunction = !state.callAddFunction
       if(state.callAddFunction) {
@@ -63,21 +118,13 @@ const scheduler = {
       this.commit('scheduler/copyDataFunction')
       state.filterValue = e
       const copy = [...state.secondData]
-
-      if(state.showAllDayEvents === 2){
-        for(let i = 0; i < copy.length; i++){
-          if(copy[i].allDay === true){
-            copy.splice(i, 1)
-          }
-        }
-      }
-
       if(state.filterValue !== 'all'){
         let filtered = copy.filter( (v)=>(v.class === state.filterValue) )
         state.data = filtered
         state.filteredData = filtered
       }else if(state.filterValue === 'all'){
-        state.data = state.secondData
+        // state.data = state.secondData
+        this.commit('scheduler/setDataToSecondData')
       }
     },
     setModalTrue(state){
@@ -121,14 +168,6 @@ const scheduler = {
     },
     setDataToSecondData(state){
       const copy = [...state.secondData]
-
-      if(state.showAllDayEvents === 2){
-        for(let i = 0; i < copy.length; i++){
-          if(copy[i].allDay === true){
-            copy.splice(i, 1)
-          }
-        }
-      }
       state.data = copy
     },
     setMemInfo_scheduler(state, data){

@@ -23,7 +23,7 @@
             <option value="boardCN">Content</option>
           </select>
           <input type="text" class="search-input" @keyup.enter="sendingSelected" v-model="key">
-          <img src="@/assets/돋보기2.png" @click="sendingSelected">
+          <img src="@/assets/zoom.png" @click="sendingSelected">
         </div>
       </div>
       <div class="body-router">

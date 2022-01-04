@@ -22,9 +22,7 @@ export default {
       saveReadMe: 'dashBoard/saveReadMe'
     }),
     updateReadMe(origin) {
-      if(this.isMount && this.$store.state.dashBoard.isUpdate) {
-        this.saveReadMe(origin)
-      }
+      this.saveReadMe(origin)
     }
   },
   mounted() {

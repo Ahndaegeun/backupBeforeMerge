@@ -25,7 +25,8 @@
             <div class="me-or-other-wrap">
               <!-- 상대방의 채팅에만 사진,닉네임 표시 시작 -->
               <div v-if="this.$store.state.git.memInfo.memNick != line.id" class="chat-userInfo">
-                <img :src="require(`@/assets/${line.img}`)" alt="img" />
+                <img v-if="line.img === '' || line.img === null" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAVCAYAAABG1c6oAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADRSURBVHgBrZQLDYMwEIb/LhMADnAwCasUJOAAHMzCLEwBm4M5AAfg4HYXWNYM+qRfck3T9L70cS3ggIg0R88x0YL0a6TAiS3ZaWNlNfnRMcI+QNjv5SqLkOBnVkqV/4Mn22T4KfYGbcI3/LwQylouPmrEwAmdQ9YhBVrK57lKprWvXTnKI5SD1/hdwCjBtzsicmXfJ2etwaAz5EkVhRW1Ka5csoHiGTbSAzJTWpjCOx3nJi5Fy3IH5KGUp9cgH40IL8jHVbY8wfJzJDCfuXkgIx+zEByVvJWBBgAAAABJRU5ErkJggg==" alt="img" />
+                <img v-else :src="line.img" alt="">
                 {{ line.id }}
               </div>
               <!-- 상대방의 채팅에만 사진,닉네임 표시 끝 -->
@@ -78,7 +79,7 @@ export default {
   },
   mounted() {
     this.sendTokenInfo()
-    if(this.s_chatData === null || this.s_chatData.content.length === 0)this.callDataOfAllChat()
+    if(this.s_chatData.content === null || this.s_chatData.content.length > 1)this.callDataOfAllChat()
   },
   computed : {
     ...mapState({
@@ -118,11 +119,15 @@ export default {
       let date = moment().format('HH:mm')
       const prjctIdx = this.prjctIdx
       if (this.inputText !== "") {
+        let userImg = this.$store.state.git.memInfo.memImg
+        if(userImg === '' || userImg === null) {
+          userImg = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAVCAYAAABG1c6oAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADRSURBVHgBrZQLDYMwEIb/LhMADnAwCasUJOAAHMzCLEwBm4M5AAfg4HYXWNYM+qRfck3T9L70cS3ggIg0R88x0YL0a6TAiS3ZaWNlNfnRMcI+QNjv5SqLkOBnVkqV/4Mn22T4KfYGbcI3/LwQylouPmrEwAmdQ9YhBVrK57lKprWvXTnKI5SD1/hdwCjBtzsicmXfJ2etwaAz5EkVhRW1Ka5csoHiGTbSAzJTWpjCOx3nJi5Fy3IH5KGUp9cgH40IL8jHVbY8wfJzJDCfuXkgIx+zEByVvJWBBgAAAABJRU5ErkJggg=='
+        }
         const arr = {
           id : this.$store.state.git.memInfo,
           text : this.inputText,
           date : date,
-          img : this.img,
+          img : userImg,
           prjctIdx : prjctIdx,
         }
         this.callMessageSocket(arr)

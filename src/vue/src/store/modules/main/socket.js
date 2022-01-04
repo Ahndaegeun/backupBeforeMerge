@@ -105,7 +105,7 @@ const socket = {
                 id : arr.id,
                 text : arr.text,
                 date : moment().format('YYYY-MM-DD')+'T'+ arr.date,
-                img : 'con1.jpg',
+                img : arr.img,
                 originDate : moment().format('YYYY-MM-DD')+' '+ arr.date,
             }
             this.commit('socket/pushToS_chatDataContent', temp)
@@ -121,7 +121,7 @@ const socket = {
             state.receivedChat.text = arr.text
             state.receivedChat.date = arr.date
             state.receivedChat.prjctIdx = arr.prjctIdx
-
+            state.receivedChat.img = arr.textAreaText
             if(sessionStorage.getItem('project') != arr.prjctIdx ) return
 
             const temp = {
@@ -129,7 +129,7 @@ const socket = {
                 id : arr.memNick,
                 text : arr.text,
                 date : moment().format('YYYY-MM-DD')+'T'+ arr.date,
-                img : 'profile.png',
+                img : arr.textAreaText,
                 originDate : moment().format('YYYY-MM-DD')+' '+ arr.date,
                 prjctIdx : arr.prjctIdx,
             }
@@ -281,7 +281,8 @@ const socket = {
                     memNick: arr.id.memNick,
                     text: arr.text,
                     date : arr.date,
-                    prjctIdx : arr.prjctIdx
+                    prjctIdx : arr.prjctIdx,
+                    textAreaText: arr.img
                 }
                 this.stompClient.send("/receive", JSON.stringify(msg), {})
             }
@@ -336,8 +337,8 @@ const socket = {
     },
     actions : {
         connect(state){
-            const serverURL = "http://192.168.46.11:8099/"
-            // const serverURL = "http://localhost:8099/"
+            // const serverURL = "http://192.168.46.11:8099/"
+            const serverURL = "http://adg0807.cafe24.com/ws"
             let socket = new SockJS(serverURL)
             this.stompClient = Stomp.over(socket)
             this.stompClient.debug = () => {}
@@ -380,12 +381,9 @@ const socket = {
                             }
 
                             // watch들 호출하기
-                        }else if(userName !== null && userName !== '' && message !== null && message !== '' && textAreaText === null){
+                        }else if(userName !== null && userName !== '' && message !== null && message !== ''){
                             this.commit('socket/setReceivedChatting',arr)
                             this.commit('socket/increaseReceiveChatCnt')
-                        }else if(textAreaText != null){
-                            this.commit('socket/setTextArea_Text', textAreaText)
-                            this.commit('socket/increaseTextAreaCnt')
                         }
                     })
                     this.stompClient.unsubscribe("/send")
@@ -398,7 +396,6 @@ const socket = {
         callAxiosForChatLog(state, arr){
             const url = '/socket/insertChatLog'
             const header = null
-
             //토큰에서 받아오는 memIdx이어야함
             const memIdx = arr.id.memIdx
 
@@ -415,7 +412,6 @@ const socket = {
         },
 
         callDataOfAllChat(){
-
             const url = '/socket/selectAllChatLog'
             axios.get( url, {
                 params : {
@@ -427,7 +423,7 @@ const socket = {
                 let tempImg = ''
                 for(let i = 0; i < data.chat.length; i++){
                     if(data.chat[i].chat.member.memImg === '' || data.chat[i].chat.member.memImg === null){
-                        tempImg ='profile.png'
+                        tempImg ='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAVCAYAAABG1c6oAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADRSURBVHgBrZQLDYMwEIb/LhMADnAwCasUJOAAHMzCLEwBm4M5AAfg4HYXWNYM+qRfck3T9L70cS3ggIg0R88x0YL0a6TAiS3ZaWNlNfnRMcI+QNjv5SqLkOBnVkqV/4Mn22T4KfYGbcI3/LwQylouPmrEwAmdQ9YhBVrK57lKprWvXTnKI5SD1/hdwCjBtzsicmXfJ2etwaAz5EkVhRW1Ka5csoHiGTbSAzJTWpjCOx3nJi5Fy3IH5KGUp9cgH40IL8jHVbY8wfJzJDCfuXkgIx+zEByVvJWBBgAAAABJRU5ErkJggg=='
                     }else{
                         tempImg = data.chat[i].chat.member.memImg
                     }

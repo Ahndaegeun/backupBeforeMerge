@@ -42,8 +42,8 @@
             <input class="endDate" type="text" placeholder="End Date..." @click="setEndIndex" v-model="this.endDate" readonly>
           </span>
 
-          <vue-timepicker :minute-range="[0]"  drop-direction="auto"  auto-scroll v-model="this.startTimePicker"></vue-timepicker>
-          <vue-timepicker :minute-range="[0]"  drop-direction="auto"  auto-scroll v-model="this.endTimePicker"></vue-timepicker>
+          <vue-timepicker :minute-range="[0]"  drop-direction="auto" auto-scroll v-model="this.startTimePicker"></vue-timepicker>
+          <vue-timepicker :minute-range="[0]"  drop-direction="auto" auto-scroll v-model="this.endTimePicker"></vue-timepicker>
         </div>
 
         <div class="rightInput">
@@ -327,7 +327,11 @@ export default {
 
       }
       this.pushData(arr)
-      this.pushSecondData(arr)
+
+      // if(this.$store.state.scheduler.filters !== 'all') {
+        this.pushSecondData(arr)
+      // }
+
       if(copy.length !== this.$store.state.scheduler.data.length){
         this.resetValue()
       }
@@ -360,7 +364,6 @@ export default {
               isClick: true,
               koName: "전체"
             }
-            this.setDataToSecondData()
             this.checkBoxClick(filter)
 
             // 여기서 소켓 알람 호출

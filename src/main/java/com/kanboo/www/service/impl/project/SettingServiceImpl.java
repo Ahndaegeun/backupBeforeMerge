@@ -3,8 +3,10 @@ package com.kanboo.www.service.impl.project;
 import com.kanboo.www.domain.entity.global.Role;
 import com.kanboo.www.domain.entity.member.Member;
 import com.kanboo.www.domain.entity.member.ProjectMember;
+import com.kanboo.www.domain.entity.project.Chat;
 import com.kanboo.www.domain.entity.project.Project;
 import com.kanboo.www.domain.repository.member.MemberRepository;
+import com.kanboo.www.domain.repository.project.ChattingRepository;
 import com.kanboo.www.domain.repository.project.ProjectMemberRepository;
 import com.kanboo.www.domain.repository.project.ProjectRepository;
 import com.kanboo.www.dto.member.MemberDTO;
@@ -25,6 +27,7 @@ public class SettingServiceImpl implements SettingService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final MemberRepository memberRepository;
+    private final ChattingRepository chattingRepository;
 
     @Override
     public List<ProjectMemberDTO> getProjectMemberData(Long prjctIdx) {
@@ -43,7 +46,6 @@ public class SettingServiceImpl implements SettingService {
                     .build();
             projectMemberDTOList.add(buildProjectMember.entityToDto());
         }
-        System.out.println(projectMemberDTOList);
         return projectMemberDTOList;
     }
 
@@ -101,6 +103,14 @@ public class SettingServiceImpl implements SettingService {
                     .project(projectDto)
                     .prjctMemRole(save.getPrjctMemRole())
                     .build();
+
+            Chat chat = Chat.builder()
+                    .member(member)
+                    .project(project)
+                    .build();
+
+            chattingRepository.save(chat);
+
             resultList.add(pmDto);
         });
 

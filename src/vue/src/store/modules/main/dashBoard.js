@@ -31,7 +31,6 @@ const dashBoard = {
             state.memberList = item
         },
         setFinishDay(state, day) {
-            console.log(day)
             state.finishDay = day
         },
         setBoardList(state, list) {
@@ -76,7 +75,7 @@ const dashBoard = {
         },
         setGitRepo(state, repo) {
             let result = ""
-            if(repo !== "") {
+            if(repo !== "" && repo !== null) {
                 result = repo.substring(0, repo.lastIndexOf("/")) + "/commits"
             }
             state.gitCommit = result
@@ -120,29 +119,35 @@ const dashBoard = {
                     context.commit("setProgress", res.data.ganttList)
                     context.commit("setGitRepo", res.data.git.gitRepo)
 
-                    const result = res.data.git.gitRepo.substring(0, res.data.git.gitRepo.lastIndexOf("/")) + "/commits"
-                    axios.get(result, {
-                        headers: {
-                            Authorization: `token ${API_KEY}`
-                        }
-                    })
-                        .then(git => {
-                            context.state.commitList = []
-                            let i = 0
-                            git.data.forEach(item => {
-                                if(i > 6) {
-                                    return false
-                                }
-                                const obj = {
-                                    name: item.commit.author.name,
-                                    message: item.commit.message,
-                                    url: item.html_url
-                                }
-                                context.state.commitList.push(obj)
-                                i++
-                            })
-                            this.repo = context.state.gitRepo
+                    let result = ''
+                    if(res.data.git.gitRepo !== null && res.data.git.gitRepo !== '') {
+                        result = res.data.git.gitRepo.substring(0, res.data.git.gitRepo.lastIndexOf("/")) + "/commits"
+                        axios.get(result, {
+                            headers: {
+                                Authorization: `token ${API_KEY}`
+                            }
                         })
+                            .then(git => {
+                                context.state.commitList = []
+                                let i = 0
+                                git.data.forEach(item => {
+                                    if(i > 6) {
+                                        return false
+                                    }
+                                    const obj = {
+                                        name: item.commit.author.name,
+                                        message: item.commit.message,
+                                        url: item.html_url
+                                    }
+                                    context.state.commitList.push(obj)
+                                    i++
+                                })
+                                this.repo = context.state.gitRepo
+                            })
+                    } else {
+                        this.repo = ''
+                    }
+
 
                 })
         }

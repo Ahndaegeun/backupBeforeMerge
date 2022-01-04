@@ -66,7 +66,6 @@ export default {
       if (this.$store.state.global.isLogin) {
         obj.right = this.list.access.right
       }
-
       // console.log(this.$store.state.global.isLogin)
       if (path.includes('pdtail')) {
         obj.left = this.list.projectDetail.left
@@ -86,14 +85,15 @@ export default {
         }
       })
 
-      console.log(path)
       switch (path) {
         case '/':
           obj.right = this.list.noAccess.home
           break
         case '/community/free':
         case '/community/qna':
-          obj.right = this.list.noAccess.community
+          if(!this.$store.state.global.isLogin) {
+            obj.right = this.list.noAccess.community
+          }
           break
         case '/signin':
           obj.right = this.list.noAccess.sign
@@ -114,6 +114,7 @@ export default {
       }
       this.menuList = obj
     }
+
   },
 
 }
