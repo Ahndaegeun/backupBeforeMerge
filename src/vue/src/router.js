@@ -39,7 +39,7 @@ const roleCheck = (repData) => {
     method: repData.method,
     data: repData.data
   }).then(res => {
-    if(res.data.isPm !== null && repData.url.includes("pmCheck")) {
+    if(res.data.isPm !== false && repData.url.includes("pmCheck")) {
       store.commit("global/setIsPm", res.data.isPm)
     } else if(repData.url.includes("pmCheck")) {
       alert("PM만 접근 가능합니다.")
@@ -99,6 +99,8 @@ const routes = [
     path: '/projects',
     component: Projects,
     beforeEnter: (to, from, next) => {
+      sessionStorage.removeItem("project")
+      sessionStorage.setItem("enterProject", '0')
       const repData = {
         url : '/token/check',
         method : 'post',
@@ -132,6 +134,10 @@ const routes = [
   {
     path: "/pdtail",
     component: ProjectDetail,
+    beforeEnter: () => {
+      const cnt = sessionStorage.getItem("enterProject")
+      sessionStorage.setItem("enterProject", (parseInt(cnt) + 1) + "")
+    },
     children: [
       {
         path: "dashboard",

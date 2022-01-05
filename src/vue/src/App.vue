@@ -62,9 +62,12 @@ export default {
         })
       }
 
+      const cnt = sessionStorage.getItem("enterProject")
       if(to.path.includes('pdtail') &&
           sessionStorage.getItem("token") !== null &&
-          sessionStorage.getItem("project") !== null) {
+          sessionStorage.getItem("project") !== null &&
+          parseInt(cnt) < 2) {
+
         this.$store.state.global.chatOn = true
         this.$store.state.socket.s_chatData.content = []
         this.callDataOfAllChat()

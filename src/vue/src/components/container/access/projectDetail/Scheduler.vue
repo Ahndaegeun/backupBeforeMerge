@@ -104,9 +104,7 @@
 </template>
 
 <script>
-
 // npm install vue3-timepicker --save
-
 import MonthCalendar from '@/components/component/acess/projectDetail/scheduler/MonthCalendar.vue'
 import WeekCalendar from '@/components/component/acess/projectDetail/scheduler/WeekCalendar.vue'
 import Filter from '@/components/component/acess/projectDetail/scheduler/Filter.vue'
@@ -118,8 +116,8 @@ import VueCal from 'vue-cal'
 
 import '../../../../../node_modules/vue-cal/dist/vuecal.css'
 import '../../../../../node_modules/vue-cal/dist/drag-and-drop.js'
-import '../../../../assets/js/ko.js'
-import '../../../../assets/css/blackTheme.css'
+import '@/assets/js/ko.js'
+import '@/assets/css/blackTheme.css'
 
 export default {
   name: 'Scheduler',
@@ -328,9 +326,9 @@ export default {
       }
       this.pushData(arr)
 
-      // if(this.$store.state.scheduler.filters !== 'all') {
+      if(!this.$store.state.scheduler.filters[0].isClick) {
         this.pushSecondData(arr)
-      // }
+      }
 
       if(copy.length !== this.$store.state.scheduler.data.length){
         this.resetValue()

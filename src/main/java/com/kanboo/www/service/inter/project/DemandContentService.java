@@ -20,5 +20,5 @@ public interface DemandContentService {
 
     void deleteDemandContent(Long demandIdx, Long demandCnIdx);
 
-    ResponseEntity<?> importDocument(MultipartFile[] uploadFile, Long demandIdx);
+    String importDocument(MultipartFile uploadFile, Long demandIdx);
 }

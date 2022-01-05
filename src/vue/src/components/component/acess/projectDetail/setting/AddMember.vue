@@ -213,6 +213,8 @@ export default {
   width : 170px;
   height : 30px;
   margin : 10px;
+  color: #fff;
+  outline: none;
 }
 .search-member-result-list{
   overflow-x: hidden;

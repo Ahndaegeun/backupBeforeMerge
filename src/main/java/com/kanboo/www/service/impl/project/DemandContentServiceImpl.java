@@ -146,12 +146,11 @@ public class DemandContentServiceImpl implements DemandContentService {
         }
         File f = new File("");
         String basePath = f.getAbsolutePath();
-        try {
-//            FileOutputStream fileOutputStream = new FileOutputStream(basePath + "/src/main/resources/storage/demand/excel/save/"+
-//                    demandContentDTOList.get(0).getDemand().getProject().getPrjctNm() + "-" +
-//                    demandContentDTOList.get(0).getDemand().getProject().getPrjctIdx() +  ".xlsx");
-//            workBook.write(fileOutputStream);
+        File f2 = new File(basePath + "/src/main/resources/storage/demand/excel/save");
 
+
+        if(!f2.exists()) f2.mkdirs();
+        try {
             FileOutputStream fileOutputStream = new FileOutputStream(basePath + "/src/main/resources/storage/demand/excel/save/"+
                     demand.getProject().getPrjctNm() + "-" +
                     demand.getProject().getPrjctIdx() + ".xlsx");
@@ -242,24 +241,27 @@ public class DemandContentServiceImpl implements DemandContentService {
 
     @Transactional
     @Override
-    public ResponseEntity<?> importDocument(MultipartFile[] uploadFile, Long projectIdx) {
+    public String importDocument(MultipartFile uploadFile, Long projectIdx) {
         Demand demand = demandRepository.findByProjectPrjctIdx(projectIdx);
         File f = new File("");
         String basePath = f.getAbsolutePath();
         String uploadFolder = basePath + "/src/main/resources/storage/demand/excel/userInput";
+
         File uploadPath = new File(uploadFolder);
-        for(MultipartFile multipartFile : uploadFile){
-            String uploadFileName = multipartFile.getOriginalFilename();
-            uploadFileName = uploadFileName.substring(uploadFileName.lastIndexOf("/") + 1);
-            File saveFile = new File(uploadPath, uploadFileName);
-            try {
-                multipartFile.transferTo(saveFile);
-                checkDocument(demand.getDemandIdx(), saveFile);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        if(!uploadPath.exists()) uploadPath.mkdirs();
+
+
+        String uploadFileName = uploadFile.getOriginalFilename();
+        uploadFileName = uploadFileName.substring(uploadFileName.lastIndexOf("/") + 1);
+        File saveFile = new File(uploadPath, uploadFileName);
+        try {
+            uploadFile.transferTo(saveFile);
+            checkDocument(demand.getDemandIdx(), saveFile);
+        } catch (IOException e) {
+            return null;
         }
-        return ResponseEntity.ok("??");
+
+        return "ok";
     }
 
 

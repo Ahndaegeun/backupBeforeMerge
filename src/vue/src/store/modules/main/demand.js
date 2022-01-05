@@ -101,30 +101,32 @@ const demand = {
             })
         },
         uploadFile(state){
+            // if(confirm("업로드 시 기존 요구사항 내용이 삭제됩니다. 진행하시겠습니까?") === true){
+            const frm = new FormData();
+            let uploadFile = document.getElementById("uploadFile");
             let sessionIdx = sessionStorage.getItem("project")
-            if(confirm("업로드 시 기존 요구사항 내용이 삭제됩니다. 진행하시겠습니까?") === true){
-                const frm = new FormData();
-                let uploadFile = document.getElementById("uploadFile");
-
-                frm.append("uploadFile", uploadFile.files[0]);
-                frm.append('demandIdx', sessionIdx);
-                axios.post('/demand/importDocument', frm, {
-                    headers : {
-                        'Content-Type' : 'multipart/form-data'
-                    }
-                }).then(() =>{
+            frm.append("uploadFile", uploadFile.files[0]);
+            frm.append('demandIdx', sessionIdx);
+            axios.post('/demand/importDocument', frm, {
+                headers : {
+                    'Content-Type' : 'multipart/form-data'
+                }
+            }).then((e) =>{
+                // 리턴 확인해야함
+                if(e.data === 'ok'){
                     axios.post('/demand/load', {
-                        idx : sessionIdx
+                        idx : sessionStorage.getItem("project")
                     }).then(res => {
                         state.rows = [];
                         for (const resKey in res.data) {
                             state.rows.push(res.data[resKey])
                         }
                     })
-                })
-            } else{
-                alert("취소되었습니다.")
-            }
+                }
+            })
+            // } else{
+            //     alert("취소되었습니다.")
+            // }
         },
         down(state, event){
             let input = event.target.value;

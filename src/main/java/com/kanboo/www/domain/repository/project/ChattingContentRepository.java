@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface ChattingContentRepository extends JpaRepository<ChattingContent, Long>, ChattingContentDslRepository {
     List<ChattingContent> findByChat_ProjectPrjctIdx(Long prjctIdx);
+    List<ChattingContent> findByChat_ProjectPrjctIdxOrderByChatCnDate(Long prjctIdx);
 }

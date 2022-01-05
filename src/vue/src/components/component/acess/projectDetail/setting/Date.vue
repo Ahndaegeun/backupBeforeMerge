@@ -75,8 +75,6 @@ export default {
       this.clickStart = false;
       this.clickEnd = false;
       this.checkDate(this.$store.state.setting.projectData.prjctStartDate, this.$store.state.setting.projectData.prjctEndDate)
-      console.log(this.$store.state.setting.projectData.prjctStartDate)
-      console.log(this.$store.state.setting.projectData.prjctEndDate)
     },
     clickStartDateFunction(){
       if(this.modalState === false){ this.modalState = true; this.clickStart = true;}
@@ -104,13 +102,8 @@ export default {
         this.$store.state.setting.projectData.prjctStartDate = axiosStartDate;
         this.$store.state.setting.projectData.prjctEndDate = axiosEndDate;
 
-        console.log("changeDate")
         axios.post('/setting/changeProjectDate', {
           params: this.$store.state.setting.projectData
-        }).then(() => {
-          console.log("잘됨ㅋㅋ");
-        }).catch( () => {
-
         })
       }
 
@@ -146,6 +139,7 @@ export default {
 }
 .date-input{
   background-color : #414556;
+  color: #FFFFFF;
   border : 0px;
   border-radius : 5px;
   width : 300px;

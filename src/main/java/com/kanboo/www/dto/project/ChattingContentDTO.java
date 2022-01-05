@@ -21,7 +21,7 @@ public class ChattingContentDTO {
     private ChatDTO chat;
     private String chatCn;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime chatCnDate;
 
     public ChattingContent dtoToEntity() {

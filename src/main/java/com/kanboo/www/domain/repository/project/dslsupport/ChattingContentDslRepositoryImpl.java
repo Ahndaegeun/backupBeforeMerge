@@ -36,16 +36,16 @@ public class ChattingContentDslRepositoryImpl implements ChattingContentDslRepos
 		// 1:1 은 innerJoin
 
 		return query.selectFrom(qChattingContent)
-				.rightJoin(qChattingContent.chat, qChat)
+				.leftJoin(qChattingContent.chat, qChat)
 				.fetchJoin()
 				.innerJoin(qChat.project, qProject)
 				.fetchJoin()
-				.rightJoin(qChat.member, qMember)
+				.innerJoin(qChat.member, qMember)
 				.fetchJoin()
 				.leftJoin(qMember.ban, qBan)
 				.fetchJoin()
-				.where(qChattingContent.chat.project.prjctIdx.eq(prjctIdx))
+				.where(qProject.prjctIdx.eq(prjctIdx))
+				.orderBy(qChattingContent.chatCnDate.asc())
 				.fetch();
-
 	}
 }

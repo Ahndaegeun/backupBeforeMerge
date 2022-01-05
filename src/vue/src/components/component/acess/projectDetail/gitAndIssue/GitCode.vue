@@ -50,6 +50,9 @@ export default {
     ...mapMutations({
       getDecodeData : 'git/getDecodeData',
       setMaxLineNum : 'git/setMaxLineNum',
+      setDecodeData : 'git/setDecodeData',
+      setSelectedFileName: 'git/setSelectedFileName',
+      setSelectedFileSize: 'git/setSelectedFileSize'
     }),
     highlighter(code){
       return highlight(code, languages.js)
@@ -63,12 +66,13 @@ export default {
     },
   },
   mounted() {
+    this.setDecodeData("")
+    this.setSelectedFileName("")
+    this.setSelectedFileSize(0)
     this.input_S_decodeData()
   },
   updated(){
     this.callMaxLineNum()
-  },
-  watch : {
   },
 }
 </script>

@@ -296,6 +296,7 @@ export default {
           this.inputPriority == "" ? this.detail.priority : this.inputPriority,
         progress:
           this.inputProgress == "" ? this.detail.progress : this.inputProgress,
+        img: this.$store.state.gantt.memImg
       };
 
       this.update(payload);

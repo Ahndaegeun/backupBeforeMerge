@@ -116,7 +116,7 @@ export default {
       this.inputText = e.target.value;
     },
     sendMessage() {
-      let date = moment().format('HH:mm')
+      let date = moment().format('HH:mm:ss')
       const prjctIdx = this.prjctIdx
       if (this.inputText !== "") {
         let userImg = this.$store.state.git.memInfo.memImg

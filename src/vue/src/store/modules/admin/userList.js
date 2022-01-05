@@ -95,7 +95,7 @@ const userList = {
             for (let item of result.data) {
               context.commit("setMembers", {
                 tag: item.memTag,
-                id: item.memId,
+                id: item.memNick,
                 memIdx: item.memIdx,
                 banIdx: item.ban != null ? item.ban.banIdx : "",
                 start:
@@ -119,7 +119,7 @@ const userList = {
             for (let item of result.data) {
               context.commit("setMembers", {
                 tag: item.memTag,
-                id: item.memId,
+                id: item.memNick,
                 memIdx: item.memIdx,
                 banIdx: item.ban != null ? item.ban.banIdx : "",
                 start:

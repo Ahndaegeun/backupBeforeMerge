@@ -18,7 +18,7 @@
     </li>
     <li class="password">
       <span class="badge">Password</span>
-      <input class="content" v-model="userDetail.memPass">
+      <input type="password" class="content" v-model="userDetail.memPass">
     </li>
     <li class="profile-img">
       <span class="img-wrap">
@@ -33,6 +33,8 @@
 </template>
 
 <script>
+import {mapMutations} from "vuex";
+
 export default {
   name: "userSetting",
   data() {
@@ -55,12 +57,17 @@ export default {
     })
   },
   methods: {
+    ...mapMutations({
+      userSettingClick: 'menu/userSettingClick'
+    }),
     modify() {
       const reqData = {...this.userDetail}
       this.axios({
         url: '/access/userModify',
         method: 'post',
         data: reqData
+      }).then(() => {
+        this.userSettingClick()
       })
     },
     modifyImg(e) {

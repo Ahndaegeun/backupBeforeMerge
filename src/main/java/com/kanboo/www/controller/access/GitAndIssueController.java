@@ -56,7 +56,6 @@ public class GitAndIssueController {
 
 	@PostMapping("/insertRepo")
 	public void insertRepo(GitDTO gitDTO){
-		System.out.println(gitDTO);
 		gitService.insertRepoAddress(gitDTO);
 	}
 }

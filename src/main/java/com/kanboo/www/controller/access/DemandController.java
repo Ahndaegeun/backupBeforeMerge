@@ -31,10 +31,8 @@ public class DemandController {
 
     @PostMapping("/load")
     public List<DemandContentDTO> loadDemandContent(@RequestBody Map<String, String> map){
-        String mapIdx = map.get("idx");
-        Long idx = Long.parseLong(mapIdx);
-        List<DemandContentDTO> list = demandContentService.loadDemandContent(idx);
-        return list;
+        Long idx = Long.parseLong(map.get("idx") +"");
+        return demandContentService.loadDemandContent(idx);
     }
     @PostMapping("/deleteRows")
     public void deleteDemandContent(@RequestBody Map<String, List<DemandContentDTO>> map){
@@ -50,9 +48,9 @@ public class DemandController {
         }
     }
 
-
+    //imprtDocument 수정
     @PostMapping("/importDocument")
-    public ResponseEntity<?> importDocument(@ModelAttribute MultipartFile[] uploadFile, String demandIdx){
+    public String importDocument(@ModelAttribute MultipartFile uploadFile, String demandIdx){
         Long idx = Long.parseLong(demandIdx);
         return demandContentService.importDocument(uploadFile, idx);
     }
@@ -64,22 +62,15 @@ public class DemandController {
         File f = new File("");
         String absolutePath = f.getAbsolutePath();
         String mapIdx = map.get("idx");
-//        String prjctNm = map.get("prjctNm"); // prjctNm vue에서 받아야디ㅗ고 확장자도 받아야한다 균창아
         Long idx = Long.parseLong(mapIdx);
-//        String fileName = prjctNm + "-" + idx + ".xlsx";
         Resource resource = demandContentService.downloadExcel(idx);
-        //해당 파일이 없을 때
-        if (!resource.exists()) {
-            System.out.println("파일이 없누");
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         String resourceName = resource.getFilename();
         HttpHeaders headers = new HttpHeaders();
         try {
             headers.add("Content-disposition", "attachment;fileName=" +
                     new String(resourceName != null ? resourceName.getBytes(StandardCharsets.UTF_8) : new byte[0],"ISO-8859-1"));
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            return null;
         }
         return new ResponseEntity<>(resource, headers, HttpStatus.OK);
     }

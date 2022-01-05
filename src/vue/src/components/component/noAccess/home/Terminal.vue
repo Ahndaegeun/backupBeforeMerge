@@ -375,7 +375,7 @@ export default {
             switch (this.inputData.length) {
               case 1: // 아이디 안내문 출력
                 this.addLine(`(sign console) > `, `${this.signHelp[0]}`, `com`);
-                this.inputType = "password";
+                this.inputType = "text";
                 return;
               case 2: // 비번 안내문
                 this.addLine(`(sign console) > `, `${this.signHelp[1]}`, `com`);
@@ -450,6 +450,25 @@ export default {
             }
           })
       this.baseMode();
+    },
+
+    copyToClipboard(textToCopy) {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(textToCopy);
+      } else {
+        let textArea = document.createElement("textarea");
+        textArea.value = textToCopy;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        return new Promise((res, rej) => {
+          document.execCommand('copy') ? res() : rej();
+          textArea.remove();
+        });
+      }
     },
 
     signAccess() {
@@ -538,7 +557,7 @@ export default {
     },
     copyToken() {
       if (this.printToken) {
-        navigator.clipboard.writeText(this.tokenText);
+        this.copyToClipboard(this.tokenText)
       }
       // this.printToken = false;
     },
