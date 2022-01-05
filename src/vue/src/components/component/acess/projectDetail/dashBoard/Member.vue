@@ -17,30 +17,7 @@
 export default {
   name: "Member",
   data() {
-    return {
-      memList: [
-        {
-          memRole: "PL",
-          memId: "kade87",
-          memCode: "#8Ad9FX"
-        },
-        {
-          memRole: "PL",
-          memId: "kade87",
-          memCode: "#8Ad9FX"
-        },
-        {
-          memRole: "PL",
-          memId: "kade87",
-          memCode: "#8Ad9FX"
-        },
-        {
-          memRole: "PL",
-          memId: "kade87",
-          memCode: "#8Ad9FX"
-        },
-      ]
-    }
+    return {}
   }
 }
 </script>

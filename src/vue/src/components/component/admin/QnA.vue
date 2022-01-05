@@ -23,7 +23,7 @@
           <span class="board-writer">{{ data.memNick }}</span>
           <span class="board-date">{{ getDate(data.date) }}</span>
         </p>
-        <p class="card-body">{{ data.content }}</p>
+        <p class="card-body" v-html="data.content"></p>
         <input
             type="text"
             @keyup.enter="addReply(index)"

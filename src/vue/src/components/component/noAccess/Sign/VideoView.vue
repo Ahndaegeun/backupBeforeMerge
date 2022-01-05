@@ -22,7 +22,7 @@ export default {};
   -khtml-user-drag: none;
   -moz-user-drag: none;
   -o-user-drag: none;
-  transform: scale(1.3);
+  transform: scale(1.2);
 }
 
 .home-bg-video{

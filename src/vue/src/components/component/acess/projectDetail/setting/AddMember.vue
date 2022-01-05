@@ -6,7 +6,8 @@
         <li v-for="(item, index) in this.$store.state.setting.selectMemberList" :key="index" class="select-member-info"
             :id="`select-member-info${index}`">
           <div class="select-member-image">
-            <img :src="item.memImg" class="member-image" alt=""/>
+            <img v-if="item.memImg === '' || item.memImg === null || item.memImg === undefined" class="member-image" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAVCAYAAABG1c6oAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADRSURBVHgBrZQLDYMwEIb/LhMADnAwCasUJOAAHMzCLEwBm4M5AAfg4HYXWNYM+qRfck3T9L70cS3ggIg0R88x0YL0a6TAiS3ZaWNlNfnRMcI+QNjv5SqLkOBnVkqV/4Mn22T4KfYGbcI3/LwQylouPmrEwAmdQ9YhBVrK57lKprWvXTnKI5SD1/hdwCjBtzsicmXfJ2etwaAz5EkVhRW1Ka5csoHiGTbSAzJTWpjCOx3nJi5Fy3IH5KGUp9cgH40IL8jHVbY8wfJzJDCfuXkgIx+zEByVvJWBBgAAAABJRU5ErkJggg==">
+            <img v-else :src="item.memImg" class="member-image"/>
           </div>
           <div class="select-member-text">
             {{item.memNick}}
@@ -41,7 +42,8 @@
              leftTextHideFunction()" v-for="(item, index) in
              this.$store.state.setting.searchMemberList" :key="index" class="search-member-result">
           <div class="search-member-result-image">
-            <img :src="item.img" class="member-image" alt=""/>
+            <img v-if="item.memImg === '' || item.memImg === null || item.memImg === undefined" class="member-image" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAVCAYAAABG1c6oAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADRSURBVHgBrZQLDYMwEIb/LhMADnAwCasUJOAAHMzCLEwBm4M5AAfg4HYXWNYM+qRfck3T9L70cS3ggIg0R88x0YL0a6TAiS3ZaWNlNfnRMcI+QNjv5SqLkOBnVkqV/4Mn22T4KfYGbcI3/LwQylouPmrEwAmdQ9YhBVrK57lKprWvXTnKI5SD1/hdwCjBtzsicmXfJ2etwaAz5EkVhRW1Ka5csoHiGTbSAzJTWpjCOx3nJi5Fy3IH5KGUp9cgH40IL8jHVbY8wfJzJDCfuXkgIx+zEByVvJWBBgAAAABJRU5ErkJggg==">
+            <img v-else :src="item.memImg" class="member-image"/>
           </div>
           <div class="search-member-result-text">
             {{item.memNick}}&nbsp;

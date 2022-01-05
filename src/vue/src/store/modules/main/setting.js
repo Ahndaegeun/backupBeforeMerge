@@ -39,6 +39,9 @@ const setting = {
     },
 
     loadData(state){
+      state.searchMemberList = []
+      state.selectMemberList = []
+      state.projectMemberList = []
       let idx = sessionStorage.getItem("project")
       axios.post('/setting/loadProjectMember', {
         prjctIdx : idx
@@ -61,7 +64,6 @@ const setting = {
           state.projectMemberList[i].tempRoleData = tempRoleData
 
           const loadRole = state.projectMemberList[i].prjctMemRole.split(',');
-
           for (let j = 0; j < loadRole.length; j++) {
             if(loadRole[j] === 'PM'){
               state.projectMemberList[i].tempRoleData.PM = true;
@@ -79,7 +81,7 @@ const setting = {
               state.projectMemberList[i].tempRoleData.BA = true;
             }else if(loadRole[j] === 'EA'){
               state.projectMemberList[i].tempRoleData.EA = true;
-            } else{
+            }else if(loadRole[j] === 'SA'){
               state.projectMemberList[i].tempRoleData.SA = true;
             }
           }
@@ -128,18 +130,17 @@ const setting = {
           };
           arr.push(obj);
         }
-        axios.post('/setting/addProjectMember', {
-          params: arr
-        }).then(res => {
-          res.data.forEach(item => {
-            this.commit('setting/makeRoleList', item);
-            // state.projectMemberList.push(item)
-          })
-          state.projectMemberList = [];
-          this.commit('setting/loadData');
-          state.selectMemberList = [];
-        })
       }
+      axios.post('/setting/addProjectMember', {
+        params: arr
+      }).then(res => {
+        res.data.forEach(item => {
+          this.commit('setting/makeRoleList', item);
+        })
+        state.projectMemberList = [];
+        this.commit('setting/loadData');
+        state.selectMemberList = [];
+      })
     },
 
     getUserInfo(state){

@@ -59,6 +59,13 @@ export default {
         color: '#FF8906'
       },
 
+      roleItemStyle: {
+        pm: {
+          color: ""
+        },
+        sa: {}
+      }
+
     }
   },
   methods: {
@@ -206,7 +213,6 @@ export default {
   margin-right: 25px;
   color: white;
   cursor:pointer
-
 }
 
 .red {
