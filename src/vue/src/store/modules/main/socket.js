@@ -122,11 +122,13 @@ const socket = {
             state.receivedChat.date = arr.date
             state.receivedChat.prjctIdx = arr.prjctIdx
             state.receivedChat.img = arr.textAreaText
+            state.receivedChat.idx = arr.idx
             if(sessionStorage.getItem('project') != arr.prjctIdx ) return
 
             const temp = {
                 // id는 꼭 로그인한 id나 idx로 값을 입력해줘야함
                 id : arr.memNick,
+                idx : arr.memIdx,
                 text : arr.text,
                 date : moment().format('YYYY-MM-DD')+'T'+ arr.date,
                 img : arr.textAreaText,
@@ -279,6 +281,7 @@ const socket = {
             if(this.stompClient && this.stompClient.connected) {
                 const msg = {
                     memNick: arr.id.memNick,
+                    memIdx : arr.id.memIdx,
                     text: arr.text,
                     date : arr.date,
                     prjctIdx : arr.prjctIdx,
@@ -429,6 +432,7 @@ const socket = {
                     }
                     const arr = {
                         id : data.chat[i].chat.member.memNick,
+                        idx : data.chat[i].chat.member.memIdx,
                         text : data.chat[i].chatCn,
                         img : tempImg,
                         date : data.chat[i].chatCnDate,

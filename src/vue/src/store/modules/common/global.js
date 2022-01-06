@@ -24,6 +24,9 @@ const global = {
       sessionStorage.setItem("project", calendar.project.prjctIdx)
       router.push('/pdtail/scheduler')
     },
+    setChatOn(state, item) {
+      state.chatOn = item
+    }
   },
   actions: {
 

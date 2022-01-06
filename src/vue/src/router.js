@@ -101,6 +101,8 @@ const routes = [
     beforeEnter: (to, from, next) => {
       sessionStorage.removeItem("project")
       sessionStorage.setItem("enterProject", '0')
+      sessionStorage.setItem("isChatOn", 'false')
+      store.commit('global/setChatOn', false)
       const repData = {
         url : '/token/check',
         method : 'post',
@@ -137,6 +139,8 @@ const routes = [
     beforeEnter: () => {
       const cnt = sessionStorage.getItem("enterProject")
       sessionStorage.setItem("enterProject", (parseInt(cnt) + 1) + "")
+      sessionStorage.setItem("isChatOn", 'true')
+      store.commit('global/setChatOn', true)
     },
     children: [
       {

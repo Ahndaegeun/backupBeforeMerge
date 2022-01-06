@@ -15,7 +15,7 @@
               class="chat-line"
               v-for="(line, index) in s_chatData.content"
               :key="index"
-              :class="{ 'chat-myLine': line.id == this.$store.state.git.memInfo.memNick }"
+              :class="{ 'chat-myLine': line.idx == this.$store.state.git.memInfo.memIdx }"
           >
             <ul v-if="line.line" class="date-line">
               <li class="chat-info">
@@ -24,7 +24,7 @@
             </ul>
             <div class="me-or-other-wrap">
               <!-- 상대방의 채팅에만 사진,닉네임 표시 시작 -->
-              <div v-if="this.$store.state.git.memInfo.memNick != line.id" class="chat-userInfo">
+              <div v-if="this.$store.state.git.memInfo.memIdx != line.idx" class="chat-userInfo">
                 <img v-if="line.img === '' || line.img === null" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAVCAYAAABG1c6oAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADRSURBVHgBrZQLDYMwEIb/LhMADnAwCasUJOAAHMzCLEwBm4M5AAfg4HYXWNYM+qRfck3T9L70cS3ggIg0R88x0YL0a6TAiS3ZaWNlNfnRMcI+QNjv5SqLkOBnVkqV/4Mn22T4KfYGbcI3/LwQylouPmrEwAmdQ9YhBVrK57lKprWvXTnKI5SD1/hdwCjBtzsicmXfJ2etwaAz5EkVhRW1Ka5csoHiGTbSAzJTWpjCOx3nJi5Fy3IH5KGUp9cgH40IL8jHVbY8wfJzJDCfuXkgIx+zEByVvJWBBgAAAABJRU5ErkJggg==" alt="img" />
                 <img v-else :src="line.img" alt="">
                 {{ line.id }}
@@ -32,7 +32,7 @@
               <!-- 상대방의 채팅에만 사진,닉네임 표시 끝 -->
 
               <!-- 상대방의 채팅은 회색 배경 시작 -->
-              <div class="chat-info" v-if="line.id != this.$store.state.git.memInfo.memNick">
+              <div class="chat-info" v-if="line.idx != this.$store.state.git.memInfo.memIdx">
               <span class="chat-text chat-friend">
                 {{ line.text }}
               </span>

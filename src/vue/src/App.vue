@@ -7,7 +7,7 @@
       <UserSetting v-if="$store.state.menu.isOpenUserSetting"/>
     </nav>
     <router-view></router-view>
-    <Chat v-if="$store.state.global.chatOn"/>
+    <Chat v-if="this.$store.state.global.chatOn"/>
     <!-- <SocketDetail v-if="$store.state.global.chatOn"/> -->
   </div>
 </template>
@@ -34,7 +34,7 @@ export default {
   },
   data() {
     return {
-      isEnterProject: false
+      isEnterProject: false,
     }
   },
   methods: {

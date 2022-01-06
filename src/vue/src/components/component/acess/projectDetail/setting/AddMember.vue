@@ -89,8 +89,6 @@ export default {
       }else{
         const tempRole = position
         item.tempRole = tempRole;
-        console.log(item)
-
       }
 
     },

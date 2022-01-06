@@ -25,6 +25,11 @@ const projectList = {
         return
       }
       state.member = item.projectMemberDtoList[0].member
+
+      if(item.projectMemberDtoList[0].project === null || item.projectMemberDtoList[0].project === undefined) {
+        return
+      }
+
       item.projectMemberDtoList.forEach(i => {
         state.projectList.push(i.project)
       })
@@ -50,7 +55,7 @@ const projectList = {
   },
 
   actions: {
-    
+
   }
 }
 

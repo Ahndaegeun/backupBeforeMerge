@@ -80,7 +80,7 @@ export default {
       this.axios.post( url, null, {
         params: {
           issueIdx: null,
-          "project.prjctIdx": prjctIdx,
+          "project.prjctIdx": sessionStorage.getItem("project"),
           "member.memIdx" : this.$store.state.git.memInfo.memIdx,
           issueCn: issueText,
           issueDate: moment().format('YYYY-MM-DD HH:mm:ss'),
