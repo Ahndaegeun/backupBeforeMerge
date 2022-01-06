@@ -390,9 +390,6 @@ const socket = {
                         }
                     })
                     this.stompClient.unsubscribe("/send")
-                },
-                () => {
-                    this.stompClient.connected = false
                 })
         }, // connect function end
 
